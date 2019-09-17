@@ -2,6 +2,7 @@ package kr.co.valuesys.vlog.mobile;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.TextureView;
 
 public class VideoRecordingView extends TextureView {
@@ -32,8 +33,11 @@ public class VideoRecordingView extends TextureView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
+        Log.d("aaa", "onMeasure  w = " + width + "  h  = " + height );
+
         if (0 == mRatioWidth || 0 == mRatioHeight) {
             setMeasuredDimension(width, height);
         } else {

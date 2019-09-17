@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile;
+package kr.co.valuesys.vlog.mobile.Activity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
+import kr.co.valuesys.vlog.mobile.R;
 
 public class SplashActivity extends AppCompatActivity {
 

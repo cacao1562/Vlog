@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile;
+package kr.co.valuesys.vlog.mobile.Fragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +16,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,6 +42,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -49,10 +52,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
 
 
-public class CameraFragment extends Fragment implements View.OnClickListener {
+public class CameraFragment extends Fragment implements View.OnClickListener, MediaRecorder.OnInfoListener {
 
     private static final String TAG = "VideoFragment";
     //Superbrain 대신 원하는 폴더이름을 만들면 됩니다.
@@ -139,6 +143,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            Log.d("aaa", "onSurfaceTextureSizeChanged  w = " + width + "  h  = " + height );
             if(!mIsRecordingVideo) configureTransform(width, height);
         }
 
@@ -201,7 +206,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
             }
 
             mVideoSize = chooseVideoSize(scm.getOutputSizes(MediaRecorder.class));
-            mPreviewSize = chooseOptimalSize(scm.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
+            mPreviewSize = chooseOptimalSize2(scm.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
+//            mPreviewSize = getOptimalSize(scm.getOutputSizes(SurfaceTexture.class), width, height);
 
             int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -235,6 +241,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
         List<Size> bigEnough = new ArrayList<>();
         int w = aspectRatio.getWidth();
         int h = aspectRatio.getHeight();
+        Log.d(TAG, " chooseOptimalSize size ==  w : " +w + "  h : " + h );
         for (Size ops : choices) {
 
             Log.d(TAG, " SurfaceTexture size ==  w : " + ops.getWidth() + "  h : " + ops.getHeight() );
@@ -249,6 +256,83 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
         } else {
             return choices[0];
         }
+    }
+
+    private static Size chooseOptimalSize2(Size[] choices, int width, int height, Size aspectRatio) {
+        // Collect the supported resolutions that are at least as big as the preview Surface
+        List<Size> bigEnough = new ArrayList<Size>();
+        int w = aspectRatio.getWidth();
+        int h = aspectRatio.getHeight();
+        double ratio = (double) h / w;
+        for (Size option : choices) {
+            double optionRatio = (double) option.getHeight() / option.getWidth();
+            if (ratio == optionRatio) {
+                bigEnough.add(option);
+            }
+        }
+
+        // Pick the smallest of those, assuming we found any
+        if (bigEnough.size() > 0) {
+            return Collections.min(bigEnough, new CompareSizesByArea());
+        } else {
+            Log.e(TAG, "Couldn't find any suitable preview size");
+            return choices[1];
+        }
+    }
+
+    private Size getOptimalSize(Size[] sizes, int w, int h) {
+
+        Log.d(TAG, " getOptimalSize size ==  w : " + w + "  h : " + h );
+        final double ASPECT_TOLERANCE = 0.2;
+        double targetRatio = (double) w / h;
+        if (sizes == null)
+            return null;
+        Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+        int targetHeight = h;
+        // Try to find an size match aspect ratio and size
+        for (Size size : sizes)
+        {
+//          Log.d("CameraActivity", "Checking size " + size.width + "w " + size.height + "h");
+            double ratio = (double) size.getWidth() / size.getHeight();
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE)
+                continue;
+            if (Math.abs(size.getHeight() - targetHeight) < minDiff)
+            {
+                optimalSize = size;
+                minDiff = Math.abs(size.getHeight() - targetHeight);
+            }
+        }
+        // Cannot find the one match the aspect ratio, ignore the requirement
+
+        if (optimalSize == null)
+        {
+            minDiff = Double.MAX_VALUE;
+            for (Size size : sizes) {
+                if (Math.abs(size.getHeight() - targetHeight) < minDiff)
+                {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.getHeight() - targetHeight);
+                }
+            }
+        }
+        Log.d(TAG, " getOptimalSize size return ==  w : " + optimalSize.getWidth() + "  h : " + optimalSize.getHeight() );
+        return optimalSize;
+//        SharedPreferences previewSizePref;
+//        if (cameraId == Camera.CameraInfo.CAMERA_FACING_BACK) {
+//            previewSizePref = getSharedPreferences("PREVIEW_PREF",MODE_PRIVATE);
+//        } else {
+//            previewSizePref = getSharedPreferences("FRONT_PREVIEW_PREF",MODE_PRIVATE);
+//        }
+//
+//        SharedPreferences.Editor prefEditor = previewSizePref.edit();
+//        prefEditor.putInt("width", optimalSize.width);
+//        prefEditor.putInt("height", optimalSize.height);
+//
+//        prefEditor.commit();
+
+//      Log.d("CameraActivity", "Using size: " + optimalSize.width + "w " + optimalSize.height + "h");
+
     }
 
 
@@ -325,6 +409,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
 
 
     private void configureTransform(int viewWidth, int viewHeight) {
+        Log.d("aaa", "configureTransform  w = " + viewWidth + "  h  = " + viewHeight );
         Activity activity = getActivity();
         if (null == binding.preview || null == mPreviewSize || null == activity) {
             return;
@@ -397,18 +482,31 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
         final Activity activity = getActivity();
         if(null == activity) return;
 
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
             mNextVideoAbsolutePath = getVideoFilePath();
         }
+
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+//        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+
+
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
-        mMediaRecorder.setVideoEncodingBitRate(10000000);
-        mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+//        mMediaRecorder.setVideoEncodingBitRate(10000000);
+//        mMediaRecorder.setVideoFrameRate(30);
+
+        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+
+//        mMediaRecorder.setMaxDuration(5000);
+//        mMediaRecorder.setOnInfoListener(this);
+//        DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
+//        mMediaRecorder.setVideoSize(displayMetrics.widthPixels, displayMetrics.heightPixels);
+
+//        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
+//
+//        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+//        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         switch (mSensorOrientation) {
@@ -533,6 +631,16 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    @Override
+    public void onInfo(MediaRecorder mr, int what, int extra) {
+
+        if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
+            Log.d("VIDEOCAPTURE","Maximum Duration Reached");
+//            mr.stop();
+            stopRecordingVideo();
+        }
+    }
+
     static class CompareSizesByArea implements Comparator<Size> {
         @Override
         public int compare(Size lhs, Size rhs) {
@@ -551,10 +659,10 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(timeout -> {
 
-                    if (timeout == 15) {
-                        stopRecordingVideo();
-                        return;
-                    }
+//                    if (timeout == 15) {
+//                        stopRecordingVideo();
+//                        return;
+//                    }
                     Log.d("aaa", "timeout = " + timeout );
                     long min = timeout / 60;
                     long sec = timeout % 60;
@@ -588,12 +696,36 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
     CompositeDisposable mCompositeDisposable;
 // 여기까지는 타이머 부분이기 때문에 사용안하셔도 됩니다.
 
+    private Timer timer;
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (!mCompositeDisposable.isDisposed())
             mCompositeDisposable.dispose();
+
+        if(timer != null){
+            timer.cancel();
+            timer.purge();
+            timer = null;
+        }
+    }
+
+
+    private void startTimer() {
+        timer = new Timer();                  // 3초 후에 3초 간격으로 실행
+        timer.scheduleAtFixedRate(new SliderTimer(), 1000, 1000);
+    }
+
+    private int time = 0;
+
+    private class SliderTimer extends TimerTask {
+
+        @Override
+        public void run() {
+
+            time += 1;
+        }
     }
 }
 

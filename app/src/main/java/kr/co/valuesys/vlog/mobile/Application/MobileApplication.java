@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile;
+package kr.co.valuesys.vlog.mobile.Application;
 
 import android.app.Application;
 

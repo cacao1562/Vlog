@@ -2,6 +2,7 @@ package kr.co.valuesys.vlog.mobile;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -52,6 +53,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             Toast.makeText(context, "show video " , Toast.LENGTH_SHORT).show();
 //            ShowVideoDialog dialog = new ShowVideoDialog(activity, uri, activity);
 //            dialog.show();
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "video/*");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
         });
 
     }

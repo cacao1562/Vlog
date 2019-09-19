@@ -62,7 +62,7 @@ import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
 
 
-public class CameraFragment extends Fragment implements View.OnClickListener, MediaRecorder.OnInfoListener, InputFileNameDialog.OnInputDialogListener {
+public class CameraFragment extends Fragment implements View.OnClickListener, MediaRecorder.OnInfoListener, InputFileNameDialog.OnInputDialogListener, MediaRecorder.OnErrorListener {
 
     private static final String TAG = "CameraFragment";
     //Superbrain 대신 원하는 폴더이름을 만들면 됩니다.
@@ -104,6 +104,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_camera, container, false);
         mCamId = CAM_REAR;
         mCompositeDisposable = new CompositeDisposable();
@@ -112,8 +113,36 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         binding.pictureBtn.setOnClickListener(this);
         binding.switchImgBtn.setOnClickListener(this);
+
+        binding.closeImgbutton.setOnClickListener(v -> {
+            getActivity().finish();
+        });
+
+        binding.cancleVideoBtn.setOnClickListener(v -> {
+
+            binding.cancleVideoBtn.setVisibility(View.INVISIBLE);
+            binding.saveVideoBtn.setVisibility(View.INVISIBLE);
+
+            try {
+                mMediaRecorder.reset();
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            startPreview();
+
+        });
+
+        binding.saveVideoBtn.setOnClickListener(v -> {
+
+            InputFileNameDialog inputFileNameDialog = InputFileNameDialog.newInstance();
+            inputFileNameDialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+            inputFileNameDialog.show(this.getChildFragmentManager(), "dialog");
+        });
+
     }
 
     @Override
@@ -250,6 +279,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
             mCameraManager.openCamera(mCamId, mStateCallback, mBackgroundHandler);
 
         } catch (CameraAccessException | SecurityException | NullPointerException | InterruptedException e) {
+            Log.d("exception", "e = " + e.toString() );
             e.printStackTrace();
             activity.finish();
         }
@@ -352,6 +382,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            Log.d("exception", "e = " + e.toString() );
         }
     }
 
@@ -368,6 +399,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
         } catch (CameraAccessException e) {
             e.printStackTrace();
+            Log.d("exception", "e = " + e.toString() );
         }
 
     }
@@ -431,6 +463,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("exception", "e = " + e.toString() );
         }
     }
 
@@ -484,6 +517,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 //촬영 맥스 시간 설정 1000 = 1초
         mMediaRecorder.setMaxDuration(5000);
         mMediaRecorder.setOnInfoListener(this);
+        mMediaRecorder.setOnErrorListener(this);
 
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
 //
@@ -554,7 +588,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
                         binding.pictureBtn.setText(R.string.stop);
                         mIsRecordingVideo = true;
 
-                        mMediaRecorder.start();
+                        try {
+                            mMediaRecorder.start();
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                     });
                 }
 
@@ -563,16 +602,18 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
                     Activity activity = getActivity();
                     if (null != activity) {
-                        Toast.makeText(activity, "Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, "onConfigureFailed", Toast.LENGTH_SHORT).show();
                     }
                 }
 
             }, mBackgroundHandler);
 
+            binding.switchImgBtn.setVisibility(View.INVISIBLE);
             timer();
 
         } catch (CameraAccessException | IOException e) {
             e.printStackTrace();
+            Log.d("exception", "e = " + e.toString() );
         }
 
     }
@@ -582,8 +623,15 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
         mIsRecordingVideo = false;
         binding.pictureBtn.setText(R.string.record);
-        mMediaRecorder.stop();
-        mMediaRecorder.reset();
+
+        try {
+            mMediaRecorder.stop();
+            mMediaRecorder.reset();
+        }catch (Exception e) {
+            e.printStackTrace();
+            Log.d("exception", "e = " + e.toString() );
+        }
+
 
         Activity activity = getActivity();
 
@@ -610,13 +658,28 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
         binding.pictureBtn.setText(R.string.record);
         stop();
 
+        binding.cancleVideoBtn.setVisibility(View.VISIBLE);
+        binding.saveVideoBtn.setVisibility(View.VISIBLE);
+
+        try {
+            mCameraCaptureSession.stopRepeating();
+            mCameraCaptureSession.abortCaptures();
+        }catch (Exception e) {
+            e.printStackTrace();
+            Log.d("exception", "e = " + e.toString() );
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 
 // pause 함수가 api24이상 부터 지원, 안드로이드 7.0 (하위 버전은 어떻게 해야할지 다시 봐야함)
-            mMediaRecorder.pause();
-            InputFileNameDialog inputFileNameDialog = InputFileNameDialog.newInstance();
-            inputFileNameDialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
-            inputFileNameDialog.show(this.getChildFragmentManager(), "dialog");
+            try {
+
+                mMediaRecorder.pause();
+
+            }catch (Exception e) {
+                e.printStackTrace();
+                Log.d("exception", "e = " + e.toString() );
+            }
 
         }
     }
@@ -665,12 +728,21 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
     }
 
+    @Override
+    public void onError(MediaRecorder mr, int what, int extra) {
+        Log.d("listener", "onError // waht = " + what + "  extra = " + extra );
+        if (what == MediaRecorder.MEDIA_ERROR_SERVER_DIED) {
+            Log.d("listener", "onError // MEDIA_ERROR_SERVER_DIED " );
+        }
+    }
+
 // max duration 최대 촬영 시간이 되면 콜백
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
 
+        Log.d("listener", "onInfo // what = " + what + " extra = " + extra );
+
         if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
-            Log.d("VIDEOCAPTURE","Maximum Duration Reached");
 //            mr.stop();
 //            stopRecordingVideo();
             pauseRecording();
@@ -681,8 +753,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
     @Override
     public void onClickSave(String newFileName) {
 
-        mMediaRecorder.stop();
-        mMediaRecorder.reset();
+        try {
+            mMediaRecorder.stop();
+            mMediaRecorder.reset();
+        }catch (Exception e) {
+
+        }
 
         File file = new File( mNextVideoAbsolutePath );
         File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
@@ -713,6 +789,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
         startPreview();
 
     }
+
+
 
     static class CompareSizesByArea implements Comparator<Size> {
         @Override

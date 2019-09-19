@@ -110,6 +110,11 @@ public class VideoListFragment extends Fragment {
 
         }
 
+        if (videoList.size() == 0) {
+            binding.videoListEmptyview.setVisibility(View.VISIBLE);
+        }else {
+            binding.videoListEmptyview.setVisibility(View.GONE);
+        }
         cursor.close();
         return videoList;
     }

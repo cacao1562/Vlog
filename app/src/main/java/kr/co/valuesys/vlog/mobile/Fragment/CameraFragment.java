@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.graphics.Matrix;
-import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -17,7 +16,6 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -27,10 +25,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -52,11 +48,6 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import kr.co.valuesys.vlog.mobile.InputFileNameDialog;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
@@ -68,7 +59,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
     //Superbrain 대신 원하는 폴더이름을 만들면 됩니다.
     private static final String DETAIL_PATH = "DCIM/TestVideo/";
 
-    FragmentCameraBinding binding;
+    private FragmentCameraBinding binding;
 
     // 카메라 광각, 전면, 후면
     private static final String CAM_WHAT = "2";
@@ -77,22 +68,22 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
     private String mCamId;
 
-    CameraCaptureSession mCameraCaptureSession;
-    CameraDevice mCameraDevice;
-    CameraManager mCameraManager;
+    private CameraCaptureSession mCameraCaptureSession;
+    private CameraDevice mCameraDevice;
+    private CameraManager mCameraManager;
 
-    Size mVideoSize;
-    Size mPreviewSize;
-    CaptureRequest.Builder mCaptureRequestBuilder;
+    private Size mVideoSize;
+    private Size mPreviewSize;
+    private CaptureRequest.Builder mCaptureRequestBuilder;
 
-    int mSensorOrientation;
+    private int mSensorOrientation;
 
-    Semaphore mSemaphore = new Semaphore(1);
+    private Semaphore mSemaphore = new Semaphore(1);
 
-    HandlerThread mBackgroundThread;
-    Handler mBackgroundHandler;
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
 
-    MediaRecorder mMediaRecorder;
+    private MediaRecorder mMediaRecorder;
 
     private String mNextVideoAbsolutePath;
     private boolean mIsRecordingVideo;
@@ -107,7 +98,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_camera, container, false);
         mCamId = CAM_REAR;
-        mCompositeDisposable = new CompositeDisposable();
         return binding.getRoot();
     }
 
@@ -123,8 +113,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
         binding.cancleVideoBtn.setOnClickListener(v -> {
 
-            binding.cancleVideoBtn.setVisibility(View.INVISIBLE);
-            binding.saveVideoBtn.setVisibility(View.INVISIBLE);
+            resetUI();
 
             try {
                 mMediaRecorder.reset();
@@ -226,16 +215,21 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
     //카메라 기능 호출
     private void openCamera(int width, int height) {
+
         Activity activity = getActivity();
         assert activity != null;
         mCameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+
         try {
+
             if (!mSemaphore.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
+
             CameraCharacteristics cc = mCameraManager.getCameraCharacteristics(mCamId);
             StreamConfigurationMap scm = cc.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mSensorOrientation = cc.get(CameraCharacteristics.SENSOR_ORIENTATION);
+
             if (scm == null) {
                 throw new RuntimeException("Cannot get available preview/video sizes");
             }
@@ -506,23 +500,27 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
 
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
 
-        mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
-        mMediaRecorder.setVideoEncodingBitRate(10000000);
+        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+
+        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
+
         mMediaRecorder.setVideoFrameRate(30);
+
+        mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
+
+        mMediaRecorder.setVideoEncodingBitRate(10000000);
 
 //        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
 
 //촬영 맥스 시간 설정 1000 = 1초
-        mMediaRecorder.setMaxDuration(5000);
+        mMediaRecorder.setMaxDuration(15000);
         mMediaRecorder.setOnInfoListener(this);
         mMediaRecorder.setOnErrorListener(this);
 
-        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-//
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
 
         int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
 
@@ -609,7 +607,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
             }, mBackgroundHandler);
 
             binding.switchImgBtn.setVisibility(View.INVISIBLE);
-            timer();
+//            timer();
+            startTimer();
 
         } catch (CameraAccessException | IOException e) {
             e.printStackTrace();
@@ -646,7 +645,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
         }
 
         mNextVideoAbsolutePath = null;
-        stop();
+//        stop();
+        stopTimer();
         startPreview();
 
     }
@@ -655,8 +655,10 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
     private void pauseRecording() {
 
         mIsRecordingVideo = false;
-        binding.pictureBtn.setText(R.string.record);
-        stop();
+        binding.pictureBtn.setVisibility(View.INVISIBLE);
+//        binding.pictureBtn.setText(R.string.record);
+//        stop();
+        stopTimer();
 
         binding.cancleVideoBtn.setVisibility(View.VISIBLE);
         binding.saveVideoBtn.setVisibility(View.VISIBLE);
@@ -697,7 +699,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
             case R.id.pictureBtn:
 
                 if (mIsRecordingVideo) {
-                    stopRecordingVideo();
+//                    stopRecordingVideo();
+                    pauseRecording();
                 } else {
                     startRecordingVideo();
                 }
@@ -753,11 +756,13 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
     @Override
     public void onClickSave(String newFileName) {
 
+        resetUI();
+
         try {
             mMediaRecorder.stop();
             mMediaRecorder.reset();
         }catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         File file = new File( mNextVideoAbsolutePath );
@@ -799,53 +804,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
         }
     }
 
-    // 여기부터
-//녹화시간 카운트 시작
-    private void timer() {
 
-        Log.d(TAG, "timer started");
 
-        binding.recordTimeTxtView.setVisibility(View.VISIBLE);
 
-        Observable<Long> duration = Observable.interval(1, TimeUnit.SECONDS)
-                .map(sec -> sec += 1);
-
-        Disposable disposable = duration.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(timeout -> {
-
-                    long min = timeout / 60;
-                    long sec = timeout % 60;
-
-                    String sMin;
-                    String sSec;
-
-                    if (min < 10) sMin = "0" + min;
-                    else sMin = String.valueOf(min);
-
-                    if (sec < 10) sSec = "0" + sec;
-                    else sSec = String.valueOf(sec);
-
-                    String elapseTime = sMin + ":" + sSec;
-                    binding.recordTimeTxtView.setText(elapseTime);
-
-                });
-
-        mCompositeDisposable.add(disposable);
-
-    }
-
-    //녹화시간 카운트 정지
-    private void stop() {
-
-        binding.recordTimeTxtView.setVisibility(View.INVISIBLE);
-
-        if (!mCompositeDisposable.isDisposed()) {
-            mCompositeDisposable.dispose();
-        }
-    }
-
-    CompositeDisposable mCompositeDisposable;
 // 여기까지는 타이머 부분이기 때문에 사용안하셔도 됩니다.
 
     private Timer timer;
@@ -854,8 +815,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
     public void onDestroyView() {
         super.onDestroyView();
 
-        if (!mCompositeDisposable.isDisposed())
-            mCompositeDisposable.dispose();
+        Log.d(TAG, "onDestroyView call");
 
         if(timer != null){
             timer.cancel();
@@ -865,21 +825,55 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Me
     }
 
 
-//    private void startTimer() {
-//        timer = new Timer();                  // 3초 후에 3초 간격으로 실행
-//        timer.scheduleAtFixedRate(new SliderTimer(), 1000, 1000);
-//    }
-//
-//    private int time = 0;
-//
-//    private class SliderTimer extends TimerTask {
-//
-//        @Override
-//        public void run() {
-//
-//            time += 1;
-//        }
-//    }
+    private void startTimer() {
+        time = 0;
+        timer = new Timer();                  // 1초 후에 1초 간격으로 실행
+        timer.scheduleAtFixedRate(new SliderTimer(), 1000, 1000);
+    }
+
+    private void stopTimer() {
+        time = 0;
+        timer.cancel();
+        timer = null;
+    }
+
+    private int time = 0;
+
+    private class SliderTimer extends TimerTask {
+
+        @Override
+        public void run() {
+
+            time += 1;
+
+            long min = time / 60;
+            long sec = time % 60;
+
+            String sMin;
+            String sSec;
+
+            if (min < 10) sMin = "0" + min;
+            else sMin = String.valueOf(min);
+
+            if (sec < 10) sSec = "0" + sec;
+            else sSec = String.valueOf(sec);
+
+            String elapseTime = sMin + ":" + sSec;
+            binding.recordTimeTxtView.setText(elapseTime);
+
+        }
+    }
+
+    private void resetUI() {
+
+        binding.cancleVideoBtn.setVisibility(View.INVISIBLE);
+        binding.saveVideoBtn.setVisibility(View.INVISIBLE);
+        binding.pictureBtn.setVisibility(View.VISIBLE);
+        binding.pictureBtn.setText(R.string.record);
+        binding.switchImgBtn.setVisibility(View.VISIBLE);
+        binding.recordTimeTxtView.setText("00:00");
+
+    }
 
 }
 

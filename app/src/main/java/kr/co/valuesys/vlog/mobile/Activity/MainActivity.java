@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.main_container, videoListFragment).commit();
-
 //        binding.bottomView.getMenu().getItem(0).setCheckable(false);
 
 //        binding.bottomView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -79,4 +78,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        getSupportFragmentManager().beginTransaction().detach(videoListFragment).attach(videoListFragment).commit();
+    }
 }

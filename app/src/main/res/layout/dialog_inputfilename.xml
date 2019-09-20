@@ -80,6 +80,7 @@
                 android:layout_height="match_parent"
                 android:hint="Site name"
                 android:inputType="text"
+                android:maxLength="15"
                 android:textSize="15dp" />
 
 

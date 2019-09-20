@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
@@ -50,8 +52,16 @@ public class VideoListFragment extends Fragment {
         binding.videoListRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         VideoListAdapter adapter = new VideoListAdapter(getActivity());
         binding.videoListRecyclerview.setAdapter(adapter);
-        getVideo();
-        adapter.setUp(getVideo());
+
+        ArrayList<VideoInfo> sortedInfo = getVideo();
+         Collections.sort(sortedInfo, new Comparator<VideoInfo>() {
+            @Override
+            public int compare(VideoInfo o1, VideoInfo o2) {
+                return o2.getDate().compareTo(o1.getDate());
+            }
+        });
+
+        adapter.setUp(sortedInfo);
 
         return binding.getRoot();
 //        return inflater.inflate(R.layout.fragment_video_list, container, false);
@@ -87,16 +97,20 @@ public class VideoListFragment extends Fragment {
                 long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));
                 Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
 
+                if (bitmap == null) {
+                    continue;
+                }
 //                Log.d("aaa", "bitmap  w = " + bitmap.getWidth() + "  h = " + bitmap.getHeight() );
                 // 썸네일 크기 변경할 때.
 //                Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bitmap, 1024, 1024);
                 String data = cursor.getString(2);
 
+                long dateTime = cursor.getLong(4);
 
                 SimpleDateFormat format = new SimpleDateFormat ( "yyyy년 MM월dd일 HH시mm분ss초");
-                String format_time = format.format ( new Date(cursor.getLong(4)) );
+                String format_time = format.format ( new Date( dateTime ) );
 
-                videoList.add(new VideoInfo(title, bitmap, Uri.parse(data), format_time));
+                videoList.add( new VideoInfo(title, bitmap, Uri.parse(data), format_time) );
 
 //                Log.d("aaa", "cursor getstring id = " + cursor.getString(0) );
 //                Log.d("aaa", "cursor getstring title = " + title );

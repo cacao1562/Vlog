@@ -1,9 +1,12 @@
 package kr.co.valuesys.vlog.mobile.Activity;
 
 import android.databinding.DataBindingUtil;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.CameraFragment;
@@ -13,6 +16,10 @@ import kr.co.valuesys.vlog.mobile.databinding.ActivityBlankBinding;
 public class BlankActivity extends AppCompatActivity implements AppInfoFragment.OnAppInfoListener {
 
     private ActivityBlankBinding binding;
+
+    public interface OnBackPressedListener {
+        void onBackPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,4 +56,21 @@ public class BlankActivity extends AppCompatActivity implements AppInfoFragment.
     }
 
 
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        if (fragmentList != null) {
+            //TODO: Perform your logic to pass back press here
+            for(Fragment fragment : fragmentList){
+                if(fragment instanceof OnBackPressedListener){
+                    ((OnBackPressedListener)fragment).onBackPressed();
+                }else {
+                    super.onBackPressed();
+                }
+            }
+        }else {
+            super.onBackPressed();
+        }
+    }
 }

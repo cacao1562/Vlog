@@ -73,7 +73,7 @@
                 android:text="/record" />
 
             <ImageButton
-                android:id="@+id/cancleVideoBtn"
+                android:id="@+id/removeVideoBtn"
                 style="@android:style/Widget.Material.Light.Button.Borderless"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"

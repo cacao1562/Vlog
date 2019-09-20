@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.VideoListAdapter;
@@ -30,6 +31,7 @@ import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
 public class VideoListFragment extends Fragment {
 
     private FragmentVideoListBinding binding;
+    private VideoListAdapter adapter;
 
     public static VideoListFragment newInstance() {
 
@@ -50,23 +52,38 @@ public class VideoListFragment extends Fragment {
 
         binding.videoListRecyclerview.setHasFixedSize(true);
         binding.videoListRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
-        VideoListAdapter adapter = new VideoListAdapter(getActivity());
+        adapter = new VideoListAdapter(getActivity());
         binding.videoListRecyclerview.setAdapter(adapter);
 
+        adapter.setUp(getSortedVideo());
+
+        return binding.getRoot();
+//        return inflater.inflate(R.layout.fragment_video_list, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        adapter.setUp(getSortedVideo());
+    }
+
+
+// date 날짜 기준으로 비디오 리스트를 내림차순 정렬
+    private ArrayList<VideoInfo> getSortedVideo() {
+
         ArrayList<VideoInfo> sortedInfo = getVideo();
-         Collections.sort(sortedInfo, new Comparator<VideoInfo>() {
+        Collections.sort(sortedInfo, new Comparator<VideoInfo>() {
             @Override
             public int compare(VideoInfo o1, VideoInfo o2) {
                 return o2.getDate().compareTo(o1.getDate());
             }
         });
 
-        adapter.setUp(sortedInfo);
-
-        return binding.getRoot();
-//        return inflater.inflate(R.layout.fragment_video_list, container, false);
+        return sortedInfo;
     }
 
+// 전체 비디오 목록 에서 앨범 이름이 TestVideo 인 것만 리스트에 추가
     private ArrayList<VideoInfo> getVideo() {
 
         String[] proj = {
@@ -91,7 +108,7 @@ public class VideoListFragment extends Fragment {
 
         while (cursor.moveToNext()) {
 
-            if (cursor.getString(3).equals("TestVideo")) {
+            if (cursor.getString(3).equals(Constants.Video_Folder_Name)) {
 
                 String title = cursor.getString(1);
                 long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));

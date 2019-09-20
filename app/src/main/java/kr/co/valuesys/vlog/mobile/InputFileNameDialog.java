@@ -1,19 +1,17 @@
 package kr.co.valuesys.vlog.mobile;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.databinding.DialogInputfilenameBinding;
 
 public class InputFileNameDialog extends DialogFragment {
@@ -74,13 +72,16 @@ public class InputFileNameDialog extends DialogFragment {
 
             }else {
 
+                if (mListener != null) {
+                    mListener.onClickSave(binding.fileNameEdittext.getText().toString());
+                }
+
                 AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "저장 되었습니다.", false, dialog -> {
 
-                    if (mListener != null) {
-                        mListener.onClickSave(binding.fileNameEdittext.getText().toString());
-                    }
+
                     dialog.dismiss(); // AlertDialog dismiss
                     dismiss();       // DialogFragment dismiss
+                    getActivity().finish();
 
                 });
 

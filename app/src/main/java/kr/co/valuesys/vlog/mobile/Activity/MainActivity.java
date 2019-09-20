@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        getSupportFragmentManager().beginTransaction().detach(videoListFragment).attach(videoListFragment).commit();
+        Log.d("aaa", "============== main onResume ");
+//        getSupportFragmentManager().beginTransaction().detach(videoListFragment).attach(videoListFragment).commit();
     }
 }

@@ -1,9 +1,12 @@
 package kr.co.valuesys.vlog.mobile.Activity;
 
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.util.List;
@@ -21,10 +24,15 @@ public class BlankActivity extends AppCompatActivity implements AppInfoFragment.
         void onBackPressed();
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_blank);
+
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_blank);
 
         if (getIntent() != null) {

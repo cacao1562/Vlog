@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile;
+package kr.co.valuesys.vlog.mobile.Common;
 
 import android.app.AlertDialog;
 import android.content.Context;

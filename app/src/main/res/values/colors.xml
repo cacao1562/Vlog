@@ -9,4 +9,6 @@
     <color name="gray">#C1B8B8B8</color>
     <color name="clear">#00000000</color>
     <color name="bottomback">#7284D1</color>
+
+    <color name="input_cursor">#35B3DB</color>
 </resources>

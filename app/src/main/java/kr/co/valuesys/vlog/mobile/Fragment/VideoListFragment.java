@@ -141,9 +141,6 @@ public class VideoListFragment extends Fragment {
 
                 }
 
-            }else {
-
-                break;
             }
 
         }

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import kr.co.valuesys.vlog.mobile.Dialog.VideoPlayDialog;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.databinding.VideoItemBinding;
 
@@ -50,14 +53,18 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         binding.itemDateTextview.setText(date);
         //다이얼로그로 동영상의 Uri를 보내며 다이얼로그를 띄우는코드.
         binding.itemThumbnailImgview.setOnClickListener(view -> {
-            Toast.makeText(context, "show video " , Toast.LENGTH_SHORT).show();
-//            ShowVideoDialog dialog = new ShowVideoDialog(activity, uri, activity);
-//            dialog.show();
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setDataAndType(uri, "video/*");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+
+//            Toast.makeText(context, "show video " , Toast.LENGTH_SHORT).show();
+
+            VideoPlayDialog dialog = VideoPlayDialog.newInstance(uri.toString());
+            dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+            dialog.show(((AppCompatActivity)activity).getSupportFragmentManager(), "dialog");
+
+//            Intent intent = new Intent();
+//            intent.setAction(Intent.ACTION_VIEW);
+//            intent.setDataAndType(uri, "video/*");
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            context.startActivity(intent);
         });
 
     }

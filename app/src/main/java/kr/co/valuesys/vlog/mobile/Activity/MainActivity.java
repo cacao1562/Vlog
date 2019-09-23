@@ -2,12 +2,14 @@ package kr.co.valuesys.vlog.mobile.Activity;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.MenuItem;
 
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
@@ -66,6 +68,15 @@ public class MainActivity extends AppCompatActivity {
         binding.mainInfoImgbutton.setOnClickListener(v -> { presentBlankActivity(0); });
         binding.mainRecordImgbutton.setOnClickListener(v -> { presentBlankActivity(1); });
         binding.mainCalendarImgbutton.setOnClickListener(v -> { presentBlankActivity(2); });
+
+// 기기 해상도
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        display.getRealSize(size);
+        int screen_width = size.x;
+        int screen_height = size.y;
+        Log.d("MainActivity" , " w = " + screen_width + " h = " + screen_height) ;
 
     }
 

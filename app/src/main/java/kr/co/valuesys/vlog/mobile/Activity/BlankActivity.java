@@ -66,6 +66,10 @@ public class BlankActivity extends AppCompatActivity implements AppInfoFragment.
 
     @Override
     public void onBackPressed() {
+
+        if (getIntent().getIntExtra("id", -1) == 2 ) {
+            super.onBackPressed();
+        }
 //        super.onBackPressed();
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         if (fragmentList != null) {

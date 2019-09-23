@@ -25,6 +25,8 @@ public class VideoRecordingView extends TextureView {
         if (width < 0 || height < 0) {
             throw new IllegalArgumentException("Size cannot be negative.");
         }
+        Log.d("aaa", "setAspectRatio  mRatioWidth = " + mRatioWidth + "  mRatioHeight  = " + mRatioHeight );
+        Log.d("aaa", "setAspectRatio  width = " + width + "  height  = " + height );
         mRatioWidth = width;
         mRatioHeight = height;
         requestLayout();
@@ -43,8 +45,10 @@ public class VideoRecordingView extends TextureView {
         } else {
             if (width < height * mRatioWidth / mRatioHeight) {
                 setMeasuredDimension(width, width * mRatioHeight / mRatioWidth);
+                Log.d("aaa", "w < h  // w = " + width + "  h  = " + width * mRatioHeight / mRatioWidth );
             } else {
                 setMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
+                Log.d("aaa", "w > h //  w = " + height * mRatioWidth / mRatioHeight + "  h  = " + height );
             }
         }
     }

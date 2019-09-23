@@ -108,26 +108,28 @@ public class VideoListFragment extends Fragment {
 
         while (cursor.moveToNext()) {
 
-            if (cursor.getString(3).equals(Constants.Video_Folder_Name)) {
+            if (cursor.getString(3) != null) {
 
-                String title = cursor.getString(1);
-                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));
-                Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
+                if (cursor.getString(3).equals(Constants.Video_Folder_Name)) {
 
-                if (bitmap == null) {
-                    continue;
-                }
+                    String title = cursor.getString(1);
+                    long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));
+                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
+
+                    if (bitmap == null) {
+                        continue;
+                    }
 //                Log.d("aaa", "bitmap  w = " + bitmap.getWidth() + "  h = " + bitmap.getHeight() );
-                // 썸네일 크기 변경할 때.
+                    // 썸네일 크기 변경할 때.
 //                Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bitmap, 1024, 1024);
-                String data = cursor.getString(2);
+                    String data = cursor.getString(2);
 
-                long dateTime = cursor.getLong(4);
+                    long dateTime = cursor.getLong(4);
 
-                SimpleDateFormat format = new SimpleDateFormat ( "yyyy년 MM월dd일 HH시mm분ss초");
-                String format_time = format.format ( new Date( dateTime ) );
+                    SimpleDateFormat format = new SimpleDateFormat ( "yyyy년 MM월dd일 HH시mm분ss초");
+                    String format_time = format.format ( new Date( dateTime ) );
 
-                videoList.add( new VideoInfo(title, bitmap, Uri.parse(data), format_time) );
+                    videoList.add( new VideoInfo(title, bitmap, Uri.parse(data), format_time) );
 
 //                Log.d("aaa", "cursor getstring id = " + cursor.getString(0) );
 //                Log.d("aaa", "cursor getstring title = " + title );
@@ -137,6 +139,11 @@ public class VideoListFragment extends Fragment {
 //
 //                Log.d("aaa", "cursor date 22 === " + format_time );
 
+                }
+
+            }else {
+
+                break;
             }
 
         }

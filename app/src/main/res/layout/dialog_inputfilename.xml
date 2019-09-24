@@ -11,31 +11,32 @@
             android:id="@+id/backButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
-            android:src="@android:drawable/ic_input_delete"
+            style="@android:style/Widget.Material.Light.Button.Borderless.Small"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/btn_arrow"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/line"/>
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
             android:text="저장정보"
             android:textSize="22dp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/line"/>
 
         <View
             android:id="@+id/line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="58dp"
             android:background="@color/black"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/text1"
@@ -61,38 +62,63 @@
             app:layout_constraintTop_toBottomOf="@+id/text1" />
 
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/inputlayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        <!--<android.support.design.widget.TextInputLayout-->
+            <!--android:id="@+id/inputlayout"-->
+            <!--style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="50dp"-->
+            <!--android:layout_marginLeft="40dp"-->
+            <!--android:layout_marginTop="30dp"-->
+            <!--android:layout_marginRight="40dp"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/text2">-->
+
+            <!--<android.support.design.widget.TextInputEditText-->
+
+                <!--android:id="@+id/file_name_edittext"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:hint="Site name"-->
+                <!--android:inputType="text"-->
+                <!--android:maxLength="15"-->
+                <!--android:textSize="15dp" />-->
+
+
+        <!--</android.support.design.widget.TextInputLayout>-->
+
+        <EditText
+            android:id="@+id/file_name_edittext"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:hint="video name"
+            android:inputType="text"
+            android:maxLength="15"
+            android:textSize="15dp"
+            android:paddingLeft="10dp"
+            android:background="@drawable/input_border"
+            android:textCursorDrawable="@color/input_cursor"
             android:layout_marginLeft="40dp"
             android:layout_marginTop="30dp"
             android:layout_marginRight="40dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text2">
-
-            <android.support.design.widget.TextInputEditText
-
-                android:id="@+id/file_name_edittext"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="Site name"
-                android:inputType="text"
-                android:maxLength="15"
-                android:textSize="15dp" />
-
-
-        </android.support.design.widget.TextInputLayout>
+            app:layout_constraintTop_toBottomOf="@+id/text2" />
 
 
         <Button
             android:id="@+id/save_button"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="저장"
+            android:layout_width="0dp"
+            android:layout_height="55.2dp"
+            android:text="저 장"
+            android:letterSpacing="-0.03"
+            android:lineSpacingExtra="-2sp"
+            android:textColor="@color/black"
+            android:background="@color/input_cursor"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
+
 
     </android.support.constraint.ConstraintLayout>
 

@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="65dp"
             android:orientation="horizontal"
-            android:background="@color/bottomback"
+            android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageButton
@@ -43,7 +43,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/clear"
-                android:src="@android:drawable/ic_menu_info_details"/>
+                android:src="@drawable/ico_info"/>
 
             <ImageButton
                 android:id="@+id/main_record_imgbutton"
@@ -51,7 +51,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/clear"
-                android:src="@android:drawable/ic_menu_camera"/>
+                android:src="@drawable/ico_playlist"/>
 
             <ImageButton
                 android:id="@+id/main_calendar_imgbutton"
@@ -59,7 +59,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@color/clear"
-                android:src="@android:drawable/ic_menu_my_calendar"/>
+                android:src="@drawable/ico_calendar"/>
 
         </LinearLayout>
 

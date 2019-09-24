@@ -19,9 +19,10 @@
 
             <ImageButton
                 android:id="@+id/videoPlay_backButton"
+                style="@android:style/Widget.Material.Light.Button.Borderless.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_input_delete"/>
+                android:src="@drawable/btn_arrow"/>
 
         </LinearLayout>
 
@@ -45,7 +46,7 @@
                 android:layout_gravity="center"
                 android:visibility="gone"
                 tools:visibility="visible"
-                android:src="@android:drawable/ic_media_play"/>
+                android:src="@drawable/ico_play"/>
 
         </FrameLayout>
 

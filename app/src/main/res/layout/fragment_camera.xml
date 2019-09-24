@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,10 +20,10 @@
             android:id="@+id/close_imgbutton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@android:style/Widget.Material.Light.Button.Borderless.Small"
             android:layout_marginTop="50dp"
             android:layout_marginLeft="20dp"
-            android:background="@color/clear"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:src="@drawable/btn_close"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"/>
 
@@ -41,60 +42,71 @@
             android:textColor="@color/black" />
 
 
-        <LinearLayout
-            android:id="@+id/control"
-            android:layout_width="0dp"
-            android:layout_height="100dp"
-            android:background="@color/clear"
-            android:orientation="horizontal"
-            android:layout_marginBottom="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent">
+
 
             <ImageButton
                 android:id="@+id/switchImgBtn"
                 style="@android:style/Widget.Material.Light.Button.Borderless"
-                android:layout_width="50dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="1"
                 android:contentDescription="/description_info"
                 android:padding="20dp"
-                android:src="@android:drawable/ic_menu_revert" />
+                android:layout_weight="1"
+                android:src="@drawable/btn_change"
+                android:layout_marginBottom="50dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
 
-            <Button
+            <ImageButton
                 android:id="@+id/pictureBtn"
+                style="@android:style/Widget.Material.Light.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:text="/record" />
+                android:src="@drawable/btn_start_de"
+                android:text="/record"
+                android:layout_marginBottom="50dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
-            <ImageButton
-                android:id="@+id/removeVideoBtn"
-                style="@android:style/Widget.Material.Light.Button.Borderless"
-                android:layout_width="50dp"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="/description_info"
-                android:padding="20dp"
-                android:src="@android:drawable/ic_delete"
-                android:visibility="invisible"/>
+                android:orientation="horizontal"
+                android:layout_marginBottom="50dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
-            <ImageButton
-                android:id="@+id/saveVideoBtn"
-                style="@android:style/Widget.Material.Light.Button.Borderless"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="/description_info"
-                android:padding="20dp"
-                android:src="@android:drawable/ic_input_add"
-                android:visibility="invisible"/>
+                <ImageButton
+                    android:id="@+id/removeVideoBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="/description_info"
+                    android:padding="20dp"
+                    android:background="@color/clear"
+                    android:src="@drawable/btn_del"
+                    android:visibility="invisible"
+                    tools:visibility="visible"/>
 
-        </LinearLayout>
+                <ImageButton
+                    android:id="@+id/saveVideoBtn"
+                    style="@android:style/Widget.Material.Light.Button.Borderless.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="/description_info"
+                    android:padding="20dp"
+                    android:src="@drawable/btn_save"
+                    android:visibility="invisible"
+                    tools:visibility="visible"/>
+
+            </LinearLayout>
+
 
     </android.support.constraint.ConstraintLayout>
 

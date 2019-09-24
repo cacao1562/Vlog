@@ -117,7 +117,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         display.getRealSize(size);
         mScreen_width = size.x;
         mScreen_height = size.y;
-
+        Log.d("zzz", "screen w = " + mScreen_width + " h = " + mScreen_height );
     }
 
     @Nullable
@@ -228,7 +228,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
                 stopTimer();
                 binding.recordTimeTxtView.setText("00L00");
-                binding.pictureBtn.setText(R.string.record);
+                binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
 
                 try {
                     mMediaRecorder.stop();
@@ -412,6 +412,10 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //            if(size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080){
 //                return size;
 //            }
+            if ( (size.getWidth() - mScreen_height) > 50 || (size.getHeight() - mScreen_width) > 50 ) {
+                continue;
+            }
+
             if (size.getWidth() == mScreen_height && size.getHeight() == mScreen_width) {
                 return size;
             }
@@ -759,7 +763,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
                     mCameraCaptureSession = session;
                     updatePreview();
                     getActivity().runOnUiThread(() -> {
-                        binding.pictureBtn.setText(R.string.stop);
+                        binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_on));
                         mIsRecordingVideo = true;
                         try {
                             mMediaRecorder.start();
@@ -1070,7 +1074,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         binding.removeVideoBtn.setVisibility(View.INVISIBLE);
         binding.saveVideoBtn.setVisibility(View.INVISIBLE);
         binding.pictureBtn.setVisibility(View.VISIBLE);
-        binding.pictureBtn.setText(R.string.record);
+        binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
         binding.switchImgBtn.setVisibility(View.VISIBLE);
         binding.recordTimeTxtView.setText("00:00");
 

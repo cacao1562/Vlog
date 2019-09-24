@@ -199,8 +199,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         if (binding.preview.isAvailable()) {
 
-            Log.d(TAG, "==================================== onResume ===  preview isAvailable true");
             openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+            Log.d(TAG, "==================================== onResume ===  preview isAvailable true ");
+            Log.d(TAG, "==================================== onResume ===  preview isAvailable  w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight());
 
         } else {
 
@@ -214,32 +215,50 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         Log.d(TAG, "==================================== onPause ===");
 
-        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
+//        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
+//
+//
+//        }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
+//
+//
+//        }else if (mIsRecordingVideo) {
+//
+//            if (mNextVideoAbsolutePath != null) {
+//
+//                mIsRecordingVideo = false;
+//
+//                stopTimer();
+//                binding.recordTimeTxtView.setText("00L00");
+//                binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
+//
+//                try {
+//                    mMediaRecorder.stop();
+//                }catch (Exception e) {
+//                    e.printStackTrace();
+//                    Log.d("exception", "e = " + e.toString() );
+//                }
+//
+//                deleteVideo();
+//            }
+//
+//        }
 
+        if (mNextVideoAbsolutePath != null) {
 
-        }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
+            mIsRecordingVideo = false;
 
+            stopTimer();
+            binding.recordTimeTxtView.setText("00L00");
+            binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
 
-        }else if (mIsRecordingVideo) {
-
-            if (mNextVideoAbsolutePath != null) {
-
-                mIsRecordingVideo = false;
-
-                stopTimer();
-                binding.recordTimeTxtView.setText("00L00");
-                binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
-
-                try {
-                    mMediaRecorder.stop();
-                }catch (Exception e) {
-                    e.printStackTrace();
-                    Log.d("exception", "e = " + e.toString() );
-                }
-
-                deleteVideo();
+            try {
+                mMediaRecorder.stop();
+            }catch (Exception e) {
+                e.printStackTrace();
+                Log.d("exception", "e = " + e.toString() );
             }
 
+            deleteVideo();
         }
 
         closeCamera();
@@ -253,7 +272,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         super.onPause();
     }
 
-    private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
+    private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             Log.d(TAG, "onSurfaceTextureAvailable  w = " + width + "  h  = " + height );
@@ -708,10 +727,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
                 mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(rotation));
+                Log.d("ddd" , "setUpMediaRecorder default = " + DEFAULT_ORIENTATIONS.get(rotation) );
                 break;
 
             case SENSOR_ORIENTATION_INVERSE_DEGREES:
                 mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
+                Log.d("ddd" , "setUpMediaRecorder inverse = " + INVERSE_ORIENTATIONS.get(rotation) );
                 break;
         }
 

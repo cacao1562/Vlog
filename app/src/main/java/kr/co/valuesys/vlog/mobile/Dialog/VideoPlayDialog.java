@@ -1,6 +1,8 @@
 package kr.co.valuesys.vlog.mobile.Dialog;
 
 import android.databinding.DataBindingUtil;
+import android.graphics.SurfaceTexture;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,20 +10,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.io.IOException;
 
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogVideoplayBinding;
 
-public class VideoPlayDialog extends DialogFragment implements SurfaceHolder.Callback{
+public class VideoPlayDialog extends DialogFragment implements TextureView.SurfaceTextureListener {
 
     private static final String ARG_MESSAGE = "message";
 
     private DialogVideoplayBinding binding;
 
-    private SurfaceHolder mSurfaceHolder;
+    //    private SurfaceHolder mSurfaceHolder;
     private MediaPlayer mMediaPlayer;
 
     public VideoPlayDialog() { }
@@ -46,8 +52,9 @@ public class VideoPlayDialog extends DialogFragment implements SurfaceHolder.Cal
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.dialog_videoplay, container, false);
-        mSurfaceHolder = binding.videoPlaySurfaceView.getHolder();
-        mSurfaceHolder.addCallback(this);
+//        mSurfaceHolder = binding.videoPlaySurfaceView.getHolder();
+//        mSurfaceHolder.addCallback(this);
+        binding.videoPlaySurfaceView.setSurfaceTextureListener(this);
 
         return binding.getRoot();
     }
@@ -60,9 +67,12 @@ public class VideoPlayDialog extends DialogFragment implements SurfaceHolder.Cal
         binding.videoPlaySurfaceView.setOnClickListener(v -> {
 
             if (mMediaPlayer.isPlaying()) {
+
                 mMediaPlayer.pause();
                 binding.videoPlayPlayButton.setVisibility(View.VISIBLE);
+
             }else {
+
                 mMediaPlayer.start();
                 binding.videoPlayPlayButton.setVisibility(View.GONE);
             }
@@ -78,48 +88,6 @@ public class VideoPlayDialog extends DialogFragment implements SurfaceHolder.Cal
     }
 
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-
-        if (mMediaPlayer == null) {
-            mMediaPlayer = new MediaPlayer();
-        } else {
-            mMediaPlayer.reset();
-        }
-
-        try {
-
-//            String path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-            String path = getArguments().getString(ARG_MESSAGE);
-            mMediaPlayer.setDataSource(path);
-            mMediaPlayer.setLooping(true);
-            //mediaPlayer.setVolume(0, 0); //볼륨 제거
-            mMediaPlayer.setDisplay(mSurfaceHolder); // 화면 호출
-            mMediaPlayer.prepare(); // 비디오 load 준비
-
-            //mediaPlayer.setOnCompletionListener(completionListener); // 비디오 재생 완료 리스너
-
-            mMediaPlayer.start();
-
-        } catch (Exception e) {
-            Log.e("MyTag","surface view error : " + e.getMessage());
-        }
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-
-        if (mMediaPlayer != null) {
-            mMediaPlayer.release();
-        }
-
-    }
 
     @Override
     public void onDestroyView() {
@@ -130,7 +98,56 @@ public class VideoPlayDialog extends DialogFragment implements SurfaceHolder.Cal
             mMediaPlayer = null;
         }
 
-        mSurfaceHolder.removeCallback(this);
-        mSurfaceHolder = null;
+//        mSurfaceHolder.removeCallback(this);
+//        mSurfaceHolder = null;
     }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+
+        Surface s = new Surface(surface);
+
+        try {
+            mMediaPlayer= new MediaPlayer();
+            String path = getArguments().getString(ARG_MESSAGE);
+            mMediaPlayer.setDataSource(path);
+            mMediaPlayer.setLooping(true);
+
+            mMediaPlayer.setSurface(s);
+            mMediaPlayer.prepare();
+//            mMediaPlayer.setOnBufferingUpdateListener(this);
+//            mMediaPlayer.setOnCompletionListener(this);
+//            mMediaPlayer.setOnPreparedListener(this);
+//            mMediaPlayer.setOnVideoSizeChangedListener(this);
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mMediaPlayer.start();
+
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+    }
+
+
 }

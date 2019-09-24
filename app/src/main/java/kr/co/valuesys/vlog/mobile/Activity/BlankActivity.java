@@ -12,6 +12,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
+import kr.co.valuesys.vlog.mobile.Fragment.CalendarFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.CameraFragment;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityBlankBinding;
@@ -49,7 +50,7 @@ public class BlankActivity extends AppCompatActivity implements AppInfoFragment.
                         getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, CameraFragment.newInstance()).commit();
                         break;
                     case 2:
-//                        getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, CalendarFragment.newInstance()).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, CalendarFragment.newInstance()).commit();
                         Toast.makeText(this, "준비중..", Toast.LENGTH_SHORT).show();
                         break;
                 }

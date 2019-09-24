@@ -53,7 +53,8 @@ public class AppInfoFragment extends Fragment {
 
         binding.backButton.setOnClickListener(v -> {
             if (mListener != null) {
-                mListener.onClickBack();
+//                mListener.onClickBack();
+                getActivity().finish();
             }
         });
     }

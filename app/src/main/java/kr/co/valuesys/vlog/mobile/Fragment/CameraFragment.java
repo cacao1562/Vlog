@@ -204,6 +204,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             if (mNextVideoAbsolutePath == null) {
                 openCamera(binding.preview.getWidth(), binding.preview.getHeight());
             }
+
             LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable true ");
             LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable  w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight());
 
@@ -404,6 +405,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //            }
             mPreviewSize = chooseOptimalSize(scm.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
 
+            LogUtil.d(TAG , " open size // w = " + width + "  h = " + height );
             LogUtil.d(TAG , " video size // w = " + mVideoSize.getWidth() + "  h = " + mVideoSize.getHeight() );
             LogUtil.d(TAG , " preview size // w = " + mPreviewSize.getWidth() + "  h = " + mPreviewSize.getHeight() );
 
@@ -775,6 +777,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             closePreviewSession();
             setUpMediaRecorder();
             SurfaceTexture texture = binding.preview.getSurfaceTexture();
+            LogUtil.d("fff", "preview / w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight() );
             assert texture != null;
             mCaptureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
 
@@ -795,9 +798,14 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
                     mCameraCaptureSession = session;
                     updatePreview();
+
                     getActivity().runOnUiThread(() -> {
+
                         binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_on));
+                        binding.switchImgBtn.setVisibility(View.INVISIBLE);
+                        binding.closeImgbutton.setVisibility(View.INVISIBLE);
                         mIsRecordingVideo = true;
+
                         try {
                             mMediaRecorder.start();
                         }catch (Exception e) {
@@ -818,8 +826,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             }, mBackgroundHandler);
 
-            binding.switchImgBtn.setVisibility(View.INVISIBLE);
-            binding.closeImgbutton.setVisibility(View.INVISIBLE);
 //            timer();
             startTimer();
 

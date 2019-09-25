@@ -15,7 +15,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/bottomlinear">
+            app:layout_constraintBottom_toTopOf="@+id/line">
 
         </FrameLayout>
 
@@ -28,6 +28,14 @@
             <!--app:layout_constraintBottom_toBottomOf="parent">-->
 
         <!--</android.support.design.widget.BottomNavigationView>-->
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/black"
+            app:layout_constraintTop_toBottomOf="@+id/main_container"
+            app:layout_constraintBottom_toTopOf="@+id/bottomlinear"/>
 
         <LinearLayout
             android:id="@+id/bottomlinear"

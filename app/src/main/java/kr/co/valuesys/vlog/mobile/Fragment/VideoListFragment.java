@@ -4,12 +4,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,13 +26,14 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import kr.co.valuesys.vlog.mobile.Common.Constants;
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
 
 
-public class VideoListFragment extends Fragment {
+public class VideoListFragment extends Fragment implements VideoInfo.CallbackEmpty, VideoListAdapter.CallbackToList {
 
     private FragmentVideoListBinding binding;
     private VideoListAdapter adapter;
@@ -52,10 +57,11 @@ public class VideoListFragment extends Fragment {
 
         binding.videoListRecyclerview.setHasFixedSize(true);
         binding.videoListRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new VideoListAdapter(getActivity());
+        binding.videoListRecyclerview.addItemDecoration(new RecyclerDecoration(20));
+        adapter = new VideoListAdapter(getActivity(), this);
         binding.videoListRecyclerview.setAdapter(adapter);
 
-        adapter.setUp(getSortedVideo());
+        adapter.setUp(VideoInfo.getVideo(getActivity(), this));
 
         return binding.getRoot();
 //        return inflater.inflate(R.layout.fragment_video_list, container, false);
@@ -65,93 +71,7 @@ public class VideoListFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        adapter.setUp(getSortedVideo());
-    }
-
-
-// date 날짜 기준으로 비디오 리스트를 내림차순 정렬
-    private ArrayList<VideoInfo> getSortedVideo() {
-
-        ArrayList<VideoInfo> sortedInfo = getVideo();
-        Collections.sort(sortedInfo, new Comparator<VideoInfo>() {
-            @Override
-            public int compare(VideoInfo o1, VideoInfo o2) {
-                return o2.getDate().compareTo(o1.getDate());
-            }
-        });
-
-        return sortedInfo;
-    }
-
-// 전체 비디오 목록 에서 앨범 이름이 TestVideo 인 것만 리스트에 추가
-    private ArrayList<VideoInfo> getVideo() {
-
-        String[] proj = {
-                MediaStore.Video.Media._ID,
-                MediaStore.Video.Media.DISPLAY_NAME,
-                MediaStore.Video.Media.DATA,
-                MediaStore.Video.Media.ALBUM,
-                MediaStore.Video.Media.DATE_TAKEN
-        };
-
-//        LogUtil.d("aaa", "path 1 = " + Environment.getExternalStorageDirectory().getAbsoluteFile().getPath() );
-//        LogUtil.d("aaa", "path 2 = " + Environment.getExternalStorageDirectory().getPath() );
-//        LogUtil.d("aaa", "path 3 = " + MediaStore.Video.Media.EXTERNAL_CONTENT_URI );
-
-        Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-//        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getAbsoluteFile().getPath() + "/DCIM/TestVideo/");
-//        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath() + "/DCIM/TestVideo/");
-
-        Cursor cursor = getActivity().getContentResolver().query(uri, proj, null, null, null);
-        ArrayList<VideoInfo> videoList = new ArrayList<>();
-        assert cursor != null;
-
-        while (cursor.moveToNext()) {
-
-            if (cursor.getString(3) != null) {
-
-                if (cursor.getString(3).equals(Constants.Real_Folder_Name)) {
-
-                    String title = cursor.getString(1);
-                    long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));
-                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(getActivity().getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
-
-                    if (bitmap == null) {
-                        continue;
-                    }
-//                LogUtil.d("aaa", "bitmap  w = " + bitmap.getWidth() + "  h = " + bitmap.getHeight() );
-                    // 썸네일 크기 변경할 때.
-//                Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bitmap, 1024, 1024);
-                    String data = cursor.getString(2);
-
-                    long dateTime = cursor.getLong(4);
-
-                    SimpleDateFormat format = new SimpleDateFormat ( "yyyy년 MM월dd일 HH시mm분ss초");
-                    String format_time = format.format ( new Date( dateTime ) );
-
-                    videoList.add( new VideoInfo(title, bitmap, Uri.parse(data), format_time) );
-
-//                LogUtil.d("aaa", "cursor getstring id = " + cursor.getString(0) );
-//                LogUtil.d("aaa", "cursor getstring title = " + title );
-//                LogUtil.d("aaa", "cursor getstring data = " + data );
-//                LogUtil.d("aaa", "cursor getstring album = " + cursor.getString(3) );
-//                LogUtil.d("aaa", "cursor getstring DATE_TAKEN = " + cursor.getString(4) );
-//
-//                LogUtil.d("aaa", "cursor date 22 === " + format_time );
-
-                }
-
-            }
-
-        }
-
-        if (videoList.size() == 0) {
-            binding.videoListEmptyview.setVisibility(View.VISIBLE);
-        }else {
-            binding.videoListEmptyview.setVisibility(View.GONE);
-        }
-        cursor.close();
-        return videoList;
+        adapter.setUp(VideoInfo.getVideo(getActivity(), this));
     }
 
 
@@ -165,6 +85,54 @@ public class VideoListFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+
+// VideoInfo에서 넘겨주는 callback
+// 비디오 개수가 0개면 true
+    @Override
+    public void onEmptyVideo(boolean show) {
+        showEmptyView(show);
+    }
+
+
+// VideoListAdapter 에서 비디오 삭제했을때 callback
+// 비디오 개수가 0개면 true
+    @Override
+    public void onCallbackToList(boolean show) {
+        showEmptyView(show);
+    }
+
+
+// 비디오가 없다는 뷰 보여주기 또는 숨기기
+    private void showEmptyView(boolean show) {
+
+        if (show) {
+            binding.videoListEmptyview.setVisibility(View.VISIBLE);
+        }else {
+            binding.videoListEmptyview.setVisibility(View.GONE);
+        }
+    }
+
+
+    // recyclerview cell 아이템 간격
+    public class RecyclerDecoration extends RecyclerView.ItemDecoration {
+
+        private final int divHeight;
+
+        public RecyclerDecoration(int divHeight) {
+            this.divHeight = divHeight;
+        }
+
+        @Override
+        public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+            super.getItemOffsets(outRect, view, parent, state);
+
+            if (parent.getChildAdapterPosition(view) != parent.getAdapter().getItemCount() - 1) {
+                outRect.bottom = divHeight;
+            }
+
+        }
     }
 
 

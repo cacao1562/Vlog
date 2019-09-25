@@ -110,7 +110,7 @@ public class VideoListFragment extends Fragment {
 
             if (cursor.getString(3) != null) {
 
-                if (cursor.getString(3).equals(Constants.Video_Folder_Name)) {
+                if (cursor.getString(3).equals(Constants.Real_Folder_Name)) {
 
                     String title = cursor.getString(1);
                     long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));

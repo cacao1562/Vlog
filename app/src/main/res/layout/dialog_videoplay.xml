@@ -31,7 +31,7 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ico_play"
+                android:src="@drawable/btn_play"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -43,6 +43,14 @@
                 android:src="@drawable/btn_close"
                 android:layout_marginTop="50dp"
                 android:layout_marginLeft="10dp" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/heart_selector"
+                android:layout_marginRight="20dp"
+                android:layout_marginBottom="50dp"
+                android:layout_gravity="bottom|right"/>
 
         </FrameLayout>
 

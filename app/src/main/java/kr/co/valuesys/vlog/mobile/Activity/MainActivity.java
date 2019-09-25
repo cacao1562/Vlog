@@ -70,15 +70,6 @@ public class MainActivity extends AppCompatActivity {
         binding.mainRecordImgbutton.setOnClickListener(v -> { presentBlankActivity(1); });
         binding.mainCalendarImgbutton.setOnClickListener(v -> { presentBlankActivity(2); });
 
-// 기기 해상도
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        display.getRealSize(size);
-        int screen_width = size.x;
-        int screen_height = size.y;
-        LogUtil.d("MainActivity" , " w = " + screen_width + " h = " + screen_height) ;
-
     }
 
     private void presentBlankActivity(int id) {
@@ -95,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         LogUtil.d("aaa", "============== main onResume ");
+// 프래그먼트 다시 시작하는 코드
 //        getSupportFragmentManager().beginTransaction().detach(videoListFragment).attach(videoListFragment).commit();
     }
+
 }

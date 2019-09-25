@@ -110,7 +110,7 @@
         <Button
             android:id="@+id/save_button"
             android:layout_width="0dp"
-            android:layout_height="55.2dp"
+            android:layout_height="44dp"
             android:text="저 장"
             android:letterSpacing="-0.03"
             android:lineSpacingExtra="-2sp"

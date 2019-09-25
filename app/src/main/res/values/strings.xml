@@ -1,7 +1,7 @@
 <resources>
 
     <string name="app_name">VideoVLog</string>
-    <string name="empty_video_msg">"기록되어있는 영상이 없습니다. \n아래 버튼을 눌러 영상을 녹화해 주세요."</string>
+    <string name="empty_video_msg">"영상이 없습니다. \n아래 버튼을 눌러 영상을 녹화해 주세요."</string>
     <string name="back_alert_msg">"촬영된 영상을 삭제하고 목록으로 돌아가시겠습니까?"</string>
     <string name="remove_video_alert_msg">"촬영된 영상을 삭제하시겠습니까?"</string>
     <string name="empty_name_alert_msg">"입력된 제목이 없습니다. 제목을 입력해주세요."</string>

@@ -67,7 +67,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     private static final String TAG = "CameraFragment";
     //Superbrain 대신 원하는 폴더이름을 만들면 됩니다.
-    private static final String DETAIL_PATH = "DCIM/" + Constants.Video_Folder_Name + "/";
+    private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";
+    private static final String REAL_PATH = "DCIM/" + Constants.Real_Folder_Name + "/";
 
     private FragmentCameraBinding binding;
 
@@ -111,7 +112,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
-        display.getSize(size);
+//        display.getSize(size);
         display.getRealSize(size);
         mScreen_width = size.x;
         mScreen_height = size.y;
@@ -165,6 +166,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
                 resetUI();
                 deleteVideo();
+                if (mCameraCaptureSession == null) {
+                    openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+                }
                 startPreview();
                 dialog.dismiss();
 
@@ -197,7 +201,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         if (binding.preview.isAvailable()) {
 
-            openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+            if (mNextVideoAbsolutePath == null) {
+                openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+            }
             LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable true ");
             LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable  w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight());
 
@@ -243,20 +249,27 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         if (mNextVideoAbsolutePath != null) {
 
-            mIsRecordingVideo = false;
+            if (mIsRecordingVideo) {
 
-            stopTimer();
-            binding.recordTimeTxtView.setText("00L00");
-            binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
+                stopRecordingVideo();
 
-            try {
-                mMediaRecorder.stop();
-            }catch (Exception e) {
-                e.printStackTrace();
-                LogUtil.d("exception", "e = " + e.toString() );
+//                mIsRecordingVideo = false;
+//
+//                stopTimer();
+//                binding.recordTimeTxtView.setText("00:00");
+//                binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
+//
+//                try {
+//                    mMediaRecorder.stop();
+//                }catch (Exception e) {
+//                    e.printStackTrace();
+//                    LogUtil.d("exception", "e = " + e.toString() );
+//                }
+//
+//                deleteVideo();
+
             }
 
-            deleteVideo();
         }
 
         closeCamera();
@@ -429,6 +442,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //            if(size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080){
 //                return size;
 //            }
+// 갤럭시s10e 해상도는 1080x2280 이지만 촬영 가능 해상도에 1080x2280이 없고 2288이 있음
             if ( (size.getWidth() - mScreen_height) > 50 || (size.getHeight() - mScreen_width) > 50 ) {
                 continue;
             }
@@ -742,7 +756,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     private String getVideoFilePath() {
 
         final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
-        String path = dir.getPath() + "/" + DETAIL_PATH;
+        String path = dir.getPath() + "/" + TEMP_PATH;
         File dst = new File(path);
         if(!dst.exists()) dst.mkdirs();
 
@@ -973,14 +987,18 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onClickSave(String newFileName) {
 
-        resetUI();
+//        resetUI();
 
         if (mNextVideoAbsolutePath == null) { return; }
 
         File file = new File( mNextVideoAbsolutePath );
         File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
-        String path = dir.getPath() + "/" + DETAIL_PATH;
+        String path = dir.getPath() + "/" + REAL_PATH;
 
+        File realfolder = new File(path);
+        if (!realfolder.exists()) {
+            realfolder.mkdir();
+        }
 // 사용자가 입력한 이름으로 파일이름 변경
         File fileNew = new File( path + newFileName + ".mp4" );
 

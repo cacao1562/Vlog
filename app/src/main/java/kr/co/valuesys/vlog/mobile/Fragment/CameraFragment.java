@@ -19,7 +19,6 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -31,7 +30,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -41,7 +39,6 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.io.File;
@@ -57,7 +54,8 @@ import java.util.concurrent.TimeUnit;
 
 import kr.co.valuesys.vlog.mobile.Activity.BlankActivity;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
-import kr.co.valuesys.vlog.mobile.InputFileNameDialog;
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.Dialog.InputFileNameDialog;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
@@ -117,7 +115,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         display.getRealSize(size);
         mScreen_width = size.x;
         mScreen_height = size.y;
-        Log.d("zzz", "screen w = " + mScreen_width + " h = " + mScreen_height );
+        LogUtil.d("zzz", "screen w = " + mScreen_width + " h = " + mScreen_height );
     }
 
     @Nullable
@@ -144,7 +142,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 
-                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "촬영된 영상을 삭제하고 목록으로 돌아가시겠습니까?", true, dialog -> {
+                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
 
                     deleteVideo();
                     dialog.dismiss();
@@ -163,7 +161,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         binding.removeVideoBtn.setOnClickListener(v -> {
 
-            AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "촬영된 영상을 삭제하시겠습니까?", true, dialog -> {
+            AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.remove_video_alert_msg), true, dialog -> {
 
                 resetUI();
                 deleteVideo();
@@ -200,12 +198,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         if (binding.preview.isAvailable()) {
 
             openCamera(binding.preview.getWidth(), binding.preview.getHeight());
-            Log.d(TAG, "==================================== onResume ===  preview isAvailable true ");
-            Log.d(TAG, "==================================== onResume ===  preview isAvailable  w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight());
+            LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable true ");
+            LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable  w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight());
 
         } else {
 
-            Log.d(TAG, "==================================== onResume ===  preview isAvailable false");
+            LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable false");
             binding.preview.setSurfaceTextureListener(mSurfaceTextureListener);
         }
     }
@@ -213,7 +211,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onPause() {
 
-        Log.d(TAG, "==================================== onPause ===");
+        LogUtil.d(TAG, "==================================== onPause ===");
 
 //        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 //
@@ -235,7 +233,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //                    mMediaRecorder.stop();
 //                }catch (Exception e) {
 //                    e.printStackTrace();
-//                    Log.d("exception", "e = " + e.toString() );
+//                    LogUtil.d("exception", "e = " + e.toString() );
 //                }
 //
 //                deleteVideo();
@@ -255,7 +253,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
                 mMediaRecorder.stop();
             }catch (Exception e) {
                 e.printStackTrace();
-                Log.d("exception", "e = " + e.toString() );
+                LogUtil.d("exception", "e = " + e.toString() );
             }
 
             deleteVideo();
@@ -275,13 +273,13 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            Log.d(TAG, "onSurfaceTextureAvailable  w = " + width + "  h  = " + height );
+            LogUtil.d(TAG, "onSurfaceTextureAvailable  w = " + width + "  h  = " + height );
             openCamera(binding.preview.getWidth(), binding.preview.getHeight());
         }
 
         @Override
         public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-            Log.d(TAG, "onSurfaceTextureSizeChanged  w = " + width + "  h  = " + height );
+            LogUtil.d(TAG, "onSurfaceTextureSizeChanged  w = " + width + "  h  = " + height );
             if(!mIsRecordingVideo) configureTransform(width, height);
         }
 
@@ -353,11 +351,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             Size[] ss = scm.getOutputSizes(SurfaceTexture.class); // 프리뷰 해상도 범위
 
             for (Size s : ms) {
-                Log.d(TAG, "Media size //  w = " + s.getWidth() + "  h = " + s.getHeight() );
+                LogUtil.d(TAG, "Media size //  w = " + s.getWidth() + "  h = " + s.getHeight() );
             }
 
             for (Size s : ss) {
-                Log.d(TAG, "SurfaceTexture size //  w = " + s.getWidth() + "  h = " + s.getHeight() );
+                LogUtil.d(TAG, "SurfaceTexture size //  w = " + s.getWidth() + "  h = " + s.getHeight() );
             }
 
             mVideoSize = chooseVideoSize(scm.getOutputSizes(MediaRecorder.class));
@@ -370,7 +368,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //            int dwidth = size.x;
 //            int dheight = size.y;
 //
-//            Log.d(TAG , " display size // w = " + dwidth + "  h = " + dheight );
+//            LogUtil.d(TAG , " display size // w = " + dwidth + "  h = " + dheight );
 //            double dd = dwidth * 1.7777777778;
 //            mPreviewSize = new Size((int) dd, dwidth);
 
@@ -386,28 +384,28 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 ////                int dwidth = size.x;
 ////                int dheight = size.y;
 ////
-////                Log.d(TAG , " display size // w = " + dwidth + "  h = " + dheight );
+////                LogUtil.d(TAG , " display size // w = " + dwidth + "  h = " + dheight );
 ////                double dd = dwidth * 1.7777777778;
 ////                mPreviewSize = new Size((int) dd, dwidth);
 //                mPreviewSize = chooseOptimalSize(scm.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
 //            }
             mPreviewSize = chooseOptimalSize(scm.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
 
-            Log.d(TAG , " video size // w = " + mVideoSize.getWidth() + "  h = " + mVideoSize.getHeight() );
-            Log.d(TAG , " preview size // w = " + mPreviewSize.getWidth() + "  h = " + mPreviewSize.getHeight() );
+            LogUtil.d(TAG , " video size // w = " + mVideoSize.getWidth() + "  h = " + mVideoSize.getHeight() );
+            LogUtil.d(TAG , " preview size // w = " + mPreviewSize.getWidth() + "  h = " + mPreviewSize.getHeight() );
 
             int orientation = getResources().getConfiguration().orientation;
 
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
 
-                Log.d(TAG , " preview LAND" );
+                LogUtil.d(TAG , " preview LAND" );
                 binding.preview.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
 
             } else {
 
-                Log.d(TAG , " preview Portraint" );
+                LogUtil.d(TAG , " preview Portraint" );
                 binding.preview.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
-                Log.d(TAG, "======== onResume ===  preview // w = " + mPreviewSize.getHeight() + " h = " + mPreviewSize.getWidth());
+                LogUtil.d(TAG, "======== onResume ===  preview // w = " + mPreviewSize.getHeight() + " h = " + mPreviewSize.getWidth());
             }
 
             configureTransform(width, height);
@@ -415,7 +413,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             mCameraManager.openCamera(mCamId, mStateCallback, mBackgroundHandler);
 
         } catch (CameraAccessException | SecurityException | NullPointerException | InterruptedException e) {
-            Log.d("exception", "e = " + e.toString() );
+            LogUtil.d("exception", "e = " + e.toString() );
             e.printStackTrace();
             activity.finish();
         }
@@ -453,7 +451,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     private static Size chooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio) {
 
-        Log.d(TAG, "// chooseOptimalSize // w = " + width + "  h = " + height + "  ratio  w = " + aspectRatio.getWidth() + " ratio h = " + aspectRatio.getHeight());
+        LogUtil.d(TAG, "// chooseOptimalSize // w = " + width + "  h = " + height + "  ratio  w = " + aspectRatio.getWidth() + " ratio h = " + aspectRatio.getHeight());
         List<Size> bigEnough = new ArrayList<>();
         List<Size> notBigEnough = new ArrayList<>();
 
@@ -556,7 +554,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         } catch (CameraAccessException e) {
             e.printStackTrace();
-            Log.d("exception", "e = " + e.toString() );
+            LogUtil.d("exception", "e = " + e.toString() );
         }
     }
 
@@ -573,7 +571,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         } catch (CameraAccessException e) {
             e.printStackTrace();
-            Log.d("exception", "e = " + e.toString() );
+            LogUtil.d("exception", "e = " + e.toString() );
         }
 
     }
@@ -585,7 +583,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     private void configureTransform(int viewWidth, int viewHeight) {
 
-        Log.d(TAG, "configureTransform  w = " + viewWidth + "  h  = " + viewHeight );
+        LogUtil.d(TAG, "configureTransform  w = " + viewWidth + "  h  = " + viewHeight );
 
         Activity activity = getActivity();
 
@@ -727,12 +725,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
                 mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(rotation));
-                Log.d("ddd" , "setUpMediaRecorder default = " + DEFAULT_ORIENTATIONS.get(rotation) );
+                LogUtil.d("ddd" , "setUpMediaRecorder default = " + DEFAULT_ORIENTATIONS.get(rotation) );
                 break;
 
             case SENSOR_ORIENTATION_INVERSE_DEGREES:
                 mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
-                Log.d("ddd" , "setUpMediaRecorder inverse = " + INVERSE_ORIENTATIONS.get(rotation) );
+                LogUtil.d("ddd" , "setUpMediaRecorder inverse = " + INVERSE_ORIENTATIONS.get(rotation) );
                 break;
         }
 
@@ -813,7 +811,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         } catch (CameraAccessException | IOException e) {
             e.printStackTrace();
-            Log.d("exception", "e = " + e.toString() );
+            LogUtil.d("exception", "e = " + e.toString() );
         }
 
     }
@@ -835,7 +833,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //            mCameraCaptureSession.abortCaptures();
 //        }catch (Exception e) {
 //            e.printStackTrace();
-//            Log.d("exception", "e = " + e.toString() );
+//            LogUtil.d("exception", "e = " + e.toString() );
 //        }
 
         try {
@@ -843,7 +841,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             mMediaRecorder.reset();
         }catch (Exception e) {
             e.printStackTrace();
-            Log.d("exception", "e = " + e.toString() );
+            LogUtil.d("exception", "e = " + e.toString() );
         }
 
 
@@ -854,7 +852,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             if (mNextVideoAbsolutePath != null) {
 
                 Toast.makeText(activity, "Video saved: " + mNextVideoAbsolutePath, Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "Video saved: " + mNextVideoAbsolutePath);
+                LogUtil.d(TAG, "Video saved: " + mNextVideoAbsolutePath);
                 File file = new File(mNextVideoAbsolutePath);
 // 아래 코드가 없으면 갤러리 저장 적용이 안됨.
                 if(!file.exists()) file.mkdir();
@@ -887,7 +885,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             mCameraCaptureSession.abortCaptures();
         }catch (Exception e) {
             e.printStackTrace();
-            Log.d("exception", "e = " + e.toString() );
+            LogUtil.d("exception", "e = " + e.toString() );
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -899,7 +897,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             }catch (Exception e) {
                 e.printStackTrace();
-                Log.d("exception", "e = " + e.toString() );
+                LogUtil.d("exception", "e = " + e.toString() );
             }
 
         }
@@ -952,9 +950,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onError(MediaRecorder mr, int what, int extra) {
-        Log.d("listener", "onError // waht = " + what + "  extra = " + extra );
+        LogUtil.d("listener", "onError // waht = " + what + "  extra = " + extra );
         if (what == MediaRecorder.MEDIA_ERROR_SERVER_DIED) {
-            Log.d("listener", "onError // MEDIA_ERROR_SERVER_DIED " );
+            LogUtil.d("listener", "onError // MEDIA_ERROR_SERVER_DIED " );
         }
     }
 
@@ -962,7 +960,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
 
-        Log.d("listener", "onInfo // what = " + what + " extra = " + extra );
+        LogUtil.d("listener", "onInfo // what = " + what + " extra = " + extra );
 
         if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
 //            mr.stop();
@@ -1029,7 +1027,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     public void onDestroyView() {
         super.onDestroyView();
 
-        Log.d(TAG, "onDestroyView call");
+        LogUtil.d(TAG, "onDestroyView call");
 
         if(timer != null){
             timer.cancel();
@@ -1115,9 +1113,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
                         getActivity().getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
                         mNextVideoAbsolutePath = null;
-                        Log.d(TAG, "======= delete succcess ");
+                        LogUtil.d(TAG, "======= delete succcess ");
                     }else {
-                        Log.d(TAG, "======= delete fail ");
+                        LogUtil.d(TAG, "======= delete fail ");
                     }
 
                 }
@@ -1136,7 +1134,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 
-            AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "촬영된 영상을 삭제하고 목록으로 돌아가시겠습니까?", true, dialog -> {
+            AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
 
                 deleteVideo();
                 dialog.dismiss();

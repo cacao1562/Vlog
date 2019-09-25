@@ -20,14 +20,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/gray"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="! \nEmpty Video"
-                    android:textSize="28dp"
+                    android:text="@string/empty_video_msg"
+                    android:lineSpacingExtra="10dp"
+                    android:textSize="20dp"
                     android:textStyle="bold"
                     android:textAlignment="center"/>
 

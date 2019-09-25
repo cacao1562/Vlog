@@ -5,6 +5,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.TextureView;
 
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+
 public class VideoRecordingView extends TextureView {
 
     int mRatioWidth = 0;
@@ -25,8 +27,8 @@ public class VideoRecordingView extends TextureView {
         if (width < 0 || height < 0) {
             throw new IllegalArgumentException("Size cannot be negative.");
         }
-        Log.d("aaa", "setAspectRatio  mRatioWidth = " + mRatioWidth + "  mRatioHeight  = " + mRatioHeight );
-        Log.d("aaa", "setAspectRatio  width = " + width + "  height  = " + height );
+        LogUtil.d("aaa", "setAspectRatio  mRatioWidth = " + mRatioWidth + "  mRatioHeight  = " + mRatioHeight );
+        LogUtil.d("aaa", "setAspectRatio  width = " + width + "  height  = " + height );
         mRatioWidth = width;
         mRatioHeight = height;
         requestLayout();
@@ -38,7 +40,7 @@ public class VideoRecordingView extends TextureView {
 
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
-        Log.d("aaa", "onMeasure  w = " + width + "  h  = " + height );
+        LogUtil.d("aaa", "onMeasure  w = " + width + "  h  = " + height );
 
         if (0 == mRatioWidth || 0 == mRatioHeight) {
             setMeasuredDimension(width, height);
@@ -46,10 +48,10 @@ public class VideoRecordingView extends TextureView {
             setMeasuredDimension(width, height);
 //            if (width < height * mRatioWidth / mRatioHeight) {
 //                setMeasuredDimension(width, width * mRatioHeight / mRatioWidth);
-//                Log.d("aaa", "w < h  // w = " + width + "  h  = " + width * mRatioHeight / mRatioWidth );
+//                LogUtil.d("aaa", "w < h  // w = " + width + "  h  = " + width * mRatioHeight / mRatioWidth );
 //            } else {
 //                setMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
-//                Log.d("aaa", "w > h //  w = " + height * mRatioWidth / mRatioHeight + "  h  = " + height );
+//                LogUtil.d("aaa", "w > h //  w = " + height * mRatioWidth / mRatioHeight + "  h  = " + height );
 //            }
         }
     }

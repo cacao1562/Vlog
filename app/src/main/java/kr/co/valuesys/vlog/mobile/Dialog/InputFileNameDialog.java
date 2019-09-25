@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile;
+package kr.co.valuesys.vlog.mobile.Dialog;
 
 import android.app.AlertDialog;
 import android.databinding.DataBindingUtil;
@@ -10,8 +10,10 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogInputfilenameBinding;
 
 public class InputFileNameDialog extends DialogFragment {
@@ -54,6 +56,8 @@ public class InputFileNameDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
         binding.backButton.setOnClickListener(v -> {
             dismiss();
         });
@@ -62,7 +66,7 @@ public class InputFileNameDialog extends DialogFragment {
 
             if (TextUtils.isEmpty(binding.fileNameEdittext.getText().toString()) ) {
 
-                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "입력된 제목이 없습니다. 제목을 입력해주세요.", false, dialog -> {
+                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.empty_name_alert_msg), false, dialog -> {
 
                     dialog.dismiss(); // AlertDialog dismiss
 
@@ -76,7 +80,7 @@ public class InputFileNameDialog extends DialogFragment {
                     mListener.onClickSave(binding.fileNameEdittext.getText().toString());
                 }
 
-                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "저장 되었습니다.", false, dialog -> {
+                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.saved_alert_msg), false, dialog -> {
 
 
                     dialog.dismiss(); // AlertDialog dismiss

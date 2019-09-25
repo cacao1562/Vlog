@@ -94,9 +94,9 @@ public class VideoListFragment extends Fragment {
                 MediaStore.Video.Media.DATE_TAKEN
         };
 
-//        Log.d("aaa", "path 1 = " + Environment.getExternalStorageDirectory().getAbsoluteFile().getPath() );
-//        Log.d("aaa", "path 2 = " + Environment.getExternalStorageDirectory().getPath() );
-//        Log.d("aaa", "path 3 = " + MediaStore.Video.Media.EXTERNAL_CONTENT_URI );
+//        LogUtil.d("aaa", "path 1 = " + Environment.getExternalStorageDirectory().getAbsoluteFile().getPath() );
+//        LogUtil.d("aaa", "path 2 = " + Environment.getExternalStorageDirectory().getPath() );
+//        LogUtil.d("aaa", "path 3 = " + MediaStore.Video.Media.EXTERNAL_CONTENT_URI );
 
         Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 //        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getAbsoluteFile().getPath() + "/DCIM/TestVideo/");
@@ -119,7 +119,7 @@ public class VideoListFragment extends Fragment {
                     if (bitmap == null) {
                         continue;
                     }
-//                Log.d("aaa", "bitmap  w = " + bitmap.getWidth() + "  h = " + bitmap.getHeight() );
+//                LogUtil.d("aaa", "bitmap  w = " + bitmap.getWidth() + "  h = " + bitmap.getHeight() );
                     // 썸네일 크기 변경할 때.
 //                Bitmap thumbnail = ThumbnailUtils.extractThumbnail(bitmap, 1024, 1024);
                     String data = cursor.getString(2);
@@ -131,13 +131,13 @@ public class VideoListFragment extends Fragment {
 
                     videoList.add( new VideoInfo(title, bitmap, Uri.parse(data), format_time) );
 
-//                Log.d("aaa", "cursor getstring id = " + cursor.getString(0) );
-//                Log.d("aaa", "cursor getstring title = " + title );
-//                Log.d("aaa", "cursor getstring data = " + data );
-//                Log.d("aaa", "cursor getstring album = " + cursor.getString(3) );
-//                Log.d("aaa", "cursor getstring DATE_TAKEN = " + cursor.getString(4) );
+//                LogUtil.d("aaa", "cursor getstring id = " + cursor.getString(0) );
+//                LogUtil.d("aaa", "cursor getstring title = " + title );
+//                LogUtil.d("aaa", "cursor getstring data = " + data );
+//                LogUtil.d("aaa", "cursor getstring album = " + cursor.getString(3) );
+//                LogUtil.d("aaa", "cursor getstring DATE_TAKEN = " + cursor.getString(4) );
 //
-//                Log.d("aaa", "cursor date 22 === " + format_time );
+//                LogUtil.d("aaa", "cursor date 22 === " + format_time );
 
                 }
 

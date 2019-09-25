@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.CameraFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.VideoListFragment;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         if (null == savedInstanceState) {
-            Log.d("aaa", "main savedInstanceState is null");
+            LogUtil.d("aaa", "main savedInstanceState is null");
 //            binding.bottomView.setSelectedItemId(R.id.two);
 //            getSupportFragmentManager().beginTransaction().replace(R.id.container, videoListFragment).commit();
         }
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         display.getRealSize(size);
         int screen_width = size.x;
         int screen_height = size.y;
-        Log.d("MainActivity" , " w = " + screen_width + " h = " + screen_height) ;
+        LogUtil.d("MainActivity" , " w = " + screen_width + " h = " + screen_height) ;
 
     }
 
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        Log.d("aaa", "============== main onResume ");
+        LogUtil.d("aaa", "============== main onResume ");
 //        getSupportFragmentManager().beginTransaction().detach(videoListFragment).attach(videoListFragment).commit();
     }
 }

@@ -3,7 +3,6 @@ package kr.co.valuesys.vlog.mobile.Common;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.support.annotation.Nullable;
 
 public class SimpleAlert {
 
@@ -19,10 +18,15 @@ public class SimpleAlert {
         if (showCancle) {
             alert.setNegativeButton("취소", null);
         }
+
         alert.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                callback.onclickOK(dialog);
+
+                if (callback != null) {
+                    callback.onclickOK(dialog);
+                }
+
             }
         });
 

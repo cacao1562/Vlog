@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 
 public class SplashActivity extends AppCompatActivity {
@@ -43,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
 
                         isPermission = false;
                         Toast.makeText(this,"permission not granted = " + permissions[i], Toast.LENGTH_LONG).show();
-                        Log.d(TAG, "permission not granted = " + permissions[i] );
+                        LogUtil.d(TAG, "permission not granted = " + permissions[i] );
                     }
                 }
 

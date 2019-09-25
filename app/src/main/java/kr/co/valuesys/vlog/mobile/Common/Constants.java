@@ -4,4 +4,6 @@ public class Constants {
 
     public static final String Video_Folder_Name = "TestVideo";
 
+    public static final boolean Print_Log = true;
+
 }

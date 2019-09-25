@@ -51,7 +51,6 @@ public class BlankActivity extends AppCompatActivity implements AppInfoFragment.
                         break;
                     case 2:
                         getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, CalendarFragment.newInstance()).commit();
-                        Toast.makeText(this, "준비중..", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }

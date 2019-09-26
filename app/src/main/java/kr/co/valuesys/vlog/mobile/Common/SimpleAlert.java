@@ -6,11 +6,9 @@ import android.content.DialogInterface;
 
 public class SimpleAlert {
 
-    public interface AlertOkCallback {
-        void onclickOK(DialogInterface dialog);
-    }
 
-    public AlertDialog createAlert(Context context, String msg, boolean showCancle, AlertOkCallback callback) {
+
+    public AlertDialog createAlert(Context context, String msg, boolean showCancle, CommonInterface.OnAlertOkCallback callback) {
 
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
         alert.setMessage(msg);

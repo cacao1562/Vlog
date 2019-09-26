@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
@@ -33,7 +34,7 @@ import kr.co.valuesys.vlog.mobile.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
 
 
-public class VideoListFragment extends Fragment implements VideoInfo.CallbackEmpty, VideoListAdapter.CallbackToList {
+public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo, CommonInterface.OnCallbackEmptyVideoToList {
 
     private FragmentVideoListBinding binding;
     private VideoListAdapter adapter;

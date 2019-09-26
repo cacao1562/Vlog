@@ -12,17 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogInputfilenameBinding;
 
 public class InputFileNameDialog extends DialogFragment {
 
-    public interface OnInputDialogListener {
-        void onClickSave(String fileName);
-    }
 
-    private OnInputDialogListener mListener;
+    private CommonInterface.OnInputDialogListener mListener;
 
     public InputFileNameDialog() { }
 
@@ -37,7 +35,7 @@ public class InputFileNameDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         try {
-            mListener = (OnInputDialogListener) getParentFragment();
+            mListener = (CommonInterface.OnInputDialogListener) getParentFragment();
         } catch (ClassCastException e) {
             throw new ClassCastException("Calling fragment must implement Callback interface");
         }

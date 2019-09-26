@@ -53,6 +53,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import kr.co.valuesys.vlog.mobile.Activity.BlankActivity;
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Dialog.InputFileNameDialog;
@@ -63,7 +64,7 @@ import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
 
 public class CameraFragment extends Fragment implements View.OnClickListener,
                                                         MediaRecorder.OnInfoListener, MediaRecorder.OnErrorListener,
-                                                        InputFileNameDialog.OnInputDialogListener, BlankActivity.OnBackPressedListener {
+                                                        CommonInterface.OnInputDialogListener, CommonInterface.OnBackPressedListener {
 
     private static final String TAG = "CameraFragment";
     //Superbrain 대신 원하는 폴더이름을 만들면 됩니다.
@@ -102,8 +103,26 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     private int mScreen_width;
     private int mScreen_height;
 
+    private CommonInterface.OnCameraPauseListener mCallbackPause;
+
     public static CameraFragment newInstance() {
         return new CameraFragment();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof CommonInterface.OnCameraPauseListener) {
+            mCallbackPause = (CommonInterface.OnCameraPauseListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbackPause = null;
     }
 
     @Override
@@ -196,7 +215,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onResume() {
         super.onResume();
-
+        LogUtil.d("eee", "camera onResume");
         startBackgroundThread();
 
         if (binding.preview.isAvailable()) {
@@ -218,8 +237,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onPause() {
 
-        LogUtil.d(TAG, "==================================== onPause ===");
-
+        LogUtil.d("eee", "camera onPause");
 //        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 //
 //
@@ -247,6 +265,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //            }
 //
 //        }
+        if (mNextVideoAbsolutePath == null && !mIsRecordingVideo) {
+            mCallbackPause.onCameraPause(true);
+        }else {
+            mCallbackPause.onCameraPause(false);
+        }
 
         if (mNextVideoAbsolutePath != null) {
 

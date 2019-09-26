@@ -14,14 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 
 public class VideoInfo {
 
-    public interface CallbackEmpty {
-        void onEmptyVideo(boolean show);
-    }
 
     private String title;
     private Bitmap img;
@@ -53,7 +51,7 @@ public class VideoInfo {
 
 
 // 전체 비디오 목록 에서 앨범 이름이 TestVideo 인 것만 리스트에 추가
-    public static ArrayList<VideoInfo> getVideo(Context context, CallbackEmpty callback) {
+    public static ArrayList<VideoInfo> getVideo(Context context, CommonInterface.OnCallbackEmptyVideo callback) {
 
         String[] proj = {
                 MediaStore.Video.Media._ID,

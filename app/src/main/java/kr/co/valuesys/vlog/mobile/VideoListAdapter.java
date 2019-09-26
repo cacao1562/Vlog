@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import java.io.File;
 import java.util.ArrayList;
 
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.Dialog.VideoPlayDialog;
@@ -28,13 +29,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private Activity activity;
     private Context context;
     private ArrayList<VideoInfo> mVideoInfo = new ArrayList<>();
-    private CallbackToList mCallbackToList;
+    private CommonInterface.OnCallbackEmptyVideoToList mCallbackToList;
 
-    public interface CallbackToList {
-        void onCallbackToList(boolean show);
-    }
 
-    public VideoListAdapter(Activity activity, CallbackToList callbackToList) {
+
+    public VideoListAdapter(Activity activity, CommonInterface.OnCallbackEmptyVideoToList callbackToList) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         this.mCallbackToList = callbackToList;
@@ -107,7 +106,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
                             activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
 
-                            setUp(VideoInfo.getVideo(activity, new VideoInfo.CallbackEmpty() {
+                            setUp(VideoInfo.getVideo(activity, new CommonInterface.OnCallbackEmptyVideo() {
                                 @Override
                                 public void onEmptyVideo(boolean show) {
                                     mCallbackToList.onCallbackToList(show);

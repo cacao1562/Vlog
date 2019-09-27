@@ -8,7 +8,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.View;
 
-import java.sql.Date;
+import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,9 +24,9 @@ public class VideoInfo {
     private String title;
     private Bitmap img;
     private Uri uri;
-    private String date;
+    private Date date;
 
-    public VideoInfo(String title, Bitmap img, Uri uri, String date) {
+    public VideoInfo(String title, Bitmap img, Uri uri, Date date) {
         this.title = title;
         this.img = img;
         this.uri = uri;
@@ -45,7 +45,7 @@ public class VideoInfo {
         return uri;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
@@ -70,7 +70,9 @@ public class VideoInfo {
 //        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath() + "/DCIM/TestVideo/");
 
         Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+
         ArrayList<VideoInfo> videoList = new ArrayList<>();
+
         assert cursor != null;
 
         while (cursor.moveToNext()) {
@@ -113,7 +115,7 @@ public class VideoInfo {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월dd일 HH시mm분ss초");
                     String format_time = format.format(new Date(dateTime));
 
-                    videoList.add(new VideoInfo(title, thumbnail, Uri.parse(data), format_time));
+                    videoList.add(new VideoInfo(title, thumbnail, Uri.parse(data), new Date(dateTime)));
 
 //                LogUtil.d("aaa", "cursor getstring id = " + cursor.getString(0) );
 //                LogUtil.d("aaa", "cursor getstring title = " + title );

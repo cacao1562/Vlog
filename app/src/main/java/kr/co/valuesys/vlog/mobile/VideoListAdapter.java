@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import java.io.File;
 import java.util.ArrayList;
 
+import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
@@ -53,8 +54,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         VideoInfo videoInfo = mVideoInfo.get(position);
         String title = videoInfo.getTitle();
         Bitmap img = videoInfo.getImg();
-        String date = videoInfo.getDate();
-        Uri uri = videoInfo.getUri();
+        String date = MobileApplication.getContext().convertDateToString(videoInfo.getDate(), "yyyy.MM.dd");
+//        Uri uri = videoInfo.getUri();
 
         binding.itemTitleTextview.setText(title);
         binding.itemThumbnailImgview.setImageBitmap(img);

@@ -92,6 +92,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
         LogUtil.d("eee", "blank onPause");
         int id = getIntent().getIntExtra("id", -1);
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.blank_container);
+
         if (id == 1 && isBeforeRecording) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
         }
@@ -104,7 +105,10 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
 
         LogUtil.d("eee", "blank onResume");
         int id = getIntent().getIntExtra("id", -1);
+
+// 현재 container에 있는 프래그먼트 가져옴
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.blank_container);
+
         if (id == 1 && fragment == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, CameraFragment.newInstance()).commit();
         }
@@ -113,6 +117,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
 
     private boolean isBeforeRecording = false;
 
+// CameraFragment에서 촬영전 상태일때 홈으로 나갔을때 true 콜백
     @Override
     public void onCameraPause(boolean pause) {
         isBeforeRecording = pause;

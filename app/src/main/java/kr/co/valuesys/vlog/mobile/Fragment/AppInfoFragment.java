@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import kr.co.valuesys.vlog.mobile.BuildConfig;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentAppInfoBinding;
 
@@ -42,6 +43,7 @@ public class AppInfoFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        binding.versionTextview.setText(BuildConfig.VERSION_NAME);
         binding.backButton.setOnClickListener(v -> {
                 getActivity().finish();
 

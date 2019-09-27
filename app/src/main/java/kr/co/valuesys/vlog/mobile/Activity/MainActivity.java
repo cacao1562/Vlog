@@ -23,9 +23,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
-    private AppInfoFragment appInfoFragment = AppInfoFragment.newInstance();
-    private CameraFragment cameraFragment = CameraFragment.newInstance();
-//    private CalendarFragment videoListFragment = CalendarFragment.newInstance();
     private VideoListFragment videoListFragment = VideoListFragment.newInstance();
 
     @Override
@@ -35,13 +32,25 @@ public class MainActivity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        if (null == savedInstanceState) {
-            LogUtil.d("aaa", "main savedInstanceState is null");
-//            binding.bottomView.setSelectedItemId(R.id.two);
-//            getSupportFragmentManager().beginTransaction().replace(R.id.container, videoListFragment).commit();
-        }
-
         getSupportFragmentManager().beginTransaction().replace(R.id.main_container, videoListFragment).commit();
+
+        binding.mainInfoImgbutton.setOnClickListener(v -> { presentBlankActivity(0); });
+        binding.mainRecordImgbutton.setOnClickListener(v -> { presentBlankActivity(1); });
+        binding.mainCalendarImgbutton.setOnClickListener(v -> { presentBlankActivity(2); });
+
+    }
+
+    private void presentBlankActivity(int id) {
+
+        Intent intent = new Intent(MainActivity.this, BlankActivity.class);
+        intent.putExtra("id", id);
+        startActivity(intent);
+
+    }
+
+}
+
+// BottomNavigationView 기본으로 첫번째 선택되어있는거 해제해주는거
 //        binding.bottomView.getMenu().getItem(0).setCheckable(false);
 
 //        binding.bottomView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -65,29 +74,3 @@ public class MainActivity extends AppCompatActivity {
 //                return true;
 //            }
 //        });
-
-        binding.mainInfoImgbutton.setOnClickListener(v -> { presentBlankActivity(0); });
-        binding.mainRecordImgbutton.setOnClickListener(v -> { presentBlankActivity(1); });
-        binding.mainCalendarImgbutton.setOnClickListener(v -> { presentBlankActivity(2); });
-
-    }
-
-    private void presentBlankActivity(int id) {
-
-        Intent intent = new Intent(MainActivity.this, BlankActivity.class);
-        intent.putExtra("id", id);
-        startActivity(intent);
-
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        LogUtil.d("aaa", "============== main onResume ");
-// 프래그먼트 다시 시작하는 코드
-//        getSupportFragmentManager().beginTransaction().detach(videoListFragment).attach(videoListFragment).commit();
-    }
-
-}

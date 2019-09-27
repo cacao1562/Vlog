@@ -1,5 +1,6 @@
 package kr.co.valuesys.vlog.mobile.Fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -9,8 +10,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
 import kr.co.valuesys.vlog.mobile.BuildConfig;
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentAppInfoBinding;
 
@@ -47,6 +54,30 @@ public class AppInfoFragment extends Fragment {
         binding.backButton.setOnClickListener(v -> {
                 getActivity().finish();
 
+        });
+
+        binding.logout.setOnClickListener(v -> {
+
+            UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
+                @Override
+                public void onCompleteLogout() {
+
+                    LogUtil.d("ooo", "logout");
+
+                    getActivity().runOnUiThread(() -> {
+
+                        Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                        AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+
+                            dialog.dismiss();
+                            getActivity().finish();
+                        });
+                        alert.show();
+
+                    });
+
+                }
+            });
         });
     }
 

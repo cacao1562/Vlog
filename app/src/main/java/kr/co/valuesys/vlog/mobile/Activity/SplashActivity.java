@@ -2,18 +2,25 @@ package kr.co.valuesys.vlog.mobile.Activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
+import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
@@ -31,8 +38,18 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        MobileApplication.getContext().requestAccessTokenInfo();
+        MobileApplication.getContext().requestMe();
+
+        getHashKey();
         deleteTempFiles();
-        requestPermission();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                requestPermission();
+            }
+        }, 2000);
 
     }
 
@@ -57,7 +74,7 @@ public class SplashActivity extends AppCompatActivity {
 
 // 권한 요청중 한 개라도 거부하면 메인으로 안 넘어감
                 if (isPermission) {
-                    presentMain();
+                    presentLoginView();
                 }
                 break;
         }
@@ -79,14 +96,14 @@ public class SplashActivity extends AppCompatActivity {
                     , Permission_Request_Code);
         }else {
 
-            presentMain();
+            presentLoginView();
         }
     }
 
 
-    private void presentMain() {
+    private void presentLoginView() {
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
     }
@@ -118,4 +135,21 @@ public class SplashActivity extends AppCompatActivity {
         }
 
     }
+
+    private void getHashKey(){
+        try {                                                        // 패키지이름을 입력해줍니다.
+            PackageInfo info = getPackageManager().getPackageInfo("kr.co.valuesys.vlog.mobile", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d(TAG,"key_hash="+ Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

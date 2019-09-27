@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 
+import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.CameraFragment;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         binding.mainRecordImgbutton.setOnClickListener(v -> { presentBlankActivity(1); });
         binding.mainCalendarImgbutton.setOnClickListener(v -> { presentBlankActivity(2); });
 
+        MobileApplication.getContext().requestAccessTokenInfo();
+        MobileApplication.getContext().requestMe();
     }
 
     private void presentBlankActivity(int id) {

@@ -30,8 +30,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCalendarBinding;
@@ -67,18 +70,6 @@ public class CalendarFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         new SetDrawVideoDate().execute();
-//        binding.calendarView.state().edit()
-//                .setFirstDayOfWeek(Calendar.SUNDAY)
-//                .setMinimumDate(CalendarDay.from(2019, 0, 1))
-//                .setMaximumDate(CalendarDay.from(2019, 11, 31))
-//                .setCalendarDisplayMode(CalendarMode.MONTHS)
-//                .commit();
-//
-//        binding.calendarView.addDecorators(new SundayDecorator(),
-//                                           new SaturdayDecorator(),
-//                                           new ToDayDecorator(),
-//                                           new EventDecorator(R.color.black, mVideosDate),
-//                                           new NewDecorator(getActivity()) );
 
 // 날짜 클릭 이벤트
         binding.calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
@@ -90,7 +81,6 @@ public class CalendarFragment extends Fragment {
                 }
             }
         });
-
         binding.backButton.setOnClickListener(v -> {
             getActivity().finish();
         });
@@ -108,8 +98,9 @@ public class CalendarFragment extends Fragment {
         if (videoInfos != null) {
 
             for (VideoInfo info : videoInfos) {
-
-                dateList.add(CalendarDay.from(info.getDate()));
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(info.getDate());
+                dateList.add(CalendarDay.from(cal));
 
             }
         }
@@ -183,9 +174,9 @@ public class CalendarFragment extends Fragment {
 
         /**
          */
-        public void setDate(Date date) {
-            this.date = CalendarDay.from(date);
-        }
+//        public void setDate(Date date) {
+//            this.date = CalendarDay.from(date);
+//        }
     }
 
 
@@ -216,7 +207,7 @@ public class CalendarFragment extends Fragment {
 
         private Drawable drawable;
 
-        CalendarDay currentDay = CalendarDay.from(new Date());
+        CalendarDay currentDay = CalendarDay.from(Calendar.getInstance());
 
         public NewDecorator(Activity context) {
             drawable = ContextCompat.getDrawable(context, R.drawable.first_day_month);

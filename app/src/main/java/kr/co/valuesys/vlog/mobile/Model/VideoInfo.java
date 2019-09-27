@@ -90,7 +90,6 @@ public class VideoInfo {
                         continue;
                     }
                     // bitmap  w = 242  h = 512 = MINI_KIND
-                    LogUtil.d("aaa", "bitmap  w = " + bitmap.getWidth() + "  h = " + bitmap.getHeight() );
 
                     String data = cursor.getString(2);
 

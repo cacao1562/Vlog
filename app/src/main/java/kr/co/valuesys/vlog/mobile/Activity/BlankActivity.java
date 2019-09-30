@@ -1,5 +1,6 @@
 package kr.co.valuesys.vlog.mobile.Activity;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -57,8 +58,9 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
     public void onBackPressed() {
 
 // calendar fragment일때 바로 finish
-        if (getIntent().getIntExtra("id", -1) == 2 ) {
+        if (getIntent().getIntExtra("id", -1) == 0 || getIntent().getIntExtra("id", -1) == 2  ) {
             super.onBackPressed();
+            return;
         }
 //        super.onBackPressed();
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();

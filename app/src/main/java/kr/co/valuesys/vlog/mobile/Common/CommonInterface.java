@@ -2,6 +2,8 @@ package kr.co.valuesys.vlog.mobile.Common;
 
 import android.content.DialogInterface;
 
+import com.kakao.util.exception.KakaoException;
+
 public interface CommonInterface {
 
 // BlankActivity에서 백버튼 눌렀을때 fragment로 callback
@@ -32,6 +34,11 @@ public interface CommonInterface {
 // SimpleAlert에서 확인버튼 눌렀을때 콜백
     interface OnAlertOkCallback {
         void onclickOK(DialogInterface dialog);
+    }
+
+// 카카오 세션 콜백
+    interface OnSessionResult {
+        void onCallback(boolean result, KakaoException exception);
     }
 
 }

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
@@ -56,7 +57,7 @@ public class AppInfoFragment extends Fragment {
 
         });
 
-        binding.logout.setOnClickListener(v -> {
+        binding.kakaoLogout.setOnClickListener(v -> {
 
             UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
                 @Override
@@ -79,6 +80,24 @@ public class AppInfoFragment extends Fragment {
                 }
             });
         });
+
+        binding.fbLogout.setOnClickListener(v -> {
+
+            LoginManager.getInstance().logOut();
+            getActivity().runOnUiThread(() -> {
+
+                Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+
+                    dialog.dismiss();
+                    getActivity().finish();
+                });
+                alert.show();
+
+            });
+
+        });
+
     }
 
 

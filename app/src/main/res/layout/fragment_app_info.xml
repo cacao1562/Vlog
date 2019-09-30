@@ -37,13 +37,33 @@
             android:background="@color/black"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <Button
-            android:id="@+id/logout"
-            app:layout_constraintTop_toBottomOf="@id/line"
-            app:layout_constraintRight_toRightOf="parent"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="logout"/>
+            app:layout_constraintTop_toBottomOf="@id/line"
+            app:layout_constraintRight_toRightOf="parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/kakao_logout"
+                app:layout_constraintTop_toBottomOf="@id/line"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:text="kakao_logout"/>
+
+
+            <Button
+                android:id="@+id/fb_logout"
+                app:layout_constraintTop_toBottomOf="@id/line"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="fb_logout"/>
+
+        </LinearLayout>
+
 
 
         <ImageView

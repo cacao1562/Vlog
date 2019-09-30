@@ -54,7 +54,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         VideoInfo videoInfo = mVideoInfo.get(position);
         String title = videoInfo.getTitle();
         Bitmap img = videoInfo.getImg();
-        String date = MobileApplication.getContext().convertDateToString(videoInfo.getDate(), "yyyy.MM.dd");
+        String date = MobileApplication.convertDateToString(videoInfo.getDate());
 //        Uri uri = videoInfo.getUri();
 
         binding.itemTitleTextview.setText(title);

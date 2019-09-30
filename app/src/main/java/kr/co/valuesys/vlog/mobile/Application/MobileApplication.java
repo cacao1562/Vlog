@@ -2,7 +2,13 @@ package kr.co.valuesys.vlog.mobile.Application;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Bundle;
 
+import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.appevents.AppEventsLogger;
 import com.kakao.auth.ApiResponseCallback;
 import com.kakao.auth.ApprovalType;
 import com.kakao.auth.AuthService;
@@ -17,8 +23,12 @@ import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +43,42 @@ public class MobileApplication extends Application {
 
     public static MobileApplication getContext() {
         return mobileApplication;
+    }
+
+    private String mKakaoNickName;
+
+    public String getKakaoNickName() { return  mKakaoNickName;}
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        mobileApplication = this;
+
+        KakaoSDK.init(new KakaoSDKAdapter());
+
+//        FacebookSdk.sdkInitialize(getApplicationContext());
+//        AppEventsLogger.activateApp(this);
+
+//        Realm.init(this);
+//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+//                .deleteRealmIfMigrationNeeded()
+//                .build();
+//        Realm.setDefaultConfiguration(realmConfiguration);
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        mobileApplication = null;
+    }
+
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+
+    public static String convertDateToString(Date date) {
+
+        String str = sdf.format(date);
+        return str;
     }
 
     private static class KakaoSDKAdapter extends KakaoAdapter {
@@ -83,33 +129,7 @@ public class MobileApplication extends Application {
         }
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        mobileApplication = this;
-
-        KakaoSDK.init(new KakaoSDKAdapter());
-//        Realm.init(this);
-//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-//                .deleteRealmIfMigrationNeeded()
-//                .build();
-//        Realm.setDefaultConfiguration(realmConfiguration);
-    }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-        mobileApplication = null;
-    }
-
-    public String convertDateToString(Date date, String pattern) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        String str = sdf.format(date);
-        return str;
-    }
-
+// 토킅 가져오기
     public void requestAccessTokenInfo() {
 
         AuthService.getInstance().requestAccessTokenInfo(new ApiResponseCallback<AccessTokenInfoResponse>() {
@@ -142,7 +162,9 @@ public class MobileApplication extends Application {
     }
 
 
+// 사용자 정보 가져오기
     public void requestMe() {
+
         List<String> keys = new ArrayList<>();
         keys.add("properties.nickname");
         keys.add("properties.profile_image");
@@ -165,6 +187,7 @@ public class MobileApplication extends Application {
             public void onSuccess(MeV2Response response) {
                 LogUtil.d("kakao ", "user id : " + response.getId());
 //                LogUtil.d("kakao " , "email: " + response.getKakaoAccount());
+                mKakaoNickName = response.getNickname();
                 LogUtil.d("kakao " , "nick name: " + response.getNickname());
                 LogUtil.d("kakao" , "profile image: " + response.getProfileImagePath());
 //                redirectMainActivity();
@@ -172,6 +195,40 @@ public class MobileApplication extends Application {
 
         });
 
+    }
+
+
+// facebook 로그인 정보 가져오기
+    public void useLoginInformation(AccessToken accessToken) {
+        /**
+         Creating the GraphRequest to fetch user details
+         1st Param - AccessToken
+         2nd Param - Callback (which will be invoked once the request is successful)
+         **/
+
+        GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+            //OnCompleted is invoked once the GraphRequest is successful
+            @Override
+            public void onCompleted(JSONObject object, GraphResponse response) {
+                try {
+                    String name = object.getString("name");
+                    String email = object.getString("email");
+                    String image = object.getJSONObject("picture").getJSONObject("data").getString("url");
+//                    displayName.setText(name);
+//                    emailID.setText(email);
+                    LogUtil.d("facebook", " name = " + name);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // We set parameters to the GraphRequest using a Bundle.
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,email,picture.width(200)");
+        request.setParameters(parameters);
+        // Initiate the GraphRequest
+        request.executeAsync();
     }
 
 

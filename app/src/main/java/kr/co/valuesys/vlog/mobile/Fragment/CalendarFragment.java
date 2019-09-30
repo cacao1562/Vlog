@@ -97,13 +97,26 @@ public class CalendarFragment extends Fragment {
 
         if (videoInfos != null) {
 
+            Calendar cal = Calendar.getInstance();
+            CalendarDay prev = null;
+
             for (VideoInfo info : videoInfos) {
-                Calendar cal = Calendar.getInstance();
+
                 cal.setTime(info.getDate());
-                dateList.add(CalendarDay.from(cal));
+
+                CalendarDay day = CalendarDay.from(cal);
+
+// 같은 날짜는 추가 안함
+                if (!day.equals(prev)) {
+                    dateList.add(day);
+                }
+
+                prev = day;
 
             }
         }
+
+        LogUtil.d("date list ", " size = " + dateList.size() );
 
         return dateList;
     }
@@ -232,10 +245,21 @@ public class CalendarFragment extends Fragment {
 
             mVideosDate = getVideosDate();
 
-            minYear = mVideosDate.get(mVideosDate.size()-1).getYear();
-            minMonth = mVideosDate.get(mVideosDate.size()-1).getMonth();
-            maxYear = mVideosDate.get(0).getYear();
-            maxMonth = mVideosDate.get(0).getMonth();
+            if (mVideosDate != null && mVideosDate.size() > 0 ) {
+
+                minYear = mVideosDate.get(mVideosDate.size()-1).getYear();
+                minMonth = mVideosDate.get(mVideosDate.size()-1).getMonth();
+                maxYear = mVideosDate.get(0).getYear();
+                maxMonth = mVideosDate.get(0).getMonth();
+
+            }else {
+
+                Calendar cal = Calendar.getInstance();
+                minYear = cal.get(Calendar.YEAR);
+                minMonth = 0;
+                maxYear = cal.get(Calendar.YEAR);
+                maxMonth = 11;
+            }
 
             return null;
         }

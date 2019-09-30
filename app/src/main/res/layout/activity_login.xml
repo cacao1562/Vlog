@@ -23,6 +23,7 @@
 
         <com.kakao.usermgmt.LoginButton
 
+            android:id="@+id/kakao_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
@@ -33,6 +34,18 @@
             app:layout_constraintRight_toRightOf="parent">
 
         </com.kakao.usermgmt.LoginButton>
+
+        <com.facebook.login.widget.LoginButton
+
+            android:id="@+id/facebook_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/kakao_button"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp" />
 
     </android.support.constraint.ConstraintLayout>
 

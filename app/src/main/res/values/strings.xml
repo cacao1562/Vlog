@@ -9,4 +9,7 @@
 
     <string name="kakao_app_key">9da05931c78e79c2050a45e5fe503b9e</string>
 
+    <string name="facebook_app_id">392782628042748</string>
+    <string name="fb_login_protocol_scheme">fb392782628042748</string>
+
 </resources>

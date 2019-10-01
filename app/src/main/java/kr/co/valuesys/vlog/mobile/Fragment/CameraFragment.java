@@ -23,6 +23,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -55,6 +56,7 @@ import java.util.concurrent.TimeUnit;
 import kr.co.valuesys.vlog.mobile.Activity.BlankActivity;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
+import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Dialog.InputFileNameDialog;
 import kr.co.valuesys.vlog.mobile.R;
@@ -64,12 +66,11 @@ import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
 
 public class CameraFragment extends Fragment implements View.OnClickListener,
                                                         MediaRecorder.OnInfoListener, MediaRecorder.OnErrorListener,
-                                                        CommonInterface.OnInputDialogListener, CommonInterface.OnBackPressedListener {
+                                                        CommonInterface.OnBackPressedListener {
 
     private static final String TAG = "CameraFragment";
-    //Superbrain 대신 원하는 폴더이름을 만들면 됩니다.
-    private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";
-    private static final String REAL_PATH = "DCIM/" + Constants.Real_Folder_Name + "/";
+//    private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";
+//    private static final String REAL_PATH = "DCIM/" + Constants.Real_Folder_Name + "/";
 
     private FragmentCameraBinding binding;
 
@@ -97,13 +98,20 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     private MediaRecorder mMediaRecorder;
 
+// 비디오 저장 경로
     private String mNextVideoAbsolutePath;
+// 촹영 중 상태인지
     private boolean mIsRecordingVideo;
 
+    private static final int Max_duration = 15000;
+
+// 기기 해상도
     private int mScreen_width;
     private int mScreen_height;
 
     private CommonInterface.OnCameraPauseListener mCallbackPause;
+
+    private CountDownTimer mCountDownTimer;
 
     public static CameraFragment newInstance() {
         return new CameraFragment();
@@ -135,7 +143,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         display.getRealSize(size);
         mScreen_width = size.x;
         mScreen_height = size.y;
-        LogUtil.d("zzz", "screen w = " + mScreen_width + " h = " + mScreen_height );
+        LogUtil.d(TAG, "screen w = " + mScreen_width + " h = " + mScreen_height );
     }
 
     @Nullable
@@ -201,8 +209,31 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             InputFileNameDialog inputFileNameDialog = InputFileNameDialog.newInstance();
             inputFileNameDialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+            Bundle args = new Bundle();
+            args.putString(Constants.ARG_Key, mNextVideoAbsolutePath);
+            inputFileNameDialog.setArguments(args);
             inputFileNameDialog.show(this.getChildFragmentManager(), "dialog");
         });
+
+
+        binding.progressBar.setMax(Max_duration);
+
+        long maxTime = 15000;
+
+        mCountDownTimer = new CountDownTimer(maxTime, 10) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+                int value = (int) ( maxTime - millisUntilFinished);
+                binding.progressBar.setProgress( value );
+            }
+
+            @Override
+            public void onFinish() {
+                binding.progressBar.setProgress( Max_duration );
+            }
+        };
 
     }
 
@@ -215,7 +246,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onResume() {
         super.onResume();
-        LogUtil.d("eee", "camera onResume");
+        LogUtil.d(TAG, "camera onResume");
         startBackgroundThread();
 
         if (binding.preview.isAvailable()) {
@@ -237,7 +268,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onPause() {
 
-        LogUtil.d("eee", "camera onPause");
+        LogUtil.d(TAG, "camera onPause");
 //        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 //
 //
@@ -363,7 +394,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     };
 
 
-    //카메라 기능 호출
+/** 카메라 기능 호출 */
     private void openCamera(int width, int height) {
 
         Activity activity = getActivity();
@@ -451,7 +482,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             mCameraManager.openCamera(mCamId, mStateCallback, mBackgroundHandler);
 
         } catch (CameraAccessException | SecurityException | NullPointerException | InterruptedException e) {
-            LogUtil.d("exception", "e = " + e.toString() );
             e.printStackTrace();
             activity.finish();
         }
@@ -529,7 +559,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     }
 
 
-// 카메라 닫기
+/** 카메라 닫기 */
     private void closeCamera() {
 
         try {
@@ -559,7 +589,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     }
 
-//미리보기 기능
+/** 미리보기 기능 */
     private void startPreview() {
 
         if(null == mCameraDevice || !binding.preview.isAvailable() || null == mPreviewSize) {
@@ -593,7 +623,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         } catch (CameraAccessException e) {
             e.printStackTrace();
-            LogUtil.d("exception", "e = " + e.toString() );
         }
     }
 
@@ -610,7 +639,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         } catch (CameraAccessException e) {
             e.printStackTrace();
-            LogUtil.d("exception", "e = " + e.toString() );
         }
 
     }
@@ -702,7 +730,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         INVERSE_ORIENTATIONS.append(Surface.ROTATION_270, 0);
     }
 
-    //영상녹화 설정
+/** 영상녹화 설정 */
     private void setUpMediaRecorder() throws IOException {
 
         final Activity activity = getActivity();
@@ -710,7 +738,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         if(null == activity) return;
 
         if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
-            mNextVideoAbsolutePath = getVideoFilePath();
+            mNextVideoAbsolutePath = FileManager.getVideoFilePath();
         }
 
 //        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -754,7 +782,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
 
 //촬영 맥스 시간 설정 1000 = 1초
-        mMediaRecorder.setMaxDuration(15000);
+        mMediaRecorder.setMaxDuration(Max_duration);
         mMediaRecorder.setOnInfoListener(this);
         mMediaRecorder.setOnErrorListener(this);
 
@@ -764,12 +792,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             case SENSOR_ORIENTATION_DEFAULT_DEGREES:
                 mMediaRecorder.setOrientationHint(DEFAULT_ORIENTATIONS.get(rotation));
-                LogUtil.d("ddd" , "setUpMediaRecorder default = " + DEFAULT_ORIENTATIONS.get(rotation) );
+                LogUtil.d(TAG , "setUpMediaRecorder default = " + DEFAULT_ORIENTATIONS.get(rotation) );
                 break;
 
             case SENSOR_ORIENTATION_INVERSE_DEGREES:
                 mMediaRecorder.setOrientationHint(INVERSE_ORIENTATIONS.get(rotation));
-                LogUtil.d("ddd" , "setUpMediaRecorder inverse = " + INVERSE_ORIENTATIONS.get(rotation) );
+                LogUtil.d(TAG , "setUpMediaRecorder inverse = " + INVERSE_ORIENTATIONS.get(rotation) );
                 break;
         }
 
@@ -777,18 +805,18 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     }
 
-    //파일 이름 및 저장경로를 만듭니다.
-    private String getVideoFilePath() {
+/** 파일 이름 및 저장경로를 만듭니다. */
+//    private String getVideoFilePath() {
+//
+//        final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
+//        String path = dir.getPath() + "/" + TEMP_PATH;
+//        File dst = new File(path);
+//        if(!dst.exists()) dst.mkdirs();
+//
+//        return path + System.currentTimeMillis() + ".mp4";
+//    }
 
-        final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
-        String path = dir.getPath() + "/" + TEMP_PATH;
-        File dst = new File(path);
-        if(!dst.exists()) dst.mkdirs();
-
-        return path + System.currentTimeMillis() + ".mp4";
-    }
-
-    //녹화시작
+/** 녹화시작 */
     private void startRecordingVideo() {
 
         if (null == mCameraDevice || !binding.preview.isAvailable() || null == mPreviewSize) {
@@ -800,7 +828,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             closePreviewSession();
             setUpMediaRecorder();
             SurfaceTexture texture = binding.preview.getSurfaceTexture();
-            LogUtil.d("fff", "preview / w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight() );
+            LogUtil.d(TAG, "preview / w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight() );
             assert texture != null;
             mCaptureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
 
@@ -851,10 +879,10 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
 //            timer();
             startTimer();
+            mCountDownTimer.start();
 
         } catch (CameraAccessException | IOException e) {
             e.printStackTrace();
-            LogUtil.d("exception", "e = " + e.toString() );
         }
 
     }
@@ -866,7 +894,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //        binding.pictureBtn.setText(R.string.record);
 
         stopTimer();
+        mCountDownTimer.cancel();
+
         binding.pictureBtn.setVisibility(View.INVISIBLE);
+        binding.progressBar.setVisibility(View.INVISIBLE);
+
         binding.removeVideoBtn.setVisibility(View.VISIBLE);
         binding.saveVideoBtn.setVisibility(View.VISIBLE);
         binding.closeImgbutton.setVisibility(View.VISIBLE);
@@ -884,7 +916,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             mMediaRecorder.reset();
         }catch (Exception e) {
             e.printStackTrace();
-            LogUtil.d("exception", "e = " + e.toString() );
         }
 
 
@@ -912,39 +943,37 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     }
 
 //녹화 최대 시간에 도달하면 녹화 일시중지 시킨다
-    private void pauseRecording() {
-
-        mIsRecordingVideo = false;
-        binding.pictureBtn.setVisibility(View.INVISIBLE);
-//        binding.pictureBtn.setText(R.string.record);
-//        stop();
-        stopTimer();
-
-        binding.removeVideoBtn.setVisibility(View.VISIBLE);
-        binding.saveVideoBtn.setVisibility(View.VISIBLE);
-
-        try {
-            mCameraCaptureSession.stopRepeating();
-            mCameraCaptureSession.abortCaptures();
-        }catch (Exception e) {
-            e.printStackTrace();
-            LogUtil.d("exception", "e = " + e.toString() );
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-
-// pause 함수가 api24이상 부터 지원, 안드로이드 7.0 (하위 버전은 어떻게 해야할지 다시 봐야함)
-            try {
-
-                mMediaRecorder.pause();
-
-            }catch (Exception e) {
-                e.printStackTrace();
-                LogUtil.d("exception", "e = " + e.toString() );
-            }
-
-        }
-    }
+//    private void pauseRecording() {
+//
+//        mIsRecordingVideo = false;
+//        binding.pictureBtn.setVisibility(View.INVISIBLE);
+////        binding.pictureBtn.setText(R.string.record);
+////        stop();
+//        stopTimer();
+//
+//        binding.removeVideoBtn.setVisibility(View.VISIBLE);
+//        binding.saveVideoBtn.setVisibility(View.VISIBLE);
+//
+//        try {
+//            mCameraCaptureSession.stopRepeating();
+//            mCameraCaptureSession.abortCaptures();
+//        }catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//
+//// pause 함수가 api24이상 부터 지원, 안드로이드 7.0 (하위 버전은 어떻게 해야할지 다시 봐야함)
+//            try {
+//
+//                mMediaRecorder.pause();
+//
+//            }catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//        }
+//    }
 
     //카메라 전, 후, 광각 변경
 // 본인 카메라에 맞게 적용하면 됨.
@@ -993,9 +1022,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onError(MediaRecorder mr, int what, int extra) {
-        LogUtil.d("listener", "onError // waht = " + what + "  extra = " + extra );
+        LogUtil.d(TAG, "onError // waht = " + what + "  extra = " + extra );
         if (what == MediaRecorder.MEDIA_ERROR_SERVER_DIED) {
-            LogUtil.d("listener", "onError // MEDIA_ERROR_SERVER_DIED " );
+            LogUtil.d(TAG, "onError // MEDIA_ERROR_SERVER_DIED " );
         }
     }
 
@@ -1003,7 +1032,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onInfo(MediaRecorder mr, int what, int extra) {
 
-        LogUtil.d("listener", "onInfo // what = " + what + " extra = " + extra );
+        LogUtil.d(TAG, "onInfo // what = " + what + " extra = " + extra );
 
         if (what == MediaRecorder.MEDIA_RECORDER_INFO_MAX_DURATION_REACHED) {
 //            mr.stop();
@@ -1012,53 +1041,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-// 파일 이름 입역하는 dialog 에서 저장버튼 누를시 들어오는 콜백 , 입력한 문자열을 넘겨 받음
-    @Override
-    public void onClickSave(String newFileName) {
-
-//        resetUI();
-
-        if (mNextVideoAbsolutePath == null) { return; }
-
-        File file = new File( mNextVideoAbsolutePath );
-        File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
-        String path = dir.getPath() + "/" + REAL_PATH;
-
-        File realfolder = new File(path);
-        if (!realfolder.exists()) {
-            realfolder.mkdir();
-        }
-// 사용자가 입력한 이름으로 파일이름 변경
-        File fileNew = new File( path + newFileName + ".mp4" );
-
-        if( file.exists() ) {
-
-            if (file.renameTo(fileNew) ) {
-
-                getActivity().getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-            }
-
-        }else { }
-
-        Activity activity = getActivity();
-
-        if (null != activity) {
-
-            Toast.makeText(activity, "Video saved: " + fileNew.getPath(), Toast.LENGTH_SHORT).show();
-
-// 아래 코드가 없으면 갤러리 저장 적용이 안됨.
-            if (fileNew.exists()) {
-                getActivity().getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(fileNew)));
-            }
-
-        }
-
-        mNextVideoAbsolutePath = null;
-//        startPreview();
-//        getActivity().finish();
-    }
-
-
 
     static class CompareSizesByArea implements Comparator<Size> {
         @Override
@@ -1066,7 +1048,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             return Long.signum((long) lhs.getWidth() * lhs.getHeight() - (long) rhs.getWidth() * rhs.getHeight());
         }
     }
-
 
 
 
@@ -1081,6 +1062,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             timer.purge();
             timer = null;
         }
+
+        mCountDownTimer.cancel();
+        mCountDownTimer = null;
     }
 
     private Timer timer;
@@ -1143,35 +1127,17 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         binding.pictureBtn.setImageDrawable(getResources().getDrawable(R.drawable.btn_start_de));
         binding.switchImgBtn.setVisibility(View.VISIBLE);
         binding.recordTimeTxtView.setText("00:00");
-
+        binding.progressBar.setProgress(0);
+        binding.progressBar.setVisibility(View.VISIBLE);
     }
 
     private void deleteVideo() {
 
-        if (mNextVideoAbsolutePath != null) {
-
-            try {
-
-                File file = new File( mNextVideoAbsolutePath );
-
-                if (file.exists() ) {
-
-                    if (file.delete() ) {
-
-                        getActivity().getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-                        mNextVideoAbsolutePath = null;
-                        LogUtil.d(TAG, "======= delete succcess ");
-                    }else {
-                        LogUtil.d(TAG, "======= delete fail ");
-                    }
-
-                }
-
-            }catch (Exception e) {
-                e.printStackTrace();
+        new FileManager(getActivity()).deleteVideo(mNextVideoAbsolutePath, result -> {
+            if (result) {
+                mNextVideoAbsolutePath = null;
             }
-
-        }
+        });
 
     }
 

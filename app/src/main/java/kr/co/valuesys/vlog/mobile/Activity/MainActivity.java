@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.CameraFragment;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Intent intent = new Intent(MainActivity.this, BlankActivity.class);
-        intent.putExtra("id", id);
+        intent.putExtra(Constants.Fragment_Id, id);
         startActivity(intent);
 
     }

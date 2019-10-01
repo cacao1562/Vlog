@@ -10,4 +10,8 @@ public class Constants {
     public static final String Kakao = "kakao";
     public static final String FaceBook = "faceBook";
 
+    public static final String Fragment_Id = "id";
+
+    public static final String ARG_Key = "tempPath_key";
+
 }

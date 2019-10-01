@@ -11,8 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Toast;
 
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.Common.Constants;
+import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogInputfilenameBinding;
@@ -20,12 +22,14 @@ import kr.co.valuesys.vlog.mobile.databinding.DialogInputfilenameBinding;
 public class InputFileNameDialog extends DialogFragment {
 
 
-    private CommonInterface.OnInputDialogListener mListener;
-
     public InputFileNameDialog() { }
 
+    private String tempPath;
+
     public static InputFileNameDialog newInstance() {
-        return new InputFileNameDialog();
+
+        InputFileNameDialog dialog = new InputFileNameDialog();
+        return dialog;
     }
 
     private DialogInputfilenameBinding binding;
@@ -34,10 +38,14 @@ public class InputFileNameDialog extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        try {
-            mListener = (CommonInterface.OnInputDialogListener) getParentFragment();
-        } catch (ClassCastException e) {
-            throw new ClassCastException("Calling fragment must implement Callback interface");
+//        try {
+//            mListener = (CommonInterface.OnInputDialogListener) getParentFragment();
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException("Calling fragment must implement Callback interface");
+//        }
+
+        if (getArguments() != null) {
+            tempPath = getArguments().getString(Constants.ARG_Key);
         }
     }
 
@@ -74,20 +82,28 @@ public class InputFileNameDialog extends DialogFragment {
 
             }else {
 
-                if (mListener != null) {
-                    mListener.onClickSave(binding.fileNameEdittext.getText().toString());
-                }
+                new FileManager(getActivity()).saveFile(tempPath, binding.fileNameEdittext.getText().toString(), result -> {
 
-                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.saved_alert_msg), false, dialog -> {
+                    if (result) {
 
+                        AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.saved_alert_msg), false, dialog -> {
 
-                    dialog.dismiss(); // AlertDialog dismiss
-                    dismiss();       // DialogFragment dismiss
-                    getActivity().finish();
+                            dialog.dismiss(); // AlertDialog dismiss
+                            dismiss();       // DialogFragment dismiss
+                            getActivity().finish();
+
+                        });
+
+                        alert.show();
+
+                    }else {
+
+                        Toast.makeText(getActivity(), "저장 실패", Toast.LENGTH_LONG).show();
+                    }
 
                 });
 
-                alert.show();
+
             }
 
         });
@@ -97,12 +113,11 @@ public class InputFileNameDialog extends DialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mListener = null;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
+
 }

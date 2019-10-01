@@ -31,13 +31,14 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private Context context;
     private ArrayList<VideoInfo> mVideoInfo = new ArrayList<>();
     private CommonInterface.OnCallbackEmptyVideoToList mCallbackToList;
-
+    private String userNamee;
 
 
     public VideoListAdapter(Activity activity, CommonInterface.OnCallbackEmptyVideoToList callbackToList) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         this.mCallbackToList = callbackToList;
+        this.userNamee = MobileApplication.getContext().getLoginkName();
     }
 
     @NonNull
@@ -60,7 +61,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         binding.itemTitleTextview.setText(title);
         binding.itemThumbnailImgview.setImageBitmap(img);
         binding.itemDateTextview.setText(date);
-
+        binding.itemUserNameTextview.setText(userNamee + "  |  ");
 
     }
 

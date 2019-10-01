@@ -23,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
+import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivitySplashBinding;
@@ -45,7 +46,7 @@ public class SplashActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
 
 //        getHashKey();
-        deleteTempFiles();
+        new FileManager(this).deleteTempFiles();
 
         LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
         LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
@@ -142,54 +143,6 @@ public class SplashActivity extends AppCompatActivity {
 //        Session.getCurrentSession().removeCallback(callback);
     }
 
-
-    /**
-     * temp 폴더 아래에 있는 파일 삭제
-     */
-    private void deleteTempFiles() {
-
-        final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
-        String path = dir.getPath() + "/DCIM/" + Constants.Temp_Folder_Name + "/";
-        File temp = new File(path);
-
-        if (temp.exists()) {
-
-            File[] childs = temp.listFiles();
-
-            if (childs != null) {
-
-                for (File file : childs) {
-
-                    if (file.delete()) {
-
-                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-                    }
-
-                }
-
-
-            }
-        }
-
-    }
-
-    /**
-     * 카카오 sdk 홈페이지에 입력 해야할 해시키값 , 페이스북도 마찬가지
-     */
-    private void getHashKey() {
-        try {                                                        // 패키지이름을 입력해줍니다.
-            PackageInfo info = getPackageManager().getPackageInfo("kr.co.valuesys.vlog.mobile", PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d(TAG, "key_hash=" + Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 }

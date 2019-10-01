@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.CalendarFragment;
@@ -33,9 +34,9 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
 
         if (getIntent() != null) {
 
-            if (getIntent().getIntExtra("id", -1) != -1) {
+            if (getIntent().getIntExtra(Constants.Fragment_Id, -1) != -1) {
 
-                int id = getIntent().getIntExtra("id", -1);
+                int id = getIntent().getIntExtra(Constants.Fragment_Id, -1);
 
                 switch (id) {
                     case 0:
@@ -58,7 +59,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
     public void onBackPressed() {
 
 // calendar fragment일때 바로 finish
-        if (getIntent().getIntExtra("id", -1) == 0 || getIntent().getIntExtra("id", -1) == 2  ) {
+        if (getIntent().getIntExtra(Constants.Fragment_Id, -1) == 0 || getIntent().getIntExtra(Constants.Fragment_Id, -1) == 2  ) {
             super.onBackPressed();
             return;
         }
@@ -92,7 +93,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
         super.onPause();
 
         LogUtil.d("eee", "blank onPause");
-        int id = getIntent().getIntExtra("id", -1);
+        int id = getIntent().getIntExtra(Constants.Fragment_Id, -1);
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.blank_container);
 
         if (id == 1 && isBeforeRecording) {
@@ -106,7 +107,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
         super.onResume();
 
         LogUtil.d("eee", "blank onResume");
-        int id = getIntent().getIntExtra("id", -1);
+        int id = getIntent().getIntExtra(Constants.Fragment_Id, -1);
 
 // 현재 container에 있는 프래그먼트 가져옴
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.blank_container);

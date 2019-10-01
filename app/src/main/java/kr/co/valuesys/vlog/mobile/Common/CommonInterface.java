@@ -26,10 +26,6 @@ public interface CommonInterface {
         void onCallbackToList(boolean show);
     }
 
-// InputFileNameDialog에서 CameraFrament로 저장버튼 눌렀을때 입력한 텍스트(파일이름) 넘겨줌
-    interface OnInputDialogListener {
-        void onClickSave(String fileName);
-    }
 
 // SimpleAlert에서 확인버튼 눌렀을때 콜백
     interface OnAlertOkCallback {
@@ -39,6 +35,10 @@ public interface CommonInterface {
 // 카카오 세션 콜백
     interface OnSessionResult {
         void onCallback(boolean result, KakaoException exception);
+    }
+
+    interface FileSaveCallback {
+        void onSaveCallback(boolean result);
     }
 
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,14 @@ import com.facebook.login.LoginManager;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
+import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.BuildConfig;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentAppInfoBinding;
-
+import static kr.co.valuesys.vlog.mobile.Common.Constants.FaceBook;
+import static kr.co.valuesys.vlog.mobile.Common.Constants.Kakao;
 
 public class AppInfoFragment extends Fragment {
 
@@ -52,51 +55,62 @@ public class AppInfoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         binding.versionTextview.setText(BuildConfig.VERSION_NAME);
+
+        String platform = MobileApplication.getContext().getmLoginPlatform();
+
+        binding.loginPlatform.setText(" Login Platform : " + platform);
+        binding.loginName.setText(MobileApplication.getContext().getLoginkName());
+
+
         binding.backButton.setOnClickListener(v -> {
                 getActivity().finish();
 
         });
 
-        binding.kakaoLogout.setOnClickListener(v -> {
+        binding.logoutButton.setOnClickListener(v -> {
 
-            UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
-                @Override
-                public void onCompleteLogout() {
+            if (TextUtils.equals(platform, Kakao)) {
 
-                    LogUtil.d("ooo", "logout");
+                UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
+                    @Override
+                    public void onCompleteLogout() {
 
-                    getActivity().runOnUiThread(() -> {
+                        LogUtil.d("ooo", "logout");
 
-                        Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                        AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+                        getActivity().runOnUiThread(() -> {
 
-                            dialog.dismiss();
-                            getActivity().finish();
+                            Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                            AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+
+                                dialog.dismiss();
+                                getActivity().finish();
+                            });
+                            alert.show();
+
                         });
-                        alert.show();
 
-                    });
-
-                }
-            });
-        });
-
-        binding.fbLogout.setOnClickListener(v -> {
-
-            LoginManager.getInstance().logOut();
-            getActivity().runOnUiThread(() -> {
-
-                Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
-
-                    dialog.dismiss();
-                    getActivity().finish();
+                    }
                 });
-                alert.show();
 
-            });
+            }else {
+
+                LoginManager.getInstance().logOut();
+                getActivity().runOnUiThread(() -> {
+
+                    Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                    AlertDialog alert = new SimpleAlert().createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+
+                        dialog.dismiss();
+                        getActivity().finish();
+                    });
+                    alert.show();
+
+                });
+
+            }
 
         });
+
 
     }
 

@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         callbackManager = CallbackManager.Factory.create();
-        
+
         binding.facebookButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -106,7 +106,6 @@ public class LoginActivity extends AppCompatActivity {
         if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
             return;
         }
-        LoginManager.getInstance().logOut();
         super.onActivityResult(requestCode, resultCode, data);
     }
 

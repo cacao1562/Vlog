@@ -8,6 +8,7 @@ import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.Profile;
 import com.facebook.appevents.AppEventsLogger;
 import com.kakao.auth.ApiResponseCallback;
 import com.kakao.auth.ApprovalType;
@@ -22,13 +23,13 @@ import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.usermgmt.response.model.UserAccount;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -45,9 +46,13 @@ public class MobileApplication extends Application {
         return mobileApplication;
     }
 
-    private String mKakaoNickName;
+    private String mLoginName;
+    private String mLoginPlatform;
 
-    public String getKakaoNickName() { return  mKakaoNickName;}
+    public String getLoginkName() { return mLoginName;}
+
+    public String getmLoginPlatform() { return mLoginPlatform; }
+    public void setmLoginPlatform(String mLoginPlatform) { this.mLoginPlatform = mLoginPlatform; }
 
     @Override
     public void onCreate() {
@@ -57,8 +62,8 @@ public class MobileApplication extends Application {
 
         KakaoSDK.init(new KakaoSDKAdapter());
 
-//        FacebookSdk.sdkInitialize(getApplicationContext());
-//        AppEventsLogger.activateApp(this);
+        FacebookSdk.sdkInitialize(this);
+        AppEventsLogger.activateApp(this);
 
 //        Realm.init(this);
 //        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
@@ -129,7 +134,7 @@ public class MobileApplication extends Application {
         }
     }
 
-// 토킅 가져오기
+// kakao 토킅 가져오기
     public void requestAccessTokenInfo() {
 
         AuthService.getInstance().requestAccessTokenInfo(new ApiResponseCallback<AccessTokenInfoResponse>() {
@@ -162,7 +167,7 @@ public class MobileApplication extends Application {
     }
 
 
-// 사용자 정보 가져오기
+/** kakao 사용자 정보 가져오기 */
     public void requestMe() {
 
         List<String> keys = new ArrayList<>();
@@ -185,9 +190,10 @@ public class MobileApplication extends Application {
 
             @Override
             public void onSuccess(MeV2Response response) {
+
                 LogUtil.d("kakao ", "user id : " + response.getId());
 //                LogUtil.d("kakao " , "email: " + response.getKakaoAccount());
-                mKakaoNickName = response.getNickname();
+                mLoginName = response.getNickname();
                 LogUtil.d("kakao " , "nick name: " + response.getNickname());
                 LogUtil.d("kakao" , "profile image: " + response.getProfileImagePath());
 //                redirectMainActivity();
@@ -197,6 +203,15 @@ public class MobileApplication extends Application {
 
     }
 
+    public void setFbName() {
+
+//        String name = Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getLastName();
+        LogUtil.d("eee", " first name = " + Profile.getCurrentProfile().getFirstName() );
+        LogUtil.d("eee", " middle name = " + Profile.getCurrentProfile().getMiddleName() );
+        LogUtil.d("eee", " last name = " + Profile.getCurrentProfile().getLastName() );
+        LogUtil.d("eee", "  name = " + Profile.getCurrentProfile().getName() );
+        mLoginName = Profile.getCurrentProfile().getName();
+    }
 
 // facebook 로그인 정보 가져오기
     public void useLoginInformation(AccessToken accessToken) {
@@ -217,6 +232,8 @@ public class MobileApplication extends Application {
 //                    displayName.setText(name);
 //                    emailID.setText(email);
                     LogUtil.d("facebook", " name = " + name);
+                    mLoginName = name;
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

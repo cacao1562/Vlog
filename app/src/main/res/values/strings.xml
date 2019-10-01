@@ -7,9 +7,12 @@
     <string name="empty_name_alert_msg">"입력된 제목이 없습니다. 제목을 입력해주세요."</string>
     <string name="saved_alert_msg">"저장 되었습니다."</string>
 
+<!--kakao    -->
     <string name="kakao_app_key">9da05931c78e79c2050a45e5fe503b9e</string>
 
+<!--faceBook-->
     <string name="facebook_app_id">392782628042748</string>
     <string name="fb_login_protocol_scheme">fb392782628042748</string>
+
 
 </resources>

@@ -197,7 +197,8 @@ public class CalendarFragment extends Fragment {
     public class EventDecorator implements DayViewDecorator {
 
         private final int color;
-        private final HashSet<CalendarDay> dates;
+//        private final HashSet<CalendarDay> dates;
+        private final Collection<CalendarDay> dates;
 
         public EventDecorator(int color, Collection<CalendarDay> dates) {
             this.color = color;
@@ -247,6 +248,7 @@ public class CalendarFragment extends Fragment {
 
             if (mVideosDate != null && mVideosDate.size() > 0 ) {
 
+// 리스트가 내림차순으로 정렬되어있어서 앞에가 높은날짜
                 minYear = mVideosDate.get(mVideosDate.size()-1).getYear();
                 minMonth = mVideosDate.get(mVideosDate.size()-1).getMonth();
                 maxYear = mVideosDate.get(0).getYear();
@@ -271,8 +273,8 @@ public class CalendarFragment extends Fragment {
             binding.calendarView.state().edit()
                     .setFirstDayOfWeek(Calendar.SUNDAY)
                     .setMinimumDate(CalendarDay.from(minYear, minMonth, 1))
-                    .setMaximumDate(CalendarDay.from(maxYear, maxMonth, 31))
-                    .setCalendarDisplayMode(CalendarMode.MONTHS)
+                    .setMaximumDate(CalendarDay.from(maxYear, 11, 31))
+//                    .setCalendarDisplayMode(CalendarMode.MONTHS)
                     .commit();
 
             binding.calendarView.addDecorators(new SundayDecorator(),

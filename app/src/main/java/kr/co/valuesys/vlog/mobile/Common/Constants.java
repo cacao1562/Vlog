@@ -7,4 +7,7 @@ public class Constants {
 
     public static final boolean Print_Log = true;
 
+    public static final String Kakao = "kakao";
+    public static final String FaceBook = "faceBook";
+
 }

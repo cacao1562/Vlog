@@ -1,34 +1,21 @@
 package kr.co.valuesys.vlog.mobile.Activity;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.ContactsContract;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.Profile;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
-import com.kakao.util.exception.KakaoException;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -36,10 +23,12 @@ import java.security.NoSuchAlgorithmException;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
-import kr.co.valuesys.vlog.mobile.Common.KakaoSessionCallback;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivitySplashBinding;
+
+import static kr.co.valuesys.vlog.mobile.Common.Constants.FaceBook;
+import static kr.co.valuesys.vlog.mobile.Common.Constants.Kakao;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -55,74 +44,94 @@ public class SplashActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_splash);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
 
-        getHashKey();
+//        getHashKey();
         deleteTempFiles();
 
-        LogUtil.d("splash", " kaako " + Session.getCurrentSession().checkAndImplicitOpen() );
-        LogUtil.d("splash", " facebook " + AccessToken.isCurrentAccessTokenActive() );
-        LogUtil.d("splash", " facebook 22 " + AccessToken.isDataAccessActive() );
-        LogUtil.d("splash", " facebook 33 " + AccessToken.getCurrentAccessToken() );
+        LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
+        LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
+        LogUtil.d(TAG, " facebook 22 " + AccessToken.isDataAccessActive());
+        LogUtil.d(TAG, " facebook 33 " + AccessToken.getCurrentAccessToken());
 
-        CallbackManager callbackManager = CallbackManager.Factory.create();
+        boolean kakaoSession = Session.getCurrentSession().checkAndImplicitOpen();
+        boolean fbSession = AccessToken.isCurrentAccessTokenActive();
 
+        if (kakaoSession) {
+            MobileApplication.getContext().requestMe();
+            MobileApplication.getContext().setmLoginPlatform(Kakao);
 
-//        if (Session.getCurrentSession().checkAndImplicitOpen() || AccessToken.isCurrentAccessTokenActive()) {
-//
-//            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-//            startActivity(intent);
-//            finish();
-//
-//        }else {
-//
-//            Intent intent = new Intent(this, LoginActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (AccessToken.isCurrentAccessTokenActive()) {
-            LogUtil.d("facebook", " splash token = active " + Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getLastName() );
         }else {
-            LogUtil.d("facebook", " splash token = not active " );
+
+            if (AccessToken.getCurrentAccessToken() != null) {
+                MobileApplication.getContext().useLoginInformation(AccessToken.getCurrentAccessToken());
+            }
+//            MobileApplication.getContext().setFbName();
+            MobileApplication.getContext().setmLoginPlatform(FaceBook);
         }
 
-        if (accessToken != null) {
-            LogUtil.d("facebook", " splash token = null");
-        }else {
-            LogUtil.d("facebook", " splash token = " + accessToken );
-        }
+        binding.logo.postDelayed(() -> {
 
-        callback = new KakaoSessionCallback( (result, exception) -> {
+            if ( kakaoSession || fbSession ) {
 
-            if (result) {
-
-                MobileApplication.getContext().requestMe();
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
 
-            }else {
+            } else {
 
-                if (exception != null) {
-                    exception.printStackTrace();
-                }
-                presentLoginView();
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+
             }
 
-        });
+        }, 1000);
 
 
-        Session.getCurrentSession().addCallback(callback);
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (AccessToken.isCurrentAccessTokenActive()) {
+            LogUtil.d(TAG, " splash token = active " + Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getLastName());
+        } else {
+            LogUtil.d(TAG, " splash token = not active ");
+        }
 
+        if (accessToken != null) {
+            LogUtil.d(TAG, " splash token = " + accessToken);
+        } else {
+            LogUtil.d(TAG, " splash token = null ");
+        }
 
-        binding.logo.postDelayed(() -> {
-            if (!Session.getCurrentSession().checkAndImplicitOpen()) {
-                presentLoginView();
-            }
-        }, 500);
+//        callback = new KakaoSessionCallback( (result, exception) -> {
+//
+//            if (result) {
+//
+//                MobileApplication.getContext().requestMe();
+//                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+//                startActivity(intent);
+//                finish();
+//
+//            }else {
+//
+//                if (exception != null) {
+//                    exception.printStackTrace();
+//                }
+//                presentLoginView();
+//            }
+//
+//        });
+//
+//
+//        Session.getCurrentSession().addCallback(callback);
+//
+//
+//        binding.logo.postDelayed(() -> {
+//            if (!Session.getCurrentSession().checkAndImplicitOpen()) {
+//                presentLoginView();
+//            }
+//        }, 500);
 
-        LogUtil.d("sss", " check = " + Session.getCurrentSession().checkAndImplicitOpen());
-        LogUtil.d("sss", " isOpenable = " + Session.getCurrentSession().isOpenable());
-        LogUtil.d("sss", " isOpened = " + Session.getCurrentSession().isOpened());
+        LogUtil.d(TAG, " check = " + Session.getCurrentSession().checkAndImplicitOpen());
+        LogUtil.d(TAG, " isOpenable = " + Session.getCurrentSession().isOpenable());
+        LogUtil.d(TAG, " isOpened = " + Session.getCurrentSession().isOpened());
 
     }
 
@@ -130,18 +139,13 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Session.getCurrentSession().removeCallback(callback);
+//        Session.getCurrentSession().removeCallback(callback);
     }
 
-    private void presentLoginView() {
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
-
-    }
-
-    // temp 폴더 아래에 있는 파일 삭제
+    /**
+     * temp 폴더 아래에 있는 파일 삭제
+     */
     private void deleteTempFiles() {
 
         final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
@@ -169,7 +173,9 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
-    // 카카오 sdk 홈페이지에 입력 해야할 해시키값
+    /**
+     * 카카오 sdk 홈페이지에 입력 해야할 해시키값 , 페이스북도 마찬가지
+     */
     private void getHashKey() {
         try {                                                        // 패키지이름을 입력해줍니다.
             PackageInfo info = getPackageManager().getPackageInfo("kr.co.valuesys.vlog.mobile", PackageManager.GET_SIGNATURES);

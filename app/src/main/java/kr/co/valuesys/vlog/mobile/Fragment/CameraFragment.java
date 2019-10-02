@@ -19,6 +19,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -741,24 +742,10 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             mNextVideoAbsolutePath = FileManager.getVideoFilePath();
         }
 
+
 //        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 //        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-//
-//        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-//
-//        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-//        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-//
-//        mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
-//
-//        mMediaRecorder.setVideoFrameRate(30);
-//
-//
-//
-//        mMediaRecorder.setVideoEncodingBitRate(10000000);
-//        mMediaRecorder.setAudioSamplingRate(16000);
-
-//        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
+//        CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
 //        mMediaRecorder.setProfile(profile);
 //        mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
 
@@ -777,6 +764,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
 
         mMediaRecorder.setVideoEncodingBitRate(10000000);
+//        mMediaRecorder.setVideoEncodingBitRate(1024 * 1024);
         mMediaRecorder.setAudioSamplingRate(16000);
 
 //        mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));

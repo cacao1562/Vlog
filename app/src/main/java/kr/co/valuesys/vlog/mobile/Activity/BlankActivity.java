@@ -39,6 +39,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
                 int id = getIntent().getIntExtra(Constants.Fragment_Id, -1);
 
                 switch (id) {
+
                     case 0:
                         getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, AppInfoFragment.newInstance()).commit();
                         break;

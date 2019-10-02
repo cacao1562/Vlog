@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.Dialog.VideoPlayDialog;
@@ -89,6 +90,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                 dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
                 dialog.show(((AppCompatActivity) activity).getSupportFragmentManager(), "dialog");
 
+// 설치된 비디오 앱으로 연결
 //            Intent intent = new Intent();
 //            intent.setAction(Intent.ACTION_VIEW);
 //            intent.setDataAndType(uri, "video/*");
@@ -100,27 +102,19 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
                 AlertDialog alert = new SimpleAlert().createAlert(activity, "삭제 하시겠습니까?", true, dialog -> {
 
-                    File file = new File(mVideoInfo.get(getAdapterPosition()).getUri().toString());
+                    new FileManager(activity).deleteVideo(mVideoInfo.get(getAdapterPosition()).getUri().toString(), result -> {
 
-                    if (file.exists()) {
+                        if (result) {
 
-                        if (file.delete()) {
+                            setUp(VideoInfo.getVideo(activity, show -> {
 
-                            activity.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-
-                            setUp(VideoInfo.getVideo(activity, new CommonInterface.OnCallbackEmptyVideo() {
-                                @Override
-                                public void onEmptyVideo(boolean show) {
-                                    mCallbackToList.onCallbackToList(show);
-                                }
+                                mCallbackToList.onCallbackToList(show);
                             }));
-//                        mVideoInfo.remove(position);
-//                        notifyDataSetChanged();
-
-//                        notifyDataSetChanged();
-                            dialog.dismiss();
                         }
-                    }
+
+                        dialog.dismiss();
+                    });
+
                 });
 
                 alert.show();

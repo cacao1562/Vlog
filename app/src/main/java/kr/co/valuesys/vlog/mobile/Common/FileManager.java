@@ -22,28 +22,31 @@ public class FileManager {
 
     private static final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
 
-    public void saveFile(String tempPath, String newFileName, CommonInterface.FileSaveCallback callback) {
+    /**
+     * 파일 저장
+     */
+    public void saveFile(String tempPath, String newFileName, CommonInterface.OnFileCallback callback) {
 
         boolean result = false;
 
         if (TextUtils.isEmpty(tempPath)) {
-            callback.onSaveCallback(false);
+            callback.onFileCallback(false);
             return;
         }
 
         File tempFile = new File(tempPath);
-//        File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
         String path = dir.getPath() + "/" + REAL_PATH;
-
         File realfolder = new File(path);
+
         if (!realfolder.exists()) {
             realfolder.mkdir();
         }
-// 사용자가 입력한 이름으로 파일이름 변경
+
         File newFile = new File(path + newFileName + ".mp4");
 
         if (tempFile.exists()) {
 
+// 사용자가 입력한 이름으로 파일이름 변경
             if (tempFile.renameTo(newFile)) {
 
                 result = true;
@@ -63,15 +66,17 @@ public class FileManager {
 
         }
 
-        callback.onSaveCallback(result);
+        callback.onFileCallback(result);
 
     }
 
-
-    public void deleteVideo(String filePath, CommonInterface.FileSaveCallback callback) {
+    /**
+     * 비디오 파일 삭제
+     */
+    public void deleteVideo(String filePath, CommonInterface.OnFileCallback callback) {
 
         if (TextUtils.isEmpty(filePath)) {
-            callback.onSaveCallback(false);
+            callback.onFileCallback(false);
             return;
         }
 
@@ -84,34 +89,35 @@ public class FileManager {
                 if (file.delete()) {
 
                     mActivity.getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-                    callback.onSaveCallback(true);
+                    callback.onFileCallback(true);
 
                 } else {
 
-                    callback.onSaveCallback(false);
+                    callback.onFileCallback(false);
                 }
 
             } else {
 
-                callback.onSaveCallback(false);
+                callback.onFileCallback(false);
             }
 
         } catch (NullPointerException e) {
 
-            callback.onSaveCallback(false);
+            callback.onFileCallback(false);
             e.printStackTrace();
         }
 
 
     }
 
-/** 파일 이름 및 저장경로를 만듭니다. */
+    /**
+     * 파일 이름 및 저장경로를 만듭니다.
+     */
     public static String getVideoFilePath() {
 
-//        final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
         String path = dir.getPath() + "/" + TEMP_PATH;
         File dst = new File(path);
-        if(!dst.exists()) dst.mkdirs();
+        if (!dst.exists()) dst.mkdirs();
 
         return path + System.currentTimeMillis() + ".mp4";
     }
@@ -121,7 +127,6 @@ public class FileManager {
      */
     public void deleteTempFiles() {
 
-//        final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
         String path = dir.getPath() + "/DCIM/" + Constants.Temp_Folder_Name + "/";
         File temp = new File(path);
 

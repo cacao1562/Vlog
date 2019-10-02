@@ -88,19 +88,6 @@ public class SplashActivity extends AppCompatActivity {
         }, 1000);
 
 
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (AccessToken.isCurrentAccessTokenActive()) {
-            LogUtil.d(TAG, " splash token = active " + Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getLastName());
-        } else {
-            LogUtil.d(TAG, " splash token = not active ");
-        }
-
-        if (accessToken != null) {
-            LogUtil.d(TAG, " splash token = " + accessToken);
-        } else {
-            LogUtil.d(TAG, " splash token = null ");
-        }
-
 //        callback = new KakaoSessionCallback( (result, exception) -> {
 //
 //            if (result) {
@@ -129,10 +116,6 @@ public class SplashActivity extends AppCompatActivity {
 //                presentLoginView();
 //            }
 //        }, 500);
-
-        LogUtil.d(TAG, " check = " + Session.getCurrentSession().checkAndImplicitOpen());
-        LogUtil.d(TAG, " isOpenable = " + Session.getCurrentSession().isOpenable());
-        LogUtil.d(TAG, " isOpened = " + Session.getCurrentSession().isOpened());
 
     }
 

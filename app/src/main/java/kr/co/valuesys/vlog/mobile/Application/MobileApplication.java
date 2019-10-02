@@ -203,13 +203,9 @@ public class MobileApplication extends Application {
 
     }
 
+// facebook 이름 가져오기
     public void setFbName() {
 
-//        String name = Profile.getCurrentProfile().getFirstName() + Profile.getCurrentProfile().getLastName();
-        LogUtil.d("eee", " first name = " + Profile.getCurrentProfile().getFirstName() );
-        LogUtil.d("eee", " middle name = " + Profile.getCurrentProfile().getMiddleName() );
-        LogUtil.d("eee", " last name = " + Profile.getCurrentProfile().getLastName() );
-        LogUtil.d("eee", "  name = " + Profile.getCurrentProfile().getName() );
         mLoginName = Profile.getCurrentProfile().getName();
     }
 

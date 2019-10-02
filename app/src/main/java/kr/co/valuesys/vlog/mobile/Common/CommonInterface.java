@@ -37,8 +37,9 @@ public interface CommonInterface {
         void onCallback(boolean result, KakaoException exception);
     }
 
-    interface FileSaveCallback {
-        void onSaveCallback(boolean result);
+// 파일 저장 삭제 결과 콜백
+    interface OnFileCallback {
+        void onFileCallback(boolean result);
     }
 
 }

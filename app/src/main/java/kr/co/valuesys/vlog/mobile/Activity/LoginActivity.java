@@ -38,10 +38,10 @@ public class LoginActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         binding.facebookButton.setPermissions(Arrays.asList("email", "public_profile"));
 
-        LogUtil.d("123", " kaako " + Session.getCurrentSession().checkAndImplicitOpen() );
-        LogUtil.d("123", " facebook " + AccessToken.isCurrentAccessTokenActive() );
-        LogUtil.d("123", " facebook 22 " + AccessToken.isDataAccessActive() );
-        LogUtil.d("123", " facebook 33 " + AccessToken.getCurrentAccessToken() );
+//        LogUtil.d("123", " kaako " + Session.getCurrentSession().checkAndImplicitOpen() );
+//        LogUtil.d("123", " facebook " + AccessToken.isCurrentAccessTokenActive() );
+//        LogUtil.d("123", " facebook 22 " + AccessToken.isDataAccessActive() );
+//        LogUtil.d("123", " facebook 33 " + AccessToken.getCurrentAccessToken() );
 
         callback = new KakaoSessionCallback( (result, exception) -> {
 
@@ -64,14 +64,17 @@ public class LoginActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
 
         binding.facebookButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
             @Override
             public void onSuccess(LoginResult loginResult) {
+
+                AccessToken token = loginResult.getAccessToken();
+                MobileApplication.getContext().useLoginInformation(token);
+
                 final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
-                AccessToken token = loginResult.getAccessToken();
-                MobileApplication.getContext().useLoginInformation(token);
-                LogUtil.d("login", " facebook " + AccessToken.isCurrentAccessTokenActive() );
+
             }
 
             @Override
@@ -88,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Session.getCurrentSession().addCallback(callback);
         Session.getCurrentSession().checkAndImplicitOpen();
-        LogUtil.d("mmm", "onCreate Login");
+
     }
 
     @Override

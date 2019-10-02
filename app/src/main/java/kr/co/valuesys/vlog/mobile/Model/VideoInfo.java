@@ -112,9 +112,6 @@ public class VideoInfo {
 
                     long dateTime = cursor.getLong(4);
 
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월dd일 HH시mm분ss초");
-                    String format_time = format.format(new Date(dateTime));
-
                     videoList.add(new VideoInfo(title, thumbnail, Uri.parse(data), new Date(dateTime)));
 
 //                LogUtil.d("aaa", "cursor getstring id = " + cursor.getString(0) );
@@ -132,13 +129,13 @@ public class VideoInfo {
         }
 
         if (videoList.size() == 0) {
-//            binding.videoListEmptyview.setVisibility(View.VISIBLE);
+
             if (callback != null) {
                 callback.onEmptyVideo(true);
             }
 
         } else {
-//            binding.videoListEmptyview.setVisibility(View.GONE);
+
             if (callback != null) {
                 callback.onEmptyVideo(false);
             }

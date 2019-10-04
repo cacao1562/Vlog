@@ -76,8 +76,7 @@ public class CalendarFragment extends Fragment {
 
         binding.calendarView.addDecorators(new SundayDecorator(),
                 new SaturdayDecorator(),
-                new ToDayDecorator(),
-                new NewDecorator(getActivity()) );
+                new ToDayDecorator() );
 
 // 날짜 클릭 이벤트
 
@@ -86,6 +85,8 @@ public class CalendarFragment extends Fragment {
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
 
                 LogUtil.d("cal", "selected = " + date );
+
+                binding.calendarView.setDateSelected(date, false);
 
                 if (mVideosDate != null) {
 
@@ -104,7 +105,7 @@ public class CalendarFragment extends Fragment {
             getActivity().finish();
         });
 
-//        binding.calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+        binding.calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
 
     }
 
@@ -239,10 +240,13 @@ public class CalendarFragment extends Fragment {
         private final int color;
 //        private final HashSet<CalendarDay> dates;
         private final Collection<CalendarDay> dates;
+        private Drawable drawable;
 
-        public EventDecorator(int color, Collection<CalendarDay> dates) {
+        public EventDecorator(Activity context, int color, Collection<CalendarDay> dates) {
             this.color = color;
             this.dates = new HashSet<>(dates);
+            this.dates.add(CalendarDay.today() );
+            this.drawable = ContextCompat.getDrawable(context, R.drawable.day_border);
         }
 
         @Override
@@ -252,32 +256,33 @@ public class CalendarFragment extends Fragment {
 
         @Override
         public void decorate(DayViewFacade view) {
-            view.addSpan(new DotSpan(5, color));
+//            view.addSpan(new DotSpan(5, color));
+            view.setSelectionDrawable(drawable);
         }
     }
 
 // 오늘 날짜에 검은 테두리 표시
-    public class NewDecorator implements DayViewDecorator {
-
-        private Drawable drawable;
-
-        CalendarDay currentDay = CalendarDay.from(Calendar.getInstance());
-
-        public NewDecorator(Activity context) {
-            drawable = ContextCompat.getDrawable(context, R.drawable.first_day_month);
-
-        }
-
-        @Override
-        public boolean shouldDecorate(CalendarDay day) {
-            return day.equals(currentDay);
-        }
-
-        @Override
-        public void decorate(DayViewFacade view) {
-            view.setSelectionDrawable(drawable);
-        }
-    }
+//    public class NewDecorator implements DayViewDecorator {
+//
+//        private Drawable drawable;
+//
+//        CalendarDay currentDay = CalendarDay.from(Calendar.getInstance());
+//
+//        public NewDecorator(Activity context) {
+//            drawable = ContextCompat.getDrawable(context, R.drawable.first_day_month);
+//
+//        }
+//
+//        @Override
+//        public boolean shouldDecorate(CalendarDay day) {
+//            return day.equals(currentDay);
+//        }
+//
+//        @Override
+//        public void decorate(DayViewFacade view) {
+//            view.setSelectionDrawable(drawable);
+//        }
+//    }
 
     private class SetDrawVideoDate extends AsyncTask<Void, Void, Void> {
 
@@ -318,7 +323,7 @@ public class CalendarFragment extends Fragment {
                     .commit();
 
             binding.calendarView.addDecorators(
-                    new EventDecorator(R.color.black, mVideosDate) );
+                    new EventDecorator(getActivity(), R.color.black, mVideosDate) );
 
         }
     }

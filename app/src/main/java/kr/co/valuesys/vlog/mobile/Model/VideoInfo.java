@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.view.View;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -52,7 +54,7 @@ public class VideoInfo {
 
 
 // 전체 비디오 목록 에서 앨범 이름이 TestVideo 인 것만 리스트에 추가
-    public static ArrayList<VideoInfo> getVideo(Context context, CommonInterface.OnCallbackEmptyVideo callback) {
+    public static ArrayList<VideoInfo> getVideo(Context context, boolean getThumbnail, CommonInterface.OnCallbackEmptyVideo callback) {
 
         String[] proj = {
                 MediaStore.Video.Media._ID,
@@ -84,30 +86,38 @@ public class VideoInfo {
 
                     String title = cursor.getString(1);
                     title = title.replace(".mp4", "");
-                    long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));
-                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(context.getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
-
-                    if (bitmap == null) {
-                        continue;
-                    }
-                    // bitmap  w = 242  h = 512 = MINI_KIND
-
                     String data = cursor.getString(2);
 
+//                    long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media._ID));
+//                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(context.getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
+//
+//                    if (bitmap == null) {
+//                        continue;
+//                    }
+                    // bitmap  w = 242  h = 512 = MINI_KIND
+
+
+
                     Bitmap thumbnail = null;
-                    // 썸네일 크기 변경할 때.
-                    try {
-                        // 썸네일 추출후 리사이즈해서 다시 비트맵 생성
-                        Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(data, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
-                        thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 1024, 512);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (getThumbnail) {
+
+                        // 썸네일 크기 변경할 때.
+                        try {
+                            // 썸네일 추출후 리사이즈해서 다시 비트맵 생성
+                            Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(data, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+                            thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 1024, 512);
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if (thumbnail == null) {
+                            continue;
+                        }
+
                     }
 
-                    if (thumbnail == null) {
-                        continue;
-                    }
 //                    LogUtil.d("aaa", "resize bitmap  w = " + thumbnail.getWidth() + "  h = " + thumbnail.getHeight() );
 
                     long dateTime = cursor.getLong(4);
@@ -128,19 +138,19 @@ public class VideoInfo {
 
         }
 
-        if (videoList.size() == 0) {
+        if (callback != null) {
 
-            if (callback != null) {
+            if (videoList.size() == 0) {
+
                 callback.onEmptyVideo(true);
-            }
 
-        } else {
+            } else {
 
-            if (callback != null) {
                 callback.onEmptyVideo(false);
-            }
 
+            }
         }
+
         cursor.close();
 
 // date 날짜 기준으로 비디오 리스트를 내림차순 정렬

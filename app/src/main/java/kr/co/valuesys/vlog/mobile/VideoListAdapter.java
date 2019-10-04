@@ -106,7 +106,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
                         if (result) {
 
-                            setUp(VideoInfo.getVideo(activity, show -> {
+                            setUp(VideoInfo.getVideo(activity, true, show -> {
 
                                 mCallbackToList.onCallbackToList(show);
                             }));

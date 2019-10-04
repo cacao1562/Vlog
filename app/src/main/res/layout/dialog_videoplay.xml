@@ -45,6 +45,7 @@
                 android:layout_marginLeft="10dp" />
 
             <CheckBox
+                android:id="@+id/videoPlay_heartCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:button="@drawable/heart_selector"

@@ -16,7 +16,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/backButton"
-            app:mcv_selectionMode="none"
+            app:mcv_selectionMode="single"
             app:mcv_showOtherDates="defaults" />
 
         <Button

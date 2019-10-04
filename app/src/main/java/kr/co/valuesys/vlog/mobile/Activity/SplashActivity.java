@@ -5,24 +5,18 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
 
 import com.facebook.AccessToken;
-import com.facebook.Profile;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
 
-import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
-import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
@@ -45,7 +39,7 @@ public class SplashActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_splash);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
 
-//        getHashKey();
+        getHashKey();
         new FileManager(this).deleteTempFiles();
 
         LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
@@ -117,6 +111,24 @@ public class SplashActivity extends AppCompatActivity {
 //            }
 //        }, 500);
 
+    }
+
+    /**
+     * 카카오 sdk 홈페이지에 입력 해야할 해시키값 , 페이스북도 마찬가지
+     */
+    private void getHashKey() {
+        try {                                                        // 패키지이름을 입력해줍니다.
+            PackageInfo info = getPackageManager().getPackageInfo("kr.co.valuesys.vlog.mobile", PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                LogUtil.d(TAG, "key_hash=" + Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
 

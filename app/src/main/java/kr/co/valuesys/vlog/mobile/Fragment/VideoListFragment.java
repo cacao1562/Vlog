@@ -19,12 +19,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 
+import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
@@ -62,7 +66,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         adapter = new VideoListAdapter(getActivity(), this);
         binding.videoListRecyclerview.setAdapter(adapter);
 
-        adapter.setUp(VideoInfo.getVideo(getActivity(), this));
+        adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
 
         return binding.getRoot();
 //        return inflater.inflate(R.layout.fragment_video_list, container, false);
@@ -72,7 +76,28 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     public void onResume() {
         super.onResume();
 
-        adapter.setUp(VideoInfo.getVideo(getActivity(), this));
+        ArrayList<VideoInfo> info = VideoInfo.getVideo(getActivity(), true,  this);
+        adapter.setUp(info);
+
+        if (MobileApplication.getContext().getmSelectDay() != null) {
+
+            Calendar cal = Calendar.getInstance();
+
+            for (int i = 0; i < info.size(); i++) {
+
+                cal.setTime(info.get(i).getDate());
+
+                if (CalendarDay.from(cal).equals(MobileApplication.getContext().getmSelectDay()) ) {
+
+                    LogUtil.d("main", " selected = " + MobileApplication.getContext().getmSelectDay() + "  position = " + i);
+                    binding.videoListRecyclerview.scrollToPosition(i);
+                    MobileApplication.getContext().setmSelectDay(null);
+                }
+
+            }
+
+        }
+
     }
 
 

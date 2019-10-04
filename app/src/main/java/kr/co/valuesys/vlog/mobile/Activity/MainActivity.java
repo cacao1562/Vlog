@@ -4,22 +4,17 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.graphics.Point;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Display;
-import android.view.MenuItem;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Toast;
 
-import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
+import kr.co.valuesys.vlog.mobile.Fragment.CalendarFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.CameraFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.VideoListFragment;
 import kr.co.valuesys.vlog.mobile.R;
@@ -61,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             requestPermission();
             return;
         }
+
         Intent intent = new Intent(MainActivity.this, BlankActivity.class);
         intent.putExtra(Constants.Fragment_Id, id);
         startActivity(intent);
@@ -115,7 +111,28 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
         super.onBackPressed();
+
+//        binding.mainContainer2.setVisibility(View.GONE);
+//        if (getFragmentManager().getBackStackEntryCount() > 0) {
+//            getFragmentManager().popBackStack();
+//
+//        } else {
+//            super.onBackPressed();
+//        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LogUtil.d(TAG, "onPause");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogUtil.d(TAG, "onResume");
     }
 }
 

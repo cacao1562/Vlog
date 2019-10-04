@@ -34,6 +34,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
@@ -51,6 +52,7 @@ public class CalendarFragment extends Fragment {
     private int maxYear;
     private int maxMonth;
 
+    private SetDrawVideoDate setDrawVideoDate;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,31 +71,69 @@ public class CalendarFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        new SetDrawVideoDate().execute();
+        setDrawVideoDate = new SetDrawVideoDate();
+        setDrawVideoDate.execute();
+
+        binding.calendarView.addDecorators(new SundayDecorator(),
+                new SaturdayDecorator(),
+                new ToDayDecorator(),
+                new NewDecorator(getActivity()) );
 
 // 날짜 클릭 이벤트
+
         binding.calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
 
-                if (date.equals(CalendarDay.today())) {
-//                    getActivity().finish();
+                LogUtil.d("cal", "selected = " + date );
+
+                if (mVideosDate != null) {
+
+                    if (mVideosDate.contains(date)) {
+
+                        MobileApplication.getContext().setmSelectDay(date);
+                        getActivity().finish();
+                    }
                 }
+
             }
+
         });
+
         binding.backButton.setOnClickListener(v -> {
             getActivity().finish();
         });
 
-//        binding.calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+//        binding.calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
 
     }
 
-// 비디오 생성 date 리스트에 넣어서 달력에 표시하기 위해
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (setDrawVideoDate.getStatus() == AsyncTask.Status.RUNNING) {
+            setDrawVideoDate.cancel(true);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+    }
+
+    // 비디오 생성 date 리스트에 넣어서 달력에 표시하기 위해
     private ArrayList<CalendarDay> getVideosDate() {
 
         ArrayList<CalendarDay> dateList =  new ArrayList<>();
-        ArrayList<VideoInfo> videoInfos = VideoInfo.getVideo(getActivity(), null);
+        ArrayList<VideoInfo> videoInfos = VideoInfo.getVideo(getActivity(), false, null);
 
         if (videoInfos != null) {
 
@@ -216,7 +256,7 @@ public class CalendarFragment extends Fragment {
         }
     }
 
-
+// 오늘 날짜에 검은 테두리 표시
     public class NewDecorator implements DayViewDecorator {
 
         private Drawable drawable;
@@ -277,11 +317,8 @@ public class CalendarFragment extends Fragment {
 //                    .setCalendarDisplayMode(CalendarMode.MONTHS)
                     .commit();
 
-            binding.calendarView.addDecorators(new SundayDecorator(),
-                    new SaturdayDecorator(),
-                    new ToDayDecorator(),
-                    new EventDecorator(R.color.black, mVideosDate),
-                    new NewDecorator(getActivity()) );
+            binding.calendarView.addDecorators(
+                    new EventDecorator(R.color.black, mVideosDate) );
 
         }
     }

@@ -24,6 +24,7 @@ import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
 import com.kakao.usermgmt.response.model.UserAccount;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,10 +50,15 @@ public class MobileApplication extends Application {
     private String mLoginName;
     private String mLoginPlatform;
 
+    private CalendarDay mSelectDay;
+
     public String getLoginkName() { return mLoginName;}
 
     public String getmLoginPlatform() { return mLoginPlatform; }
     public void setmLoginPlatform(String mLoginPlatform) { this.mLoginPlatform = mLoginPlatform; }
+
+    public CalendarDay getmSelectDay() { return mSelectDay; }
+    public void setmSelectDay(CalendarDay mSelectDay) { this.mSelectDay = mSelectDay; }
 
     @Override
     public void onCreate() {

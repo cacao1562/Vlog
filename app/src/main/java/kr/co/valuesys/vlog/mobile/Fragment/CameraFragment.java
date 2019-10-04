@@ -20,6 +20,7 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.CamcorderProfile;
+import android.media.MediaCodecInfo;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
@@ -741,7 +742,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
         if (mNextVideoAbsolutePath == null || mNextVideoAbsolutePath.isEmpty()) {
             mNextVideoAbsolutePath = FileManager.getVideoFilePath();
         }
-
 
 //        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 //        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);

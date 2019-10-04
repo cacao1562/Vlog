@@ -21,6 +21,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
 
     private ActivityBlankBinding binding;
 
+    private int mFragmentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +37,9 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
 
             if (getIntent().getIntExtra(Constants.Fragment_Id, -1) != -1) {
 
-                int id = getIntent().getIntExtra(Constants.Fragment_Id, -1);
+                mFragmentId = getIntent().getIntExtra(Constants.Fragment_Id, -1);
 
-                switch (id) {
+                switch (mFragmentId) {
 
                     case 0:
                         getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, AppInfoFragment.newInstance()).commit();
@@ -60,11 +61,10 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
     public void onBackPressed() {
 
 // calendar fragment일때 바로 finish
-        if (getIntent().getIntExtra(Constants.Fragment_Id, -1) == 0 || getIntent().getIntExtra(Constants.Fragment_Id, -1) == 2  ) {
+        if (mFragmentId == 0 || mFragmentId == 2  ) {
             super.onBackPressed();
             return;
         }
-//        super.onBackPressed();
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
 
         if (fragmentList != null) {
@@ -93,11 +93,15 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
     protected void onPause() {
         super.onPause();
 
+        if (mFragmentId == 0 || mFragmentId == 2  ) {
+            return;
+        }
+
         LogUtil.d("eee", "blank onPause");
         int id = getIntent().getIntExtra(Constants.Fragment_Id, -1);
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.blank_container);
 
-        if (id == 1 && isBeforeRecording) {
+        if (mFragmentId == 1 && isBeforeRecording) {
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
         }
 
@@ -107,13 +111,16 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
     protected void onResume() {
         super.onResume();
 
+        if (mFragmentId == 0 || mFragmentId == 2  ) {
+            return;
+        }
         LogUtil.d("eee", "blank onResume");
         int id = getIntent().getIntExtra(Constants.Fragment_Id, -1);
 
 // 현재 container에 있는 프래그먼트 가져옴
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.blank_container);
 
-        if (id == 1 && fragment == null) {
+        if (mFragmentId == 1 && fragment == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.blank_container, CameraFragment.newInstance()).commit();
         }
 

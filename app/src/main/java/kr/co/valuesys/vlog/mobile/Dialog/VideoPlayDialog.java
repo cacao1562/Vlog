@@ -17,6 +17,7 @@ import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import java.io.IOException;
 
@@ -90,6 +91,16 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
 
         binding.videoPlayBackButton.setOnClickListener(v -> {
             dismiss();
+        });
+
+        binding.videoPlayHeartCheckBox.setOnClickListener(v -> {
+
+            if (binding.videoPlayHeartCheckBox.isChecked()) {
+
+            }else {
+
+            }
+
         });
     }
 

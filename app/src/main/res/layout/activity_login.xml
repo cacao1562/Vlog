@@ -39,7 +39,8 @@
 
             android:id="@+id/facebook_button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
+            android:scaleY="1.9"
             app:layout_constraintTop_toBottomOf="@+id/kakao_button"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

@@ -100,9 +100,9 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
             binding.itemDeleteImgButton.setOnClickListener(v -> {
 
-                AlertDialog alert = new SimpleAlert().createAlert(activity, "삭제 하시겠습니까?", true, dialog -> {
+                AlertDialog alert = SimpleAlert.createAlert(activity, "삭제 하시겠습니까?", true, dialog -> {
 
-                    new FileManager(activity).deleteVideo(mVideoInfo.get(getAdapterPosition()).getUri().toString(), result -> {
+                    FileManager.deleteVideo(activity, mVideoInfo.get(getAdapterPosition()).getUri().toString(), result -> {
 
                         if (result) {
 

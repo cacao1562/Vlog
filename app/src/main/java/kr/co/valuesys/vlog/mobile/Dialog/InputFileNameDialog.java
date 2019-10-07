@@ -72,7 +72,7 @@ public class InputFileNameDialog extends DialogFragment {
 
             if (TextUtils.isEmpty(binding.fileNameEdittext.getText().toString()) ) {
 
-                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.empty_name_alert_msg), false, dialog -> {
+                AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.empty_name_alert_msg), false, dialog -> {
 
                     dialog.dismiss(); // AlertDialog dismiss
 
@@ -82,11 +82,11 @@ public class InputFileNameDialog extends DialogFragment {
 
             }else {
 
-                new FileManager(getActivity()).saveFile(tempPath, binding.fileNameEdittext.getText().toString(), result -> {
+                FileManager.saveFile(getActivity(), tempPath, binding.fileNameEdittext.getText().toString(), result -> {
 
                     if (result) {
 
-                        AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.saved_alert_msg), false, dialog -> {
+                        AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.saved_alert_msg), false, dialog -> {
 
                             dialog.dismiss(); // AlertDialog dismiss
                             dismiss();       // DialogFragment dismiss

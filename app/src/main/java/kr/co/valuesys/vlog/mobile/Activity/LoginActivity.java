@@ -47,10 +47,17 @@ public class LoginActivity extends AppCompatActivity {
 
             if (result) {
 
-                MobileApplication.getContext().requestMe();
-                final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                MobileApplication.getContext().requestMe(result1 -> {
+
+                    if (result) {
+
+                        final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+
+                });
 
             }else {
 
@@ -69,11 +76,17 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
 
                 AccessToken token = loginResult.getAccessToken();
-                MobileApplication.getContext().useLoginInformation(token);
+                MobileApplication.getContext().useLoginInformation(token, result -> {
 
-                final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                    if (result) {
+
+                        final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+
+                });
 
             }
 

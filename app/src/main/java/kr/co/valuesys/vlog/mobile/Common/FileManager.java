@@ -11,21 +11,15 @@ import java.io.File;
 
 public class FileManager {
 
-    public FileManager(Activity activity) {
-        this.mActivity = activity;
-    }
-
     private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";
     private static final String REAL_PATH = "DCIM/" + Constants.Real_Folder_Name + "/";
-
-    private Activity mActivity;
 
     private static final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
 
     /**
      * 파일 저장
      */
-    public void saveFile(String tempPath, String newFileName, CommonInterface.OnFileCallback callback) {
+    public static void saveFile(Activity mActivity, String tempPath, String newFileName, CommonInterface.OnFileCallback callback) {
 
         boolean result = false;
 
@@ -73,7 +67,7 @@ public class FileManager {
     /**
      * 비디오 파일 삭제
      */
-    public void deleteVideo(String filePath, CommonInterface.OnFileCallback callback) {
+    public static void deleteVideo(Activity mActivity, String filePath, CommonInterface.OnFileCallback callback) {
 
         if (TextUtils.isEmpty(filePath)) {
             callback.onFileCallback(false);
@@ -125,9 +119,10 @@ public class FileManager {
     /**
      * temp 폴더 아래에 있는 파일 삭제
      */
-    public void deleteTempFiles() {
+    public static void deleteTempFiles(Activity mActivity) {
 
-        String path = dir.getPath() + "/DCIM/" + Constants.Temp_Folder_Name + "/";
+//        String path = dir.getPath() + "/DCIM/" + Constants.Temp_Folder_Name + "/";
+        String path = dir.getPath() + "/" + TEMP_PATH;
         File temp = new File(path);
 
         if (temp.exists()) {

@@ -7,6 +7,7 @@ import android.content.pm.Signature;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.facebook.AccessToken;
@@ -33,6 +34,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private ISessionCallback callback;
 
+    private String session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,46 +43,39 @@ public class SplashActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
 
         getHashKey();
-        new FileManager(this).deleteTempFiles();
+        FileManager.deleteTempFiles(this);
 
         LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
         LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
         LogUtil.d(TAG, " facebook 22 " + AccessToken.isDataAccessActive());
         LogUtil.d(TAG, " facebook 33 " + AccessToken.getCurrentAccessToken());
 
-        boolean kakaoSession = Session.getCurrentSession().checkAndImplicitOpen();
-        boolean fbSession = AccessToken.isCurrentAccessTokenActive();
+        session = MobileApplication.getLoginSession();
 
-        if (kakaoSession) {
-            MobileApplication.getContext().requestMe();
-            MobileApplication.getContext().setmLoginPlatform(Kakao);
+        if (TextUtils.equals(session, Kakao)) {
+
+            MobileApplication.getContext().requestMe(result -> {
+
+                presentNext();
+
+            });
+
+        }else if (TextUtils.equals(session, FaceBook)) {
+
+            if (AccessToken.getCurrentAccessToken() != null) {
+
+                MobileApplication.getContext().useLoginInformation(AccessToken.getCurrentAccessToken(), result -> {
+
+                    presentNext();
+
+                });
+            }
 
         }else {
 
-            if (AccessToken.getCurrentAccessToken() != null) {
-                MobileApplication.getContext().useLoginInformation(AccessToken.getCurrentAccessToken());
-            }
-//            MobileApplication.getContext().setFbName();
-            MobileApplication.getContext().setmLoginPlatform(FaceBook);
+            presentNext();
+
         }
-
-        binding.logo.postDelayed(() -> {
-
-            if ( kakaoSession || fbSession ) {
-
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-
-            } else {
-
-                Intent intent = new Intent(this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-
-            }
-
-        }, 1000);
 
 
 //        callback = new KakaoSessionCallback( (result, exception) -> {
@@ -113,6 +109,27 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
+    private void presentNext() {
+
+        binding.logo.postDelayed(() -> {
+
+            if (!TextUtils.isEmpty(session)) {
+
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+
+            }
+
+        }, 1000);
+
+    }
     /**
      * 카카오 sdk 홈페이지에 입력 해야할 해시키값 , 페이스북도 마찬가지
      */

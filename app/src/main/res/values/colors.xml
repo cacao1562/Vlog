@@ -17,4 +17,7 @@
     <color name="circle_gray">#80FFFFFF</color>
     <color name="green">#8BC34A</color>
 
+    <color name="kakao_color">#FADC4A</color>
+    <color name="facebook_color">#3379EA</color>
+
 </resources>

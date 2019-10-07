@@ -18,6 +18,7 @@ import com.kakao.auth.IApplicationConfig;
 import com.kakao.auth.ISessionConfig;
 import com.kakao.auth.KakaoAdapter;
 import com.kakao.auth.KakaoSDK;
+import com.kakao.auth.Session;
 import com.kakao.auth.network.response.AccessTokenInfoResponse;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 
 //import io.realm.Realm;
@@ -52,6 +55,7 @@ public class MobileApplication extends Application {
 
     private CalendarDay mSelectDay;
 
+    public void setmLoginName(String mLoginName) { this.mLoginName = mLoginName; }
     public String getLoginkName() { return mLoginName;}
 
     public String getmLoginPlatform() { return mLoginPlatform; }
@@ -174,7 +178,7 @@ public class MobileApplication extends Application {
 
 
 /** kakao 사용자 정보 가져오기 */
-    public void requestMe() {
+    public void requestMe(CommonInterface.OnFileCallback callback) {
 
         List<String> keys = new ArrayList<>();
         keys.add("properties.nickname");
@@ -186,6 +190,7 @@ public class MobileApplication extends Application {
             public void onFailure(ErrorResult errorResult) {
                 String message = "failed to get user info. msg=" + errorResult;
                 LogUtil.d("kakao requestMe onFailure", message);
+                callback.onFileCallback(false);
             }
 
             @Override
@@ -200,9 +205,11 @@ public class MobileApplication extends Application {
                 LogUtil.d("kakao ", "user id : " + response.getId());
 //                LogUtil.d("kakao " , "email: " + response.getKakaoAccount());
                 mLoginName = response.getNickname();
+                mLoginPlatform = Constants.Kakao;
                 LogUtil.d("kakao " , "nick name: " + response.getNickname());
                 LogUtil.d("kakao" , "profile image: " + response.getProfileImagePath());
 //                redirectMainActivity();
+                callback.onFileCallback(true);
             }
 
         });
@@ -216,7 +223,7 @@ public class MobileApplication extends Application {
     }
 
 // facebook 로그인 정보 가져오기
-    public void useLoginInformation(AccessToken accessToken) {
+    public void useLoginInformation(AccessToken accessToken, CommonInterface.OnFileCallback callback) {
         /**
          Creating the GraphRequest to fetch user details
          1st Param - AccessToken
@@ -235,9 +242,12 @@ public class MobileApplication extends Application {
 //                    emailID.setText(email);
                     LogUtil.d("facebook", " name = " + name);
                     mLoginName = name;
+                    mLoginPlatform = Constants.FaceBook;
+                    callback.onFileCallback(true);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    callback.onFileCallback(false);
                 }
             }
         });
@@ -248,6 +258,20 @@ public class MobileApplication extends Application {
         request.setParameters(parameters);
         // Initiate the GraphRequest
         request.executeAsync();
+    }
+
+
+    public static String getLoginSession() {
+
+        boolean kakaoSession = Session.getCurrentSession().checkAndImplicitOpen();
+        boolean fbSession = AccessToken.isCurrentAccessTokenActive();
+
+        if (kakaoSession) {
+            return Constants.Kakao;
+        }else if (fbSession) {
+            return Constants.FaceBook;
+        }
+        return "";
     }
 
 

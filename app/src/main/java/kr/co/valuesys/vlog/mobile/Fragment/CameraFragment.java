@@ -172,7 +172,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 
-                AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
+                AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
 
                     deleteVideo();
                     dialog.dismiss();
@@ -191,7 +191,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         binding.removeVideoBtn.setOnClickListener(v -> {
 
-            AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.remove_video_alert_msg), true, dialog -> {
+            AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.remove_video_alert_msg), true, dialog -> {
 
                 resetUI();
                 deleteVideo();
@@ -1121,7 +1121,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     private void deleteVideo() {
 
-        new FileManager(getActivity()).deleteVideo(mNextVideoAbsolutePath, result -> {
+        FileManager.deleteVideo(getActivity(), mNextVideoAbsolutePath, result -> {
             if (result) {
                 mNextVideoAbsolutePath = null;
             }
@@ -1135,7 +1135,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 
-            AlertDialog alert = new SimpleAlert().createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
+            AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
 
                 deleteVideo();
                 dialog.dismiss();

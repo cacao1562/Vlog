@@ -73,7 +73,7 @@ public class BlankActivity extends AppCompatActivity implements CommonInterface.
 
                 if(fragment instanceof CommonInterface.OnBackPressedListener) {
 
-                    ((CommonInterface.OnBackPressedListener)fragment).onBackPressed();
+                    ((CommonInterface.OnBackPressedListener)fragment).onBackPressedCallback();
 
                 }else {
 

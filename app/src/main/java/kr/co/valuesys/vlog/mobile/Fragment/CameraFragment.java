@@ -1131,7 +1131,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
 // BlankActivity에서 back키 눌렀을때 callback
     @Override
-    public void onBackPressed() {
+    public void onBackPressedCallback() {
 
         if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 

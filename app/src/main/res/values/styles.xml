@@ -12,6 +12,7 @@
     <style name="FullScreenDialogTheme" parent="Theme.AppCompat.Light.DialogWhenLarge">
         <!--<item name="android:statusBarColor">@color/white</item>-->
         <item name="windowNoTitle">true</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:windowAnimationStyle">@style/MyAnimation.Window</item>
     </style>
 

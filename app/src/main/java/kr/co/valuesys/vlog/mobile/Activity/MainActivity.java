@@ -7,10 +7,12 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
@@ -20,7 +22,7 @@ import kr.co.valuesys.vlog.mobile.Fragment.VideoListFragment;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CommonInterface.OnBackPressedListener {
 
     private static final String TAG = "MainActivity";
     private static final int Permission_Request_Code = 200;
@@ -65,9 +67,19 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        Intent intent = new Intent(MainActivity.this, BlankActivity.class);
-        intent.putExtra(Constants.Fragment_Id, id);
-        startActivity(intent);
+
+        if (id == 0) {
+            AppInfoFragment af = AppInfoFragment.newInstance();
+            af.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+            af.show(getSupportFragmentManager(), "tag");
+        }else if (id == 2) {
+            CalendarFragment cf = CalendarFragment.newInstance();
+            cf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+            cf.show(getSupportFragmentManager(), "tag");
+        }
+//        Intent intent = new Intent(MainActivity.this, BlankActivity.class);
+//        intent.putExtra(Constants.Fragment_Id, id);
+//        startActivity(intent);
 
     }
 
@@ -118,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
 
         super.onBackPressed();
-
 //        binding.mainContainer2.setVisibility(View.GONE);
 //        if (getFragmentManager().getBackStackEntryCount() > 0) {
 //            getFragmentManager().popBackStack();
@@ -138,6 +149,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         LogUtil.d(TAG, "onResume");
+    }
+
+    @Override
+    public void onBackPressedCallback() {
+        VideoListFragment vf = (VideoListFragment) getSupportFragmentManager().findFragmentById(R.id.main_container);
+        vf.scrolltoVideo();
     }
 }
 

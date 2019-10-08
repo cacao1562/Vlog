@@ -1,12 +1,14 @@
 package kr.co.valuesys.vlog.mobile.Fragment;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -29,7 +31,7 @@ import kr.co.valuesys.vlog.mobile.databinding.FragmentAppInfoBinding;
 import static kr.co.valuesys.vlog.mobile.Common.Constants.FaceBook;
 import static kr.co.valuesys.vlog.mobile.Common.Constants.Kakao;
 
-public class AppInfoFragment extends Fragment {
+public class AppInfoFragment extends DialogFragment {
 
     private FragmentAppInfoBinding binding;
 
@@ -37,6 +39,19 @@ public class AppInfoFragment extends Fragment {
         AppInfoFragment fragment = new AppInfoFragment();
 
         return fragment;
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+//        return super.onCreateDialog(savedInstanceState);
+        return new Dialog(getActivity(), getTheme()){
+            @Override
+            public void onBackPressed() {
+                //do your stuff
+                dismiss();
+            }
+        };
     }
 
     @Override
@@ -79,7 +94,9 @@ public class AppInfoFragment extends Fragment {
         }
 
         binding.backButton.setOnClickListener(v -> {
-            getActivity().finish();
+
+//            getActivity().finish();
+            dismiss();
 
         });
 
@@ -145,6 +162,7 @@ public class AppInfoFragment extends Fragment {
 
     private void presentLogin() {
 
+        dismiss();
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);

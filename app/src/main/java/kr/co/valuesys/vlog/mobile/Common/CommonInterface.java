@@ -8,7 +8,7 @@ public interface CommonInterface {
 
 // BlankActivity에서 백버튼 눌렀을때 fragment로 callback
     interface OnBackPressedListener {
-        void onBackPressed();
+        void onBackPressedCallback();
     }
 
 // CameraFragment에서 홈버튼 누를때 촬영전 상태일때만 camerafragment remove했다 다시 생성. 이유는 홈으로 갔다 다시 촬영시 비율이 깨져보이는 문제때문

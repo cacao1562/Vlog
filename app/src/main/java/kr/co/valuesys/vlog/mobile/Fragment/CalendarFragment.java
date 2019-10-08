@@ -1,6 +1,7 @@
 package kr.co.valuesys.vlog.mobile.Fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -9,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.style.ForegroundColorSpan;
@@ -35,12 +37,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCalendarBinding;
 
-public class CalendarFragment extends Fragment {
+public class CalendarFragment extends DialogFragment {
 
     private FragmentCalendarBinding binding;
     private ArrayList<CalendarDay> mVideosDate;
@@ -53,10 +56,18 @@ public class CalendarFragment extends Fragment {
     private int maxMonth;
 
     private SetDrawVideoDate setDrawVideoDate;
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+    private CommonInterface.OnBackPressedListener mListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mListener = (CommonInterface.OnBackPressedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException("Calling fragment must implement Callback interface");
+        }
     }
 
     @Nullable
@@ -93,7 +104,10 @@ public class CalendarFragment extends Fragment {
                     if (mVideosDate.contains(date)) {
 
                         MobileApplication.getContext().setmSelectDay(date);
-                        getActivity().finish();
+//                        getActivity().finish();
+
+                        dismiss();
+                        mListener.onBackPressedCallback();
                     }
                 }
 
@@ -102,7 +116,8 @@ public class CalendarFragment extends Fragment {
         });
 
         binding.backButton.setOnClickListener(v -> {
-            getActivity().finish();
+//            getActivity().finish();
+            dismiss();
         });
 
         binding.calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
@@ -127,7 +142,7 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-
+        mListener = null;
     }
 
     // 비디오 생성 date 리스트에 넣어서 달력에 표시하기 위해

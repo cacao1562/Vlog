@@ -42,6 +42,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
 
     private FragmentVideoListBinding binding;
     private VideoListAdapter adapter;
+    private ArrayList<VideoInfo> info;
 
     public static VideoListFragment newInstance() {
 
@@ -76,7 +77,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     public void onResume() {
         super.onResume();
 
-        ArrayList<VideoInfo> info = VideoInfo.getVideo(getActivity(), true,  this);
+        info = VideoInfo.getVideo(getActivity(), true,  this);
         adapter.setUp(info);
 
         if (MobileApplication.getContext().getmSelectDay() != null) {
@@ -138,6 +139,29 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         }else {
             binding.videoListEmptyview.setVisibility(View.GONE);
         }
+    }
+
+    public void scrolltoVideo() {
+
+        if (MobileApplication.getContext().getmSelectDay() != null) {
+
+            Calendar cal = Calendar.getInstance();
+
+            for (int i = 0; i < info.size(); i++) {
+
+                cal.setTime(info.get(i).getDate());
+
+                if (CalendarDay.from(cal).equals(MobileApplication.getContext().getmSelectDay()) ) {
+
+                    LogUtil.d("main", " selected = " + MobileApplication.getContext().getmSelectDay() + "  position = " + i);
+                    binding.videoListRecyclerview.smoothScrollToPosition(i);
+                    MobileApplication.getContext().setmSelectDay(null);
+                }
+
+            }
+
+        }
+
     }
 
 

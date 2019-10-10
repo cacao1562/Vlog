@@ -1,44 +1,35 @@
 package kr.co.valuesys.vlog.mobile.Fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
 import android.graphics.Rect;
-import android.media.ThumbnailUtils;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
-import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
 
 
-public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo, CommonInterface.OnCallbackEmptyVideoToList {
+public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo, CommonInterface.OnCallbackEmptyVideoToList,
+        CommonInterface.OnLoadingCallback {
 
     private FragmentVideoListBinding binding;
     private VideoListAdapter adapter;
@@ -64,7 +55,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         binding.videoListRecyclerview.setHasFixedSize(true);
         binding.videoListRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.videoListRecyclerview.addItemDecoration(new RecyclerDecoration(20));
-        adapter = new VideoListAdapter(getActivity(), this);
+        adapter = new VideoListAdapter(getActivity(), this, this);
         binding.videoListRecyclerview.setAdapter(adapter);
 
         adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
@@ -77,27 +68,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     public void onResume() {
         super.onResume();
 
-        info = VideoInfo.getVideo(getActivity(), true,  this);
-        adapter.setUp(info);
-
-        if (MobileApplication.getContext().getmSelectDay() != null) {
-
-            Calendar cal = Calendar.getInstance();
-
-            for (int i = 0; i < info.size(); i++) {
-
-                cal.setTime(info.get(i).getDate());
-
-                if (CalendarDay.from(cal).equals(MobileApplication.getContext().getmSelectDay()) ) {
-
-                    LogUtil.d("main", " selected = " + MobileApplication.getContext().getmSelectDay() + "  position = " + i);
-                    binding.videoListRecyclerview.scrollToPosition(i);
-                    MobileApplication.getContext().setmSelectDay(null);
-                }
-
-            }
-
-        }
+        LogUtil.d("main list fragment", " onResume");
 
     }
 
@@ -128,6 +99,23 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     @Override
     public void onCallbackToList(boolean show) {
         showEmptyView(show);
+    }
+
+    AlertDialog loading;
+
+    @Override
+    public void onLoading(boolean show) {
+
+        if (loading == null) {
+            loading = MobileApplication.showProgress(null, null, getActivity()).create();
+        }
+
+            if (show) {
+                loading.show();
+            }else {
+                loading.dismiss();
+            }
+
     }
 
 
@@ -161,6 +149,40 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
             }
 
         }
+
+    }
+
+
+    private class updateVideo extends AsyncTask<Void, Void, Void> {
+
+        AlertDialog loading;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loading = MobileApplication.showProgress(null, null, getActivity()).create();
+            loading.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            info = VideoInfo.getVideo(getActivity(), true,  null);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (info != null) {
+                adapter.setUp(info);
+                loading.dismiss();
+            }
+        }
+    }
+
+    public void refreshVideo() {
+
+        new updateVideo().execute();
 
     }
 

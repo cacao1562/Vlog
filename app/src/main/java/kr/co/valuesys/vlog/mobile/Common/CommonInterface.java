@@ -7,8 +7,8 @@ import com.kakao.util.exception.KakaoException;
 public interface CommonInterface {
 
 // BlankActivity에서 백버튼 눌렀을때 fragment로 callback
-    interface OnBackPressedListener {
-        void onBackPressedCallback();
+    interface OnCallbackToMain {
+        void oncallbackMain(int id);
     }
 
 // CameraFragment에서 홈버튼 누를때 촬영전 상태일때만 camerafragment remove했다 다시 생성. 이유는 홈으로 갔다 다시 촬영시 비율이 깨져보이는 문제때문
@@ -40,6 +40,10 @@ public interface CommonInterface {
 // 파일 저장 삭제 결과 콜백
     interface OnFileCallback {
         void onFileCallback(boolean result);
+    }
+
+    interface OnLoadingCallback {
+        void onLoading(boolean show);
     }
 
 }

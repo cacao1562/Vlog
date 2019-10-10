@@ -1,6 +1,5 @@
-package kr.co.valuesys.vlog.mobile.Dialog;
+package kr.co.valuesys.vlog.mobile.DialogFragment;
 
-import android.app.Dialog;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
@@ -10,17 +9,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
-import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 
 import java.io.IOException;
 
+import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogVideoplayBinding;
 
@@ -43,7 +40,6 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
         dialog.setArguments(args);
         return dialog;
     }
-
 
 
     @Nullable
@@ -105,6 +101,31 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     }
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LogUtil.d("ddd", "onPause");
+        if (mMediaPlayer != null) {
+            mMediaPlayer.pause();
+        }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LogUtil.d("ddd", "onResume");
+        if (mMediaPlayer != null) {
+            if (!mMediaPlayer.isPlaying()) {
+                mMediaPlayer.start();
+            }
+        }
+    }
 
     @Override
     public void onDestroyView() {
@@ -122,6 +143,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
 
+        LogUtil.d("ddd", "onSurfaceTextureAvailable");
         Surface s = new Surface(surface);
 
         try {

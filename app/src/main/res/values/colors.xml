@@ -20,4 +20,6 @@
     <color name="kakao_color">#FADC4A</color>
     <color name="facebook_color">#3379EA</color>
 
+    <color name="progress_back_color">#2C000000</color>
+
 </resources>

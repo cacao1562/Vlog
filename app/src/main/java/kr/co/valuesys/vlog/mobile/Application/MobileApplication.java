@@ -1,8 +1,12 @@
 package kr.co.valuesys.vlog.mobile.Application;
 
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -38,6 +42,7 @@ import java.util.List;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.R;
 
 //import io.realm.Realm;
 //import io.realm.RealmConfiguration;
@@ -272,6 +277,32 @@ public class MobileApplication extends Application {
             return Constants.FaceBook;
         }
         return "";
+    }
+
+
+    public static AlertDialog.Builder showProgress(String title, String msg, Context context) {
+
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View innerView = inflater.inflate(R.layout.dialog_progress, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.DialogStyle);
+
+        if (!TextUtils.isEmpty(title)) {
+            builder.setTitle(title);
+        }
+        if (!TextUtils.isEmpty(msg)) {
+            builder.setMessage(msg);
+        }
+//        final ProgressBar progressBar = new ProgressBar(this);
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.WRAP_CONTENT,
+//                LinearLayout.LayoutParams.WRAP_CONTENT);
+//        progressBar.setLayoutParams(lp);
+
+        builder.setView(innerView);
+        builder.setCancelable(false);
+
+        return builder;
     }
 
 

@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Fragment;
+package kr.co.valuesys.vlog.mobile.DialogFragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -21,19 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
-import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
-import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
@@ -57,14 +51,14 @@ public class CalendarFragment extends DialogFragment {
 
     private SetDrawVideoDate setDrawVideoDate;
 
-    private CommonInterface.OnBackPressedListener mListener;
+    private CommonInterface.OnCallbackToMain mListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
         try {
-            mListener = (CommonInterface.OnBackPressedListener) context;
+            mListener = (CommonInterface.OnCallbackToMain) context;
         } catch (ClassCastException e) {
             throw new ClassCastException("Calling fragment must implement Callback interface");
         }
@@ -107,7 +101,7 @@ public class CalendarFragment extends DialogFragment {
 //                        getActivity().finish();
 
                         dismiss();
-                        mListener.onBackPressedCallback();
+                        mListener.oncallbackMain(2);
                     }
                 }
 

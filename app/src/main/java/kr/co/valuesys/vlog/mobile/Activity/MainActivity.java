@@ -1,28 +1,28 @@
 package kr.co.valuesys.vlog.mobile.Activity;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
 
+import java.util.List;
+
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
-import kr.co.valuesys.vlog.mobile.Fragment.AppInfoFragment;
-import kr.co.valuesys.vlog.mobile.Fragment.CalendarFragment;
-import kr.co.valuesys.vlog.mobile.Fragment.CameraFragment;
+import kr.co.valuesys.vlog.mobile.DialogFragment.AppInfoFragment;
+import kr.co.valuesys.vlog.mobile.DialogFragment.CalendarFragment;
+import kr.co.valuesys.vlog.mobile.DialogFragment.CameraFragment;
 import kr.co.valuesys.vlog.mobile.Fragment.VideoListFragment;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity implements CommonInterface.OnBackPressedListener {
+public class MainActivity extends AppCompatActivity implements CommonInterface.OnCallbackToMain {
 
     private static final String TAG = "MainActivity";
     private static final int Permission_Request_Code = 200;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
     private ActivityMainBinding binding;
 
-    private VideoListFragment videoListFragment = VideoListFragment.newInstance();
+//    private VideoListFragment videoListFragment = VideoListFragment.newInstance();
 
     private static String[] PERMISSIONS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -67,16 +67,27 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
             return;
         }
 
+        switch (id) {
 
-        if (id == 0) {
-            AppInfoFragment af = AppInfoFragment.newInstance();
-            af.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
-            af.show(getSupportFragmentManager(), "tag");
-        }else if (id == 2) {
-            CalendarFragment cf = CalendarFragment.newInstance();
-            cf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
-            cf.show(getSupportFragmentManager(), "tag");
+            case 0:
+                AppInfoFragment aif = AppInfoFragment.newInstance();
+                aif.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+                aif.show(getSupportFragmentManager(), "tag");
+                break;
+
+            case 1:
+                CameraFragment cf = CameraFragment.newInstance();
+                cf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+                cf.show(getSupportFragmentManager(), "tag");
+                break;
+
+            case 2:
+                CalendarFragment clf = CalendarFragment.newInstance();
+                clf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+                clf.show(getSupportFragmentManager(), "tag");
+                break;
         }
+
 //        Intent intent = new Intent(MainActivity.this, BlankActivity.class);
 //        intent.putExtra(Constants.Fragment_Id, id);
 //        startActivity(intent);
@@ -103,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
                 }
 
                 if (isPermission) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_container, videoListFragment).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
                 }
                 break;
         }
@@ -122,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
                     , Permission_Request_Code);
         }else {
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, videoListFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
         }
     }
 
@@ -149,13 +160,62 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
     protected void onResume() {
         super.onResume();
         LogUtil.d(TAG, "onResume");
+
+//        if (mpause) {
+//            mpause = false;
+////            CameraFragment cf = CameraFragment.newInstance();
+////            cf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+////            cf.show(getSupportFragmentManager(), "tag");
+//
+//            if (cf.isVisible()) {
+//                cf.dismiss();
+////                cf.show(getSupportFragmentManager(), "tag1");
+//                CameraFragment cameraFragment = CameraFragment.newInstance();
+//                cf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+//                cf.show(getSupportFragmentManager(), "tag");
+//            }
+//        }
     }
 
     @Override
-    public void onBackPressedCallback() {
+    public void oncallbackMain(int id) {
+
         VideoListFragment vf = (VideoListFragment) getSupportFragmentManager().findFragmentById(R.id.main_container);
-        vf.scrolltoVideo();
+
+// 캘린더에서 날짜 눌렀을때 콜백
+        if (id == 2) {
+
+            if (vf != null) {
+                vf.scrolltoVideo();
+            }
+
+// 동영상 제목 입력하는 뷰에서 저장 버튼누르고 확인 눌렀을때 콜백
+        }else if (id == 1) {
+
+            List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+
+            if (fragmentList != null) {
+
+                for(Fragment fragment : fragmentList) {
+
+                    if (fragment instanceof CameraFragment) {
+
+                        ((CameraFragment) fragment).dismiss();
+
+                        if (vf != null) {
+                            vf.refreshVideo();
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+
+
     }
+
 }
 
 // BottomNavigationView 기본으로 첫번째 선택되어있는거 해제해주는거

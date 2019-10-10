@@ -1,7 +1,8 @@
-package kr.co.valuesys.vlog.mobile.Fragment;
+package kr.co.valuesys.vlog.mobile.DialogFragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -19,20 +20,15 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.CamcorderProfile;
-import android.media.MediaCodecInfo;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -55,20 +51,16 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import kr.co.valuesys.vlog.mobile.Activity.BlankActivity;
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
-import kr.co.valuesys.vlog.mobile.Dialog.InputFileNameDialog;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
 
 
-public class CameraFragment extends Fragment implements View.OnClickListener,
-                                                        MediaRecorder.OnInfoListener, MediaRecorder.OnErrorListener,
-                                                        CommonInterface.OnBackPressedListener {
+public class CameraFragment extends DialogFragment implements View.OnClickListener,
+                                                        MediaRecorder.OnInfoListener, MediaRecorder.OnErrorListener {
 
     private static final String TAG = "CameraFragment";
 //    private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";
@@ -111,7 +103,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     private int mScreen_width;
     private int mScreen_height;
 
-    private CommonInterface.OnCameraPauseListener mCallbackPause;
+//    private CommonInterface.OnCameraPauseListener mCallbackPause;
 
     private CountDownTimer mCountDownTimer;
 
@@ -122,17 +114,50 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof CommonInterface.OnCameraPauseListener) {
-            mCallbackPause = (CommonInterface.OnCameraPauseListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
+//        if (context instanceof CommonInterface.OnCameraPauseListener) {
+//            mCallbackPause = (CommonInterface.OnCameraPauseListener) context;
+//        } else {
+//            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+//        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mCallbackPause = null;
+//        mCallbackPause = null;
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+//        return super.onCreateDialog(savedInstanceState);
+        return new Dialog(getActivity(), getTheme()) {
+            @Override
+            public void onBackPressed() {
+//                super.onBackPressed();
+                if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
+
+                    AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
+
+                        deleteVideo();
+                        dialog.dismiss();
+//                        getActivity().finish();
+                        dismiss();
+
+                    });
+
+                    alert.show();
+
+                }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
+
+//                    getActivity().finish();
+                    dismiss();
+
+                }else if (mIsRecordingVideo && mNextVideoAbsolutePath != null) {
+
+                }
+            }
+        };
     }
 
     @Override
@@ -161,9 +186,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
 // 삳태바 투명
-        getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getActivity().getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        getDialog().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        getDialog().getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getDialog().getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
         binding.pictureBtn.setOnClickListener(this);
         binding.switchImgBtn.setOnClickListener(this);
@@ -176,7 +201,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
                     deleteVideo();
                     dialog.dismiss();
-                    getActivity().finish();
+//                    getActivity().finish();
+                    dismiss();
 
                 });
 
@@ -184,7 +210,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
             }else if ( !mIsRecordingVideo && mNextVideoAbsolutePath == null) {
 
-                getActivity().finish();
+//                getActivity().finish();
+                dismiss();
             }
 
         });
@@ -249,12 +276,16 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     public void onResume() {
         super.onResume();
         LogUtil.d(TAG, "camera onResume");
+
         startBackgroundThread();
+
 
         if (binding.preview.isAvailable()) {
 
             if (mNextVideoAbsolutePath == null) {
+
                 openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+
             }
 
             LogUtil.d(TAG, "==================================== onResume ===  preview isAvailable true ");
@@ -298,11 +329,17 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 //            }
 //
 //        }
-        if (mNextVideoAbsolutePath == null && !mIsRecordingVideo) {
-            mCallbackPause.onCameraPause(true);
-        }else {
-            mCallbackPause.onCameraPause(false);
-        }
+//        if (mNextVideoAbsolutePath == null && !mIsRecordingVideo) {
+//
+//            mCallbackPause.onCameraPause(true);
+////            if (getDialog().isShowing()) {
+////                dismiss();
+////            }
+//
+//        }else {
+//
+//            mCallbackPause.onCameraPause(false);
+//        }
 
         if (mNextVideoAbsolutePath != null) {
 
@@ -355,6 +392,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            closeCamera();
             return true;
         }
 
@@ -388,10 +426,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
             mSemaphore.release();
             camera.close();
             mCameraDevice = null;
-            Activity activity = getActivity();
-            if (null != activity) {
-                activity.finish();
-            }
+
+            dismiss();
+//            Activity activity = getActivity();
+//            if (null != activity) {
+//                activity.finish();
+//            }
         }
     };
 
@@ -695,15 +735,19 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
 
     private void stopBackgroundThread() {
 
-        mBackgroundThread.quitSafely();
+        if (mBackgroundThread != null) {
+            mBackgroundThread.quitSafely();
 
-        try {
-            mBackgroundThread.join();
-            mBackgroundThread = null;
-            mBackgroundHandler = null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                mBackgroundThread.join();
+                mBackgroundThread = null;
+                mBackgroundHandler = null;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
+
     }
 
     private void closePreviewSession() {
@@ -1130,27 +1174,27 @@ public class CameraFragment extends Fragment implements View.OnClickListener,
     }
 
 // BlankActivity에서 back키 눌렀을때 callback
-    @Override
-    public void onBackPressedCallback() {
-
-        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
-
-            AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
-
-                deleteVideo();
-                dialog.dismiss();
-                getActivity().finish();
-
-            });
-
-            alert.show();
-
-        }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
-
-            getActivity().finish();
-        }
-
-    }
+//    @Override
+//    public void oncallbackMain() {
+//
+//        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
+//
+//            AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
+//
+//                deleteVideo();
+//                dialog.dismiss();
+//                getActivity().finish();
+//
+//            });
+//
+//            alert.show();
+//
+//        }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
+//
+//            getActivity().finish();
+//        }
+//
+//    }
 
 }
 

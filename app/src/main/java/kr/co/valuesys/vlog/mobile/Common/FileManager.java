@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 import java.io.File;
 
+import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
+
 public class FileManager {
 
     private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";

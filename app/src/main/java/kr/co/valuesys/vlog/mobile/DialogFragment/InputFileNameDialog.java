@@ -1,6 +1,7 @@
-package kr.co.valuesys.vlog.mobile.Dialog;
+package kr.co.valuesys.vlog.mobile.DialogFragment;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
@@ -33,6 +35,25 @@ public class InputFileNameDialog extends DialogFragment {
     }
 
     private DialogInputfilenameBinding binding;
+
+    private CommonInterface.OnCallbackToMain mListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof CommonInterface.OnCallbackToMain) {
+            mListener = (CommonInterface.OnCallbackToMain) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,8 +110,11 @@ public class InputFileNameDialog extends DialogFragment {
                         AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.saved_alert_msg), false, dialog -> {
 
                             dialog.dismiss(); // AlertDialog dismiss
+
                             dismiss();       // DialogFragment dismiss
-                            getActivity().finish();
+//                            getActivity().finish();
+//                            getDialog().dismiss();
+                            mListener.oncallbackMain(1);
 
                         });
 
@@ -110,14 +134,6 @@ public class InputFileNameDialog extends DialogFragment {
     }
 
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
 }

@@ -3,9 +3,8 @@ package kr.co.valuesys.vlog.mobile;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -13,15 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.FileManager;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
-import kr.co.valuesys.vlog.mobile.Dialog.VideoPlayDialog;
+import kr.co.valuesys.vlog.mobile.DialogFragment.VideoPlayDialog;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.databinding.VideoItemBinding;
 
@@ -32,13 +30,15 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private Context context;
     private ArrayList<VideoInfo> mVideoInfo = new ArrayList<>();
     private CommonInterface.OnCallbackEmptyVideoToList mCallbackToList;
+    private CommonInterface.OnLoadingCallback mCallbackLoading;
     private String userNamee;
 
 
-    public VideoListAdapter(Activity activity, CommonInterface.OnCallbackEmptyVideoToList callbackToList) {
+    public VideoListAdapter(Activity activity, CommonInterface.OnCallbackEmptyVideoToList callbackToList, CommonInterface.OnLoadingCallback onLoadingCallback) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         this.mCallbackToList = callbackToList;
+        this.mCallbackLoading = onLoadingCallback;
         this.userNamee = MobileApplication.getContext().getLoginkName();
     }
 
@@ -64,6 +64,16 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         binding.itemDateTextview.setText(date);
         binding.itemUserNameTextview.setText(userNamee + "  |  ");
 
+        long time = (new Date().getTime() - videoInfo.getDate().getTime()) / (1000 * 60 * 60);
+        if (time == 0) {
+            binding.itemElapsedTimeTextview.setText("방금전");
+        }else if (time >= 24) {
+            binding.itemElapsedTimeTextview.setText((time / 24) + " 일 전");
+        }else {
+            binding.itemElapsedTimeTextview.setText(time + "시간 전");
+        }
+
+
     }
 
     @Override
@@ -73,7 +83,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
     public void setUp(ArrayList<VideoInfo> videoInfos) {
         this.mVideoInfo = videoInfos;
-        notifyDataSetChanged();
+
+        activity.runOnUiThread(() -> {
+            notifyDataSetChanged();
+        });
+
     }
 
     public class VideoListHolder extends RecyclerView.ViewHolder {
@@ -98,22 +112,40 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 //            context.startActivity(intent);
             });
 
+
             binding.itemDeleteImgButton.setOnClickListener(v -> {
 
                 AlertDialog alert = SimpleAlert.createAlert(activity, "삭제 하시겠습니까?", true, dialog -> {
 
-                    FileManager.deleteVideo(activity, mVideoInfo.get(getAdapterPosition()).getUri().toString(), result -> {
+                    dialog.dismiss();
+                    mCallbackLoading.onLoading(true);
+                    new removeLoading(getAdapterPosition()).execute();
 
-                        if (result) {
 
-                            setUp(VideoInfo.getVideo(activity, true, show -> {
+//                        FileManager.deleteVideo(activity, mVideoInfo.get(getAdapterPosition()).getUri().toString(), result -> {
+//
+//                            if (result) {
+//
+////                            ProgressDialog progress = ProgressDialog.newInstance();
+////                            progress.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
+////                            progress.setCancelable(false);
+////                            progress.show(((AppCompatActivity) activity).getSupportFragmentManager(), "tag");
+//
+//
+//                                setUp(VideoInfo.getVideo(activity, true, show -> {
+//
+//                                    mCallbackToList.onCallbackToList(show);
+//                                    mCallbackLoading.onLoading(false);
+//
+//                                }));
+//
+//                            }
+//
+//
+//                        });
 
-                                mCallbackToList.onCallbackToList(show);
-                            }));
-                        }
-
-                        dialog.dismiss();
-                    });
+//
+//                    dialog.dismiss();
 
                 });
 
@@ -121,6 +153,46 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
             });
 
+        }
+    }
+
+
+    private class removeLoading extends AsyncTask<Void, Void, Void> {
+
+        private int position;
+
+        public removeLoading(int index) {
+            position = index;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            FileManager.deleteVideo(activity, mVideoInfo.get(position).getUri().toString(), result -> {
+
+                if (result) {
+
+                    setUp(VideoInfo.getVideo(activity, true, show -> {
+
+                        mCallbackToList.onCallbackToList(show);
+                        mCallbackLoading.onLoading(false);
+
+                    }));
+
+                }
+
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 

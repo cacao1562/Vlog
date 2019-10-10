@@ -1,5 +1,6 @@
 package kr.co.valuesys.vlog.mobile.Activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -47,9 +48,9 @@ public class LoginActivity extends AppCompatActivity {
 
             if (result) {
 
-                MobileApplication.getContext().requestMe(result1 -> {
+                MobileApplication.getContext().requestMe(res -> {
 
-                    if (result) {
+                    if (res) {
 
                         final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
@@ -92,12 +93,10 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-
             }
 
             @Override
             public void onError(FacebookException error) {
-
             }
 
         });

@@ -1,15 +1,13 @@
-package kr.co.valuesys.vlog.mobile.Fragment;
+package kr.co.valuesys.vlog.mobile.DialogFragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,13 +43,51 @@ public class AppInfoFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 //        return super.onCreateDialog(savedInstanceState);
+        LogUtil.d("ddd", "onCreateDialog appinfo");
         return new Dialog(getActivity(), getTheme()){
             @Override
             public void onBackPressed() {
                 //do your stuff
+
                 dismiss();
             }
         };
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        LogUtil.d("ddd", "onStart appinfo");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        LogUtil.d("ddd", "onStop appinfo");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LogUtil.d("ddd", "onResume appinfo");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LogUtil.d("ddd", "onDestroyView appinfo");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LogUtil.d("ddd", "onDestroy appinfo");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        LogUtil.d("ddd", "onDetach appinfo");
     }
 
     @Override

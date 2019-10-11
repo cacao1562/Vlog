@@ -42,6 +42,7 @@ public interface CommonInterface {
         void onFileCallback(boolean result);
     }
 
+// Adapter에서 삭제버튼 눌렀을때 프래그먼트로 콜백
     interface OnLoadingCallback {
         void onLoading(boolean show);
     }

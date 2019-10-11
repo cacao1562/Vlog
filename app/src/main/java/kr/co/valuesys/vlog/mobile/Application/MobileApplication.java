@@ -1,10 +1,11 @@
 package kr.co.valuesys.vlog.mobile.Application;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -286,6 +287,7 @@ public class MobileApplication extends Application {
         View innerView = inflater.inflate(R.layout.dialog_progress, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.DialogStyle);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.DialogStyle));
 
         if (!TextUtils.isEmpty(title)) {
             builder.setTitle(title);

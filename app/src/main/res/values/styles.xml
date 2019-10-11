@@ -22,6 +22,12 @@
     </style>
 
     <style name="DialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@color/clear</item>
     </style>
+
+    <style name="progress_style">
+        <item name="colorAccent">@color/blue</item>
+    </style>
+
 
 </resources>

@@ -121,32 +121,6 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                     mCallbackLoading.onLoading(true);
                     new removeLoading(getAdapterPosition()).execute();
 
-
-//                        FileManager.deleteVideo(activity, mVideoInfo.get(getAdapterPosition()).getUri().toString(), result -> {
-//
-//                            if (result) {
-//
-////                            ProgressDialog progress = ProgressDialog.newInstance();
-////                            progress.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
-////                            progress.setCancelable(false);
-////                            progress.show(((AppCompatActivity) activity).getSupportFragmentManager(), "tag");
-//
-//
-//                                setUp(VideoInfo.getVideo(activity, true, show -> {
-//
-//                                    mCallbackToList.onCallbackToList(show);
-//                                    mCallbackLoading.onLoading(false);
-//
-//                                }));
-//
-//                            }
-//
-//
-//                        });
-
-//
-//                    dialog.dismiss();
-
                 });
 
                 alert.show();
@@ -179,8 +153,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
                     setUp(VideoInfo.getVideo(activity, true, show -> {
 
-                        mCallbackToList.onCallbackToList(show);
                         mCallbackLoading.onLoading(false);
+                        mCallbackToList.onCallbackToList(show);
 
                     }));
 

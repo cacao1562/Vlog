@@ -63,8 +63,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
                                                         MediaRecorder.OnInfoListener, MediaRecorder.OnErrorListener {
 
     private static final String TAG = "CameraFragment";
-//    private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";
-//    private static final String REAL_PATH = "DCIM/" + Constants.Real_Folder_Name + "/";
 
     private FragmentCameraBinding binding;
 
@@ -141,7 +139,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
                         deleteVideo();
                         dialog.dismiss();
-//                        getActivity().finish();
                         dismiss();
 
                     });
@@ -150,7 +147,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
                 }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
 
-//                    getActivity().finish();
                     dismiss();
 
                 }else if (mIsRecordingVideo && mNextVideoAbsolutePath != null) {
@@ -201,7 +197,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
                     deleteVideo();
                     dialog.dismiss();
-//                    getActivity().finish();
                     dismiss();
 
                 });
@@ -210,7 +205,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
             }else if ( !mIsRecordingVideo && mNextVideoAbsolutePath == null) {
 
-//                getActivity().finish();
                 dismiss();
             }
 
@@ -392,7 +386,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            closeCamera();
+//            closeCamera();
             return true;
         }
 
@@ -525,7 +519,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
         } catch (CameraAccessException | SecurityException | NullPointerException | InterruptedException e) {
             e.printStackTrace();
-            activity.finish();
+//            activity.finish();
+            dismiss();
         }
 
 
@@ -579,7 +574,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             if (ops.getWidth() == aspectRatio.getWidth() && ops.getHeight() == aspectRatio.getHeight() ) {
                 return ops;
             }
-            if(ops.getHeight() == ops.getWidth() * h / w && (ops.getWidth() >= width && ops.getHeight() >= height)) {
+            if(ops.getHeight() == (ops.getWidth() * h / w) && (ops.getWidth() >= width && ops.getHeight() >= height)) {
                 bigEnough.add(ops);
             }
         }
@@ -837,16 +832,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
     }
 
-/** 파일 이름 및 저장경로를 만듭니다. */
-//    private String getVideoFilePath() {
-//
-//        final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
-//        String path = dir.getPath() + "/" + TEMP_PATH;
-//        File dst = new File(path);
-//        if(!dst.exists()) dst.mkdirs();
-//
-//        return path + System.currentTimeMillis() + ".mp4";
-//    }
 
 /** 녹화시작 */
     private void startRecordingVideo() {
@@ -919,7 +904,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
     }
 
-    //녹화 중지
+/** 녹화 중지 */
     private void stopRecordingVideo() {
 
         mIsRecordingVideo = false;
@@ -957,7 +942,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
             if (mNextVideoAbsolutePath != null) {
 
-                Toast.makeText(activity, "Video saved: " + mNextVideoAbsolutePath, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(activity, "Video saved: " + mNextVideoAbsolutePath, Toast.LENGTH_SHORT).show();
                 LogUtil.d(TAG, "Video saved: " + mNextVideoAbsolutePath);
                 File file = new File(mNextVideoAbsolutePath);
 // 아래 코드가 없으면 갤러리 저장 적용이 안됨.
@@ -1173,28 +1158,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
     }
 
-// BlankActivity에서 back키 눌렀을때 callback
-//    @Override
-//    public void oncallbackMain() {
-//
-//        if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
-//
-//            AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
-//
-//                deleteVideo();
-//                dialog.dismiss();
-//                getActivity().finish();
-//
-//            });
-//
-//            alert.show();
-//
-//        }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
-//
-//            getActivity().finish();
-//        }
-//
-//    }
 
 }
 

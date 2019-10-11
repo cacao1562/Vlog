@@ -59,7 +59,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 삳태바 투명
+        // 삳태바, 네이게이션바 투명
         getDialog().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         getDialog().getWindow().setStatusBarColor(Color.TRANSPARENT);
         getDialog().getWindow().setNavigationBarColor(Color.TRANSPARENT);

@@ -41,11 +41,11 @@ public class InputFileNameDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
+// 카메라 다이얼로그 프래그먼트에서 input 다이얼로그 프래그먼트를 띄웠지만 메인 액티비테에 인터페이스 구현해야함
         if (context instanceof CommonInterface.OnCallbackToMain) {
             mListener = (CommonInterface.OnCallbackToMain) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnCallbackToMain");
         }
     }
 
@@ -83,6 +83,7 @@ public class InputFileNameDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+// 키보드 올라올때 키보드 위에 저장버튼 위치하도록
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         binding.backButton.setOnClickListener(v -> {

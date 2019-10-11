@@ -88,10 +88,6 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
                 break;
         }
 
-//        Intent intent = new Intent(MainActivity.this, BlankActivity.class);
-//        intent.putExtra(Constants.Fragment_Id, id);
-//        startActivity(intent);
-
     }
 
     @Override

@@ -1,6 +1,6 @@
 package kr.co.valuesys.vlog.mobile.Fragment;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Rect;
@@ -28,12 +28,14 @@ import kr.co.valuesys.vlog.mobile.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
 
 
-public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo, CommonInterface.OnCallbackEmptyVideoToList,
-        CommonInterface.OnLoadingCallback {
+public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo,
+                                                           CommonInterface.OnCallbackEmptyVideoToList,
+                                                           CommonInterface.OnLoadingCallback {
 
     private FragmentVideoListBinding binding;
     private VideoListAdapter adapter;
     private ArrayList<VideoInfo> info;
+    private AlertDialog loading;
 
     public static VideoListFragment newInstance() {
 
@@ -58,51 +60,53 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         adapter = new VideoListAdapter(getActivity(), this, this);
         binding.videoListRecyclerview.setAdapter(adapter);
 
-        adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
+//        adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
+        refreshVideo();
 
         return binding.getRoot();
 //        return inflater.inflate(R.layout.fragment_video_list, container, false);
     }
 
+
     @Override
-    public void onResume() {
-        super.onResume();
-
-        LogUtil.d("main list fragment", " onResume");
-
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (loading != null) {
+            if (loading.isShowing()) {
+                loading.dismiss();
+                loading = null;
+            }
+        }
     }
 
 
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-
-// VideoInfo에서 넘겨주는 callback
-// 비디오 개수가 0개면 true
+/** VideoInfo에서 넘겨주는 callback
+     비디오 개수가 0개면 true */
     @Override
     public void onEmptyVideo(boolean show) {
-        showEmptyView(show);
+
+        getActivity().runOnUiThread(() -> {
+            showEmptyView(show);
+        });
+
     }
 
 
-// VideoListAdapter 에서 비디오 삭제했을때 callback
-// 비디오 개수가 0개면 true
+/** VideoListAdapter 에서 비디오 삭제했을때 callback
+    비디오 개수가 0개면 true */
     @Override
     public void onCallbackToList(boolean show) {
-        showEmptyView(show);
+        getActivity().runOnUiThread(() -> {
+            showEmptyView(show);
+        });
     }
 
-    AlertDialog loading;
 
+
+    /**
+     * 비디오 삭제 버튼눌렀을때 로딩
+     */
     @Override
     public void onLoading(boolean show) {
 
@@ -110,25 +114,30 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
             loading = MobileApplication.showProgress(null, null, getActivity()).create();
         }
 
-            if (show) {
-                loading.show();
-            }else {
-                loading.dismiss();
-            }
+        if (show) {
+            loading.show();
+        } else {
+            loading.dismiss();
+        }
 
     }
 
 
-// 비디오가 없다는 뷰 보여주기 또는 숨기기
+    /**
+     * 비디오가 없다는 뷰 보여주기 또는 숨기기
+     */
     private void showEmptyView(boolean show) {
 
         if (show) {
             binding.videoListEmptyview.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             binding.videoListEmptyview.setVisibility(View.GONE);
         }
     }
 
+    /**
+     * 캘린더에서 날짜 클릭후 메인액티비티에서 호출
+     */
     public void scrolltoVideo() {
 
         if (MobileApplication.getContext().getmSelectDay() != null) {
@@ -139,7 +148,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
 
                 cal.setTime(info.get(i).getDate());
 
-                if (CalendarDay.from(cal).equals(MobileApplication.getContext().getmSelectDay()) ) {
+                if (CalendarDay.from(cal).equals(MobileApplication.getContext().getmSelectDay())) {
 
                     LogUtil.d("main", " selected = " + MobileApplication.getContext().getmSelectDay() + "  position = " + i);
                     binding.videoListRecyclerview.smoothScrollToPosition(i);
@@ -155,7 +164,12 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
 
     private class updateVideo extends AsyncTask<Void, Void, Void> {
 
-        AlertDialog loading;
+        private AlertDialog loading;
+        private CommonInterface.OnCallbackEmptyVideo listener;
+
+        public updateVideo(CommonInterface.OnCallbackEmptyVideo callback) {
+            this.listener = callback;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -166,7 +180,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
 
         @Override
         protected Void doInBackground(Void... voids) {
-            info = VideoInfo.getVideo(getActivity(), true,  null);
+            info = VideoInfo.getVideo(getActivity(), true, listener);
             return null;
         }
 
@@ -180,14 +194,19 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         }
     }
 
+    /**
+     * 로딩 보여주면서 비디오 목록 업데이트
+     */
     public void refreshVideo() {
 
-        new updateVideo().execute();
+        new updateVideo(this).execute();
 
     }
 
 
-    // recyclerview cell 아이템 간격
+    /**
+     *  recyclerview cell 아이템 간격
+     */
     public class RecyclerDecoration extends RecyclerView.ItemDecoration {
 
         private final int divHeight;

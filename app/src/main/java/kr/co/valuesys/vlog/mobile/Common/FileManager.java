@@ -58,6 +58,10 @@ public class FileManager {
 
                 }
 
+            }else {
+
+                Toast.makeText(mActivity, "파일 이름 변경 실패", Toast.LENGTH_SHORT).show();
+
             }
 
         }
@@ -103,7 +107,6 @@ public class FileManager {
             e.printStackTrace();
         }
 
-
     }
 
     /**
@@ -138,6 +141,11 @@ public class FileManager {
                     if (file.delete()) {
 
                         mActivity.getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+
+                    }else {
+
+                        Toast.makeText(mActivity, "temp 파일들 삭제 실패", Toast.LENGTH_SHORT).show();
+
                     }
 
                 }

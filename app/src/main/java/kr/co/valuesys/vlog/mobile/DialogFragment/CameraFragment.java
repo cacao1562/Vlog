@@ -1153,6 +1153,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
         FileManager.deleteVideo(getActivity(), mNextVideoAbsolutePath, result -> {
             if (result) {
                 mNextVideoAbsolutePath = null;
+            }else {
+                Toast.makeText(getActivity(), "파일 삭제 실패", Toast.LENGTH_SHORT).show();
             }
         });
 

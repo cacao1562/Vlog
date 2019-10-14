@@ -8,6 +8,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
+import java.lang.ref.WeakReference;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
@@ -243,7 +246,7 @@ public class CalendarFragment extends DialogFragment {
     }
 
 
-// param에 날짜 리스트를 넣으면 해당 날짜에 점 표시
+// param에 날짜 리스트를 넣으면 해당 날짜에 동그라미 표시
     public class EventDecorator implements DayViewDecorator {
 
         private final int color;
@@ -254,7 +257,7 @@ public class CalendarFragment extends DialogFragment {
         public EventDecorator(Activity context, int color, Collection<CalendarDay> dates) {
             this.color = color;
             this.dates = new HashSet<>(dates);
-            this.dates.add(CalendarDay.today() );
+//            this.dates.add(CalendarDay.today() );
             this.drawable = ContextCompat.getDrawable(context, R.drawable.day_border);
         }
 
@@ -265,6 +268,7 @@ public class CalendarFragment extends DialogFragment {
 
         @Override
         public void decorate(DayViewFacade view) {
+            //점 표시
 //            view.addSpan(new DotSpan(5, color));
             view.setSelectionDrawable(drawable);
         }

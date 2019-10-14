@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -157,6 +158,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                         mCallbackToList.onCallbackToList(show);
 
                     }));
+
+                }else {
+
+                    mCallbackLoading.onLoading(false);
+                    Toast.makeText(activity, "파일 삭제 실패", Toast.LENGTH_SHORT).show();
 
                 }
 

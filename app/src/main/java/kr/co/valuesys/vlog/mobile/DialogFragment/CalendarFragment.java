@@ -2,18 +2,17 @@ package kr.co.valuesys.vlog.mobile.DialogFragment;
 
 import android.app.Activity;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.core.content.ContextCompat;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
@@ -27,11 +26,11 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
-import java.lang.ref.WeakReference;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
@@ -47,10 +46,6 @@ public class CalendarFragment extends DialogFragment {
 
     public static CalendarFragment newInstance() { return new CalendarFragment(); }
 
-    private int minYear;
-    private int minMonth;
-    private int maxYear;
-    private int maxMonth;
 
     private SetDrawVideoDate setDrawVideoDate;
 
@@ -79,7 +74,7 @@ public class CalendarFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setDrawVideoDate = new SetDrawVideoDate();
+        setDrawVideoDate = new SetDrawVideoDate(this);
         setDrawVideoDate.execute();
 
         binding.calendarView.addDecorators(new SundayDecorator(),
@@ -247,7 +242,7 @@ public class CalendarFragment extends DialogFragment {
 
 
 // param에 날짜 리스트를 넣으면 해당 날짜에 동그라미 표시
-    public class EventDecorator implements DayViewDecorator {
+    public static class EventDecorator implements DayViewDecorator {
 
         private final int color;
 //        private final HashSet<CalendarDay> dates;
@@ -297,20 +292,36 @@ public class CalendarFragment extends DialogFragment {
 //        }
 //    }
 
-    private class SetDrawVideoDate extends AsyncTask<Void, Void, Void> {
+    private static class SetDrawVideoDate extends AsyncTask<Void, Void, Void> {
+
+        private int minYear;
+        private int minMonth;
+        private int maxYear;
+        private int maxMonth;
+        private WeakReference<CalendarFragment> wrFragment;
+        private CalendarFragment fragment;
+
+        SetDrawVideoDate(CalendarFragment calendarFragment) {
+            this.wrFragment = new WeakReference<>(calendarFragment);
+            this.fragment = wrFragment.get();
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
 
-            mVideosDate = getVideosDate();
+            if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing() || isCancelled()) {
+                return null;
+            }
 
-            if (mVideosDate != null && mVideosDate.size() > 0 ) {
+            fragment.mVideosDate = fragment.getVideosDate();
+
+            if (fragment.mVideosDate != null && fragment.mVideosDate.size() > 0 ) {
 
 // 리스트가 내림차순으로 정렬되어있어서 앞에가 높은날짜
-                minYear = mVideosDate.get(mVideosDate.size()-1).getYear();
-                minMonth = mVideosDate.get(mVideosDate.size()-1).getMonth();
-                maxYear = mVideosDate.get(0).getYear();
-                maxMonth = mVideosDate.get(0).getMonth();
+                minYear = fragment.mVideosDate.get(fragment.mVideosDate.size()-1).getYear();
+                minMonth = fragment.mVideosDate.get(fragment.mVideosDate.size()-1).getMonth();
+                maxYear = fragment.mVideosDate.get(0).getYear();
+                maxMonth = fragment.mVideosDate.get(0).getMonth();
 
             }else {
 
@@ -328,15 +339,19 @@ public class CalendarFragment extends DialogFragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            binding.calendarView.state().edit()
+            if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
+                return;
+            }
+
+            fragment.binding.calendarView.state().edit()
                     .setFirstDayOfWeek(Calendar.SUNDAY)
                     .setMinimumDate(CalendarDay.from(minYear, minMonth, 1))
                     .setMaximumDate(CalendarDay.from(maxYear, 11, 31))
 //                    .setCalendarDisplayMode(CalendarMode.MONTHS)
                     .commit();
 
-            binding.calendarView.addDecorators(
-                    new EventDecorator(getActivity(), R.color.black, mVideosDate) );
+            fragment.binding.calendarView.addDecorators(
+                    new EventDecorator(fragment.getActivity(), R.color.black, fragment.mVideosDate) );
 
         }
     }

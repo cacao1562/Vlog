@@ -13,8 +13,8 @@ import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 
 public class FileManager {
 
-    private static final String TEMP_PATH = "DCIM/" + Constants.Temp_Folder_Name + "/";
-    private static final String REAL_PATH = "DCIM/" + Constants.Real_Folder_Name + "/";
+    private static final String TEMP_PATH = "/DCIM/" + Constants.Temp_Folder_Name + "/";
+    private static final String REAL_PATH = "/DCIM/" + Constants.Real_Folder_Name + "/";
 
     private static final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
 
@@ -31,10 +31,10 @@ public class FileManager {
         }
 
         File tempFile = new File(tempPath);
-        String path = dir.getPath() + "/" + REAL_PATH;
+        String path = dir.getPath() + REAL_PATH;
         File realfolder = new File(path);
 
-        if (!realfolder.exists()) {
+        if (realfolder.exists() == false) {
             realfolder.mkdir();
         }
 
@@ -114,7 +114,7 @@ public class FileManager {
      */
     public static String getVideoFilePath() {
 
-        String path = dir.getPath() + "/" + TEMP_PATH;
+        String path = dir.getPath() + TEMP_PATH;
         File dst = new File(path);
         if (!dst.exists()) dst.mkdirs();
 
@@ -127,7 +127,7 @@ public class FileManager {
     public static void deleteTempFiles(Activity mActivity) {
 
 //        String path = dir.getPath() + "/DCIM/" + Constants.Temp_Folder_Name + "/";
-        String path = dir.getPath() + "/" + TEMP_PATH;
+        String path = dir.getPath() + TEMP_PATH;
         File temp = new File(path);
 
         if (temp.exists()) {

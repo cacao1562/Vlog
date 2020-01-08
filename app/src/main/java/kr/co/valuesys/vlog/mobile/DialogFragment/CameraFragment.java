@@ -6,7 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -26,9 +26,9 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -125,6 +125,9 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 //        mCallbackPause = null;
     }
 
+    /**
+     * 다이얼로그 백 버튼 이벤트 처
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -133,6 +136,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             @Override
             public void onBackPressed() {
 //                super.onBackPressed();
+
+                // 녹화를 다하고 저장 할지 삭제할지 선택하는 대기 상태 일때
                 if (!mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 
                     AlertDialog alert = SimpleAlert.createAlert(getActivity(), getString(R.string.back_alert_msg), true, dialog -> {
@@ -145,10 +150,12 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
                     alert.show();
 
+                // 녹화 하기 전 상태
                 }else if (!mIsRecordingVideo && mNextVideoAbsolutePath == null) {
 
                     dismiss();
 
+                // 녹화 중인 상태
                 }else if (mIsRecordingVideo && mNextVideoAbsolutePath != null) {
 
                 }

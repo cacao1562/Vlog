@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.ViewDataBinding;
+
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -111,7 +113,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void presentNext() {
 
-        binding.logo.postDelayed(() -> {
+        binding.spLogo.postDelayed(() -> {
 
             if (!TextUtils.isEmpty(session)) {
 

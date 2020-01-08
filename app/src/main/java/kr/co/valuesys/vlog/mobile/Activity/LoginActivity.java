@@ -1,10 +1,9 @@
 package kr.co.valuesys.vlog.mobile.Activity;
 
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -18,7 +17,6 @@ import java.util.Arrays;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.KakaoSessionCallback;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityLoginBinding;
 
@@ -119,9 +117,10 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         Session.getCurrentSession().removeCallback(callback);
         binding.facebookButton.unregisterCallback(callbackManager);
+        super.onDestroy();
+
     }
 
 

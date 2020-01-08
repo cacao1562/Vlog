@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".Activity.LoginActivity">
@@ -48,6 +48,6 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

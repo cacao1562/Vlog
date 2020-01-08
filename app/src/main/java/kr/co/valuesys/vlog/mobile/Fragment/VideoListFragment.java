@@ -1,15 +1,14 @@
 package kr.co.valuesys.vlog.mobile.Fragment;
 
-import android.support.v7.app.AlertDialog;
-import android.content.Context;
-import android.databinding.DataBindingUtil;
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,7 @@ import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
-
+import java.lang.ref.WeakReference;
 
 public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo,
                                                            CommonInterface.OnCallbackEmptyVideoToList,
@@ -61,16 +60,15 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         binding.videoListRecyclerview.setAdapter(adapter);
 
 //        adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
-        refreshVideo();
+        refreshVideo(false);
 
         return binding.getRoot();
 //        return inflater.inflate(R.layout.fragment_video_list, container, false);
     }
 
-
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onStop() {
+        super.onStop();
         if (loading != null) {
             if (loading.isShowing()) {
                 loading.dismiss();
@@ -86,10 +84,11 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     @Override
     public void onEmptyVideo(boolean show) {
 
-        getActivity().runOnUiThread(() -> {
-            showEmptyView(show);
-        });
-
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                showEmptyView(show);
+            });
+        }
     }
 
 
@@ -97,9 +96,12 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     비디오 개수가 0개면 true */
     @Override
     public void onCallbackToList(boolean show) {
-        getActivity().runOnUiThread(() -> {
-            showEmptyView(show);
-        });
+
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                showEmptyView(show);
+            });
+        }
     }
 
 
@@ -162,34 +164,54 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     }
 
 
-    private class updateVideo extends AsyncTask<Void, Void, Void> {
+    private static class UpdateVideo extends AsyncTask<Void, Void, Void> {
 
         private AlertDialog loading;
         private CommonInterface.OnCallbackEmptyVideo listener;
+        private WeakReference<VideoListFragment> wrFragment;
+        private VideoListFragment fragment;
+        private boolean isInsert;
 
-        public updateVideo(CommonInterface.OnCallbackEmptyVideo callback) {
+        public UpdateVideo(VideoListFragment videoListFragment, boolean insert, CommonInterface.OnCallbackEmptyVideo callback) {
+            this.wrFragment = new WeakReference<>(videoListFragment);
             this.listener = callback;
+            this.isInsert = insert;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            loading = MobileApplication.showProgress(null, null, getActivity()).create();
+            fragment = wrFragment.get();
+            if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
+                return;
+            }
+            loading = MobileApplication.showProgress(null, null, fragment.getActivity()).create();
             loading.show();
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            info = VideoInfo.getVideo(getActivity(), true, listener);
+            if (fragment.getActivity() != null) {
+                fragment.info = VideoInfo.getVideo(fragment.getActivity(), true, listener);
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (info != null) {
-                adapter.setUp(info);
+            if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
+                return;
+            }
+            if (fragment.info != null) {
+                if (isInsert) {
+                    fragment.adapter.setUpTest(fragment.info);
+                }else {
+                    fragment.adapter.setUp(fragment.info);
+                }
+
                 loading.dismiss();
+                fragment.binding.videoListRecyclerview.smoothScrollToPosition(0);
             }
         }
     }
@@ -197,9 +219,9 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     /**
      * 로딩 보여주면서 비디오 목록 업데이트
      */
-    public void refreshVideo() {
+    public void refreshVideo(boolean insert) {
 
-        new updateVideo(this).execute();
+        new UpdateVideo(this, insert, this).execute();
 
     }
 
@@ -219,6 +241,8 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
             super.getItemOffsets(outRect, view, parent, state);
 
+            // 맨 마지막 아이템이면 바텀 마진을 안줌
+            // 마지막 아이템 외에 전부 바텀 마진을
             if (parent.getChildAdapterPosition(view) != parent.getAdapter().getItemCount() - 1) {
                 outRect.bottom = divHeight;
             }

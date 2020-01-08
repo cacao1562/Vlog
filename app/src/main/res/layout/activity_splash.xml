@@ -4,13 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".Activity.SplashActivity">
 
-        <ImageView
-            android:id="@+id/logo"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/sp_logo"
             android:layout_width="240dp"
             android:layout_height="70dp"
             android:layout_marginTop="60dp"
@@ -44,6 +44,6 @@
             android:layout_marginBottom="25dp"
             android:text="Copyright © 2019 VALUESYS. All rights reserved."/>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

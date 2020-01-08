@@ -5,10 +5,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -65,6 +65,9 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         binding.itemDateTextview.setText(date);
         binding.itemUserNameTextview.setText(userNamee + "  |  ");
 
+
+        // 시간을 1시간 단위로 나눠서 0 이면 1시안 이내이고
+        // 24이상이면 하루가 넘어서 24이상은 다시 24로 나누어서 일자로 표
         long time = (new Date().getTime() - videoInfo.getDate().getTime()) / (1000 * 60 * 60);
         if (time == 0) {
             binding.itemElapsedTimeTextview.setText("방금전");
@@ -87,6 +90,16 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
         activity.runOnUiThread(() -> {
             notifyDataSetChanged();
+        });
+
+    }
+
+    public void setUpTest(ArrayList<VideoInfo> videoInfos) {
+        this.mVideoInfo = videoInfos;
+
+        activity.runOnUiThread(() -> {
+            notifyItemInserted(0);
+
         });
 
     }

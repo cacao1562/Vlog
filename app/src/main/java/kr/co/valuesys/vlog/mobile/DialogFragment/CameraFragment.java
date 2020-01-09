@@ -249,7 +249,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
         binding.progressBar.setMax(Max_duration);
 
         long maxTime = 15000;
-
+                                                        // 0.01초 간격으로 프로그레스 값 업떼이트 ( 1000 = 1초 )
         mCountDownTimer = new CountDownTimer(maxTime, 10) {
 
             @Override
@@ -383,6 +383,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             LogUtil.d(TAG, "onSurfaceTextureAvailable  w = " + width + "  h  = " + height );
             openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+//            openCamera(width, height);
         }
 
         @Override
@@ -541,6 +542,17 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 //            if(size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080){
 //                return size;
 //            }
+//            if (mCamId == CAM_FRONT) {
+//                Log.d("ddd", "w = " + size.getWidth() + "  h = " + size.getHeight() );
+//                if(size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080){
+//                    return size;
+//                }
+//            }
+//            if (size.getWidth() == size.getHeight() * 16 / 9 && size.getWidth() <= 1080) {
+//                return size;
+//            }
+
+
 // 갤럭시s10e 해상도는 1080x2280 이지만 촬영 가능 해상도에 1080x2280이 없고 2288이 있음
             if ( (size.getWidth() - mScreen_height) > 50 || (size.getHeight() - mScreen_width) > 50 ) {
                 continue;
@@ -573,6 +585,10 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
         for (Size ops : choices) {
 
+//            if (ops.getHeight() == ops.getWidth() * h / w &&
+//                    ops.getWidth() >= width && ops.getHeight() >= height) {
+//                bigEnough.add(ops);
+//            }
 //            if(ops.getWidth() <= 1920 && ops.getHeight() <= 1080 && ops.getHeight() == ops.getWidth() * h / w && (ops.getWidth() >= width && ops.getHeight() >= height)) {
 //                bigEnough.add(ops);
 //            }else {
@@ -586,11 +602,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             }
         }
 
-//        if (bigEnough.size() > 0) {
-//            return Collections.min(bigEnough, new CompareSizesByArea());
-//        } else {
-//            return choices[0];
-//        }
 
         if (bigEnough.size() > 0) {
             return Collections.min(bigEnough, new CompareSizesByArea());
@@ -724,8 +735,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
         }
 
-        activity.runOnUiThread(() -> binding.preview.setTransform(matrix));
-
+//        activity.runOnUiThread(() -> binding.preview.setTransform(matrix));
+        binding.preview.setTransform(matrix);
     }
 
     private void startBackgroundThread() {
@@ -1037,7 +1048,12 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
                 }
 
                 closeCamera();
-                openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+//                openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+                if (binding.preview.isAvailable()) {
+                    openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+                } else {
+                    binding.preview.setSurfaceTextureListener(mSurfaceTextureListener);
+                }
                 break;
 
         }

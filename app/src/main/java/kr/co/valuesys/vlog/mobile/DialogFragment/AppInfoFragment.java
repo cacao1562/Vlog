@@ -148,18 +148,22 @@ public class AppInfoFragment extends DialogFragment {
 
                         resetLogin();
 
-                        getActivity().runOnUiThread(() -> {
+                        if (getActivity() != null) {
 
-                            Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                            AlertDialog alert = SimpleAlert.createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+                            getActivity().runOnUiThread(() -> {
 
-                                dialog.dismiss();
-                                presentLogin();
+                                Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                                AlertDialog alert = SimpleAlert.createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+
+                                    dialog.dismiss();
+                                    presentLogin();
 //                                getActivity().finish();
-                            });
-                            alert.show();
+                                });
+                                alert.show();
 
-                        });
+                            });
+
+                        }
 
                     }
                 });

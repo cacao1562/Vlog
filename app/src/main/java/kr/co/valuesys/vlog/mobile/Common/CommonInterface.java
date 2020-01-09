@@ -47,4 +47,8 @@ public interface CommonInterface {
         void onLoading(boolean show);
     }
 
+    interface OnRemoveCallback {
+        void onRemove(int index);
+    }
+
 }

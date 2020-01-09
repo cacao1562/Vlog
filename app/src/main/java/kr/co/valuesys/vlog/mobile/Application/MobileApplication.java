@@ -28,6 +28,7 @@ import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.usermgmt.response.model.UserAccount;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import org.json.JSONException;
@@ -206,12 +207,16 @@ public class MobileApplication extends Application {
             @Override
             public void onSuccess(MeV2Response response) {
 
+                UserAccount userAccount = response.getKakaoAccount();
+
                 LogUtil.d("kakao ", "user id : " + response.getId());
+                LogUtil.d("kakao " , "nick name: " + response.getNickname());
+//                LogUtil.d("kakao " , "getProfile nick name: " + userAccount.getProfile().getNickname());
 //                LogUtil.d("kakao " , "email: " + response.getKakaoAccount());
                 mLoginName = response.getNickname();
+//                mLoginName = userAccount.getProfile().getNickname();;
                 mLoginPlatform = Constants.Kakao;
-                LogUtil.d("kakao " , "nick name: " + response.getNickname());
-                LogUtil.d("kakao" , "profile image: " + response.getProfileImagePath());
+
 //                redirectMainActivity();
                 callback.onFileCallback(true);
             }

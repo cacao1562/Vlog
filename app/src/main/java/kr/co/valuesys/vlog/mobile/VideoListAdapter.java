@@ -32,14 +32,19 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private ArrayList<VideoInfo> mVideoInfo = new ArrayList<>();
     private CommonInterface.OnCallbackEmptyVideoToList mCallbackToList;
     private CommonInterface.OnLoadingCallback mCallbackLoading;
+    private CommonInterface.OnRemoveCallback mCallbackRemove;
     private String userNamee;
 
 
-    public VideoListAdapter(Activity activity, CommonInterface.OnCallbackEmptyVideoToList callbackToList, CommonInterface.OnLoadingCallback onLoadingCallback) {
+    public VideoListAdapter(Activity activity,
+                            CommonInterface.OnCallbackEmptyVideoToList callbackToList,
+                            CommonInterface.OnLoadingCallback onLoadingCallback,
+                            CommonInterface.OnRemoveCallback onRemoveCallback) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         this.mCallbackToList = callbackToList;
         this.mCallbackLoading = onLoadingCallback;
+        this.mCallbackRemove = onRemoveCallback;
         this.userNamee = MobileApplication.getContext().getLoginkName();
     }
 
@@ -94,7 +99,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
     }
 
-    public void setUpTest(ArrayList<VideoInfo> videoInfos) {
+    public void setUpInsert(ArrayList<VideoInfo> videoInfos) {
         this.mVideoInfo = videoInfos;
 
         activity.runOnUiThread(() -> {
@@ -133,8 +138,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 
                     dialog.dismiss();
                     mCallbackLoading.onLoading(true);
-                    new removeLoading(getAdapterPosition()).execute();
-
+//                    new RemoveLoading(getAdapterPosition()).execute();
+                    mCallbackRemove.onRemove(getAdapterPosition());
                 });
 
                 alert.show();
@@ -145,11 +150,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     }
 
 
-    private class removeLoading extends AsyncTask<Void, Void, Void> {
+    private class RemoveLoading extends AsyncTask<Void, Void, Void> {
 
         private int position;
 
-        public removeLoading(int index) {
+        public RemoveLoading(int index) {
             position = index;
         }
 

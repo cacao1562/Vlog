@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
@@ -20,6 +21,7 @@ import java.util.Calendar;
 
 import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.Common.FileManager;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
 import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
@@ -29,7 +31,8 @@ import java.lang.ref.WeakReference;
 
 public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo,
                                                            CommonInterface.OnCallbackEmptyVideoToList,
-                                                           CommonInterface.OnLoadingCallback {
+                                                           CommonInterface.OnLoadingCallback,
+                                                           CommonInterface.OnRemoveCallback {
 
     private FragmentVideoListBinding binding;
     private VideoListAdapter adapter;
@@ -56,7 +59,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         binding.videoListRecyclerview.setHasFixedSize(true);
         binding.videoListRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.videoListRecyclerview.addItemDecoration(new RecyclerDecoration(20));
-        adapter = new VideoListAdapter(getActivity(), this, this);
+        adapter = new VideoListAdapter(getActivity(), this, this, this);
         binding.videoListRecyclerview.setAdapter(adapter);
 
 //        adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
@@ -126,6 +129,15 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
 
 
     /**
+     * VideoListAdapter 에서 삭제 버튼 눌렀을때 콜
+     */
+    @Override
+    public void onRemove(int index) {
+        new RemoveVideo(index, this).execute();
+    }
+
+
+    /**
      * 비디오가 없다는 뷰 보여주기 또는 숨기기
      */
     private void showEmptyView(boolean show) {
@@ -164,6 +176,11 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     }
 
 
+
+    /**
+     * 처음 메인 왔을때 비디오 목록 업데이트하고
+     * 비디오 녹화시 추가 했을때 다시 업데이트
+     */
     private static class UpdateVideo extends AsyncTask<Void, Void, Void> {
 
         private AlertDialog loading;
@@ -172,7 +189,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         private VideoListFragment fragment;
         private boolean isInsert;
 
-        public UpdateVideo(VideoListFragment videoListFragment, boolean insert, CommonInterface.OnCallbackEmptyVideo callback) {
+        UpdateVideo(VideoListFragment videoListFragment, boolean insert, CommonInterface.OnCallbackEmptyVideo callback) {
             this.wrFragment = new WeakReference<>(videoListFragment);
             this.listener = callback;
             this.isInsert = insert;
@@ -205,7 +222,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
             }
             if (fragment.info != null) {
                 if (isInsert) {
-                    fragment.adapter.setUpTest(fragment.info);
+                    fragment.adapter.setUpInsert(fragment.info);
                 }else {
                     fragment.adapter.setUp(fragment.info);
                 }
@@ -213,6 +230,67 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
                 loading.dismiss();
                 fragment.binding.videoListRecyclerview.smoothScrollToPosition(0);
             }
+        }
+    }
+
+    /**
+     * 선택한 비디오 삭제하고 리스트 다시 정렬
+     */
+    private static class RemoveVideo extends AsyncTask<Void, Void, Void> {
+
+        private int position;
+        private WeakReference<VideoListFragment> wrFragment;
+        private VideoListFragment fragment;
+
+        RemoveVideo(int index, VideoListFragment videoListFragment) {
+            this.position = index;
+            this.wrFragment = new WeakReference<>(videoListFragment);
+            this.fragment = wrFragment.get();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
+                cancel(true);
+            }
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
+                return null;
+            }
+
+            FileManager.deleteVideo(fragment.getActivity(), fragment.info.get(position).getUri().toString(), result -> {
+
+                if (result) {
+
+                    fragment.info = VideoInfo.getVideo(fragment.getActivity(), true, null);
+                    fragment.onLoading(false);
+                    if (fragment.info.size() == 0) {
+                        fragment.onCallbackToList(true);
+                    }else {
+                        fragment.onCallbackToList(false);
+                    }
+
+                    fragment.adapter.setUp(fragment.info);
+
+                }else {
+
+                    fragment.onLoading(false);
+                    Toast.makeText(fragment.getActivity(), "파일 삭제 실패", Toast.LENGTH_SHORT).show();
+
+                }
+
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 
@@ -229,7 +307,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     /**
      *  recyclerview cell 아이템 간격
      */
-    public class RecyclerDecoration extends RecyclerView.ItemDecoration {
+    private static class RecyclerDecoration extends RecyclerView.ItemDecoration {
 
         private final int divHeight;
 

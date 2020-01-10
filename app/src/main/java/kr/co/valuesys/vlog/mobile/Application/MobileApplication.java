@@ -1,6 +1,7 @@
 package kr.co.valuesys.vlog.mobile.Application;
 
 import androidx.appcompat.app.AlertDialog;
+
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.appevents.AppEventsLogger;
+import com.kakao.auth.AccessTokenCallback;
 import com.kakao.auth.ApiResponseCallback;
 import com.kakao.auth.ApprovalType;
 import com.kakao.auth.AuthService;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import kr.co.valuesys.vlog.mobile.Activity.SplashActivity;
 import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.Common.Constants;
 import kr.co.valuesys.vlog.mobile.Common.LogUtil;
@@ -60,14 +63,29 @@ public class MobileApplication extends Application {
 
     private CalendarDay mSelectDay;
 
-    public void setmLoginName(String mLoginName) { this.mLoginName = mLoginName; }
-    public String getLoginkName() { return mLoginName;}
+    public void setmLoginName(String mLoginName) {
+        this.mLoginName = mLoginName;
+    }
 
-    public String getmLoginPlatform() { return mLoginPlatform; }
-    public void setmLoginPlatform(String mLoginPlatform) { this.mLoginPlatform = mLoginPlatform; }
+    public String getLoginkName() {
+        return mLoginName;
+    }
 
-    public CalendarDay getmSelectDay() { return mSelectDay; }
-    public void setmSelectDay(CalendarDay mSelectDay) { this.mSelectDay = mSelectDay; }
+    public String getmLoginPlatform() {
+        return mLoginPlatform;
+    }
+
+    public void setmLoginPlatform(String mLoginPlatform) {
+        this.mLoginPlatform = mLoginPlatform;
+    }
+
+    public CalendarDay getmSelectDay() {
+        return mSelectDay;
+    }
+
+    public void setmSelectDay(CalendarDay mSelectDay) {
+        this.mSelectDay = mSelectDay;
+    }
 
     @Override
     public void onCreate() {
@@ -105,6 +123,7 @@ public class MobileApplication extends Application {
         /**
          * Session Config에 대해서는 default값들이 존재한다.
          * 필요한 상황에서만 override해서 사용하면 됨.
+         *
          * @return Session의 설정값.
          */
         @Override
@@ -112,7 +131,7 @@ public class MobileApplication extends Application {
             return new ISessionConfig() {
                 @Override
                 public AuthType[] getAuthTypes() {
-                    return new AuthType[] {AuthType.KAKAO_LOGIN_ALL};
+                    return new AuthType[]{AuthType.KAKAO_LOGIN_ALL};
                 }
 
                 @Override
@@ -149,7 +168,7 @@ public class MobileApplication extends Application {
         }
     }
 
-// kakao 토킅 가져오기
+    // kakao 토킅 가져오기
     public void requestAccessTokenInfo() {
 
         AuthService.getInstance().requestAccessTokenInfo(new ApiResponseCallback<AccessTokenInfoResponse>() {
@@ -182,13 +201,16 @@ public class MobileApplication extends Application {
     }
 
 
-/** kakao 사용자 정보 가져오기 */
+    /**
+     * kakao 사용자 정보 가져오기
+     */
     public void requestMe(CommonInterface.OnFileCallback callback) {
 
         List<String> keys = new ArrayList<>();
         keys.add("properties.nickname");
         keys.add("properties.profile_image");
         keys.add("kakao_account.email");
+        keys.add("kakao_account.profile");
 
         UserManagement.getInstance().me(keys, new MeV2ResponseCallback() {
             @Override
@@ -201,20 +223,36 @@ public class MobileApplication extends Application {
             @Override
             public void onSessionClosed(ErrorResult errorResult) {
 //                redirectLoginActivity()
-                LogUtil.d("kakao requestMe ", "onSessionClosed" );
+                LogUtil.d("kakao requestMe ", "onSessionClosed");
             }
 
             @Override
             public void onSuccess(MeV2Response response) {
 
-                UserAccount userAccount = response.getKakaoAccount();
+                UserAccount userAccount = null;
+                if (response != null) {
+                    if (response.getKakaoAccount() != null) {
+                        userAccount = response.getKakaoAccount();
+                        LogUtil.d("kakao ", "userAccount  : " + userAccount.toString() );
+                        if (userAccount.profileNeedsAgreement() != null) {
+                            if (userAccount.profileNeedsAgreement().getBoolean()) {
+                                handleScopeError(userAccount);
+                            }else {
+                                if (userAccount.getProfile() != null) {
+                                    if (userAccount.getProfile().getNickname() != null) {
+                                        LogUtil.d("kakao ", "profile nick name: " + userAccount.getProfile().getNickname());
+                                        mLoginName = userAccount.getProfile().getNickname();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 LogUtil.d("kakao ", "user id : " + response.getId());
-                LogUtil.d("kakao " , "nick name: " + response.getNickname());
-//                LogUtil.d("kakao " , "getProfile nick name: " + userAccount.getProfile().getNickname());
-//                LogUtil.d("kakao " , "email: " + response.getKakaoAccount());
+                LogUtil.d("kakao ", "nick name: " + response.getNickname());
+
                 mLoginName = response.getNickname();
-//                mLoginName = userAccount.getProfile().getNickname();;
                 mLoginPlatform = Constants.Kakao;
 
 //                redirectMainActivity();
@@ -225,13 +263,37 @@ public class MobileApplication extends Application {
 
     }
 
-// facebook 이름 가져오기
+    private void handleScopeError(UserAccount account) {
+        List<String> neededScopes = new ArrayList<>();
+        if (account.emailNeedsAgreement().getBoolean()) {
+            neededScopes.add("account_email");
+        }
+        if (account.genderNeedsAgreement().getBoolean()) {
+            neededScopes.add("gender");
+        }
+        Session.getCurrentSession().updateScopes(((SplashActivity) this.getApplicationContext()), neededScopes, new
+                AccessTokenCallback() {
+
+
+                    @Override
+                    public void onAccessTokenReceived(com.kakao.auth.authorization.accesstoken.AccessToken accessToken) {
+                        // 유저에게 성공적으로 동의를 받음. 토큰을 재발급 받게 됨.
+                    }
+
+                    @Override
+                    public void onAccessTokenFailure(ErrorResult errorResult) {
+                        // 동의 얻기 실패
+                    }
+                });
+    }
+
+    // facebook 이름 가져오기
     public void setFbName() {
 
         mLoginName = Profile.getCurrentProfile().getName();
     }
 
-// facebook 로그인 정보 가져오기
+    // facebook 로그인 정보 가져오기
     public void useLoginInformation(AccessToken accessToken, CommonInterface.OnFileCallback callback) {
         /**
          Creating the GraphRequest to fetch user details
@@ -277,7 +339,7 @@ public class MobileApplication extends Application {
 
         if (kakaoSession) {
             return Constants.Kakao;
-        }else if (fbSession) {
+        } else if (fbSession) {
             return Constants.FaceBook;
         }
         return "";
@@ -286,10 +348,10 @@ public class MobileApplication extends Application {
 
     public static AlertDialog.Builder showProgress(String title, String msg, Context context) {
 
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View innerView = inflater.inflate(R.layout.dialog_progress, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context,R.style.DialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.DialogStyle);
 //        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.DialogStyle));
 
         if (!TextUtils.isEmpty(title)) {

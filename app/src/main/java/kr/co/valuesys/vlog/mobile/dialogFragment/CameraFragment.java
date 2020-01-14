@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.DialogFragment;
+package kr.co.valuesys.vlog.mobile.dialogFragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import androidx.databinding.DataBindingUtil;
+
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -51,11 +52,11 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import kr.co.valuesys.vlog.mobile.Common.Constants;
-import kr.co.valuesys.vlog.mobile.Common.FileManager;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.common.Constants;
+import kr.co.valuesys.vlog.mobile.common.FileManager;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
-import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
+import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
 
 
@@ -265,6 +266,24 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             }
         };
 
+        binding.switchFilterBtn.setOnClickListener(v -> {
+//            mCaptureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+//            mCaptureRequestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, CaptureRequest.CONTROL_EFFECT_MODE_SEPIA);
+
+            if (null == mCameraDevice) {
+                return;
+            }
+            try {
+                mCaptureRequestBuilder.set(CaptureRequest.CONTROL_EFFECT_MODE, CaptureRequest.CONTROL_EFFECT_MODE_SEPIA);
+                HandlerThread thread = new HandlerThread("CameraPreview");
+                thread.start();
+                mCameraCaptureSession.setRepeatingRequest(mCaptureRequestBuilder.build(), null, mBackgroundHandler);
+
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
 
     @Override
@@ -395,7 +414,11 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
 //            closeCamera();
-            return true;
+            if (mCameraDevice != null) {
+                closeCamera();
+                mCameraDevice = null;
+            }
+            return false;
         }
 
         @Override
@@ -656,7 +679,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             assert texture != null;
             texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             mCaptureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-
             Surface previewSurface = new Surface(texture);
             mCaptureRequestBuilder.addTarget(previewSurface);
             mCameraDevice.createCaptureSession(Collections.singletonList(previewSurface), new CameraCaptureSession.StateCallback() {
@@ -700,6 +722,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
     private void setUpCaptureRequestBuilder(CaptureRequest.Builder builder) {
         builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+//        builder.set(CaptureRequest.CONTROL_EFFECT_MODE, CaptureRequest.CONTROL_EFFECT_MODE_SEPIA);
     }
 
 
@@ -862,6 +885,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
         try {
             closePreviewSession();
             setUpMediaRecorder();
+
             SurfaceTexture texture = binding.preview.getSurfaceTexture();
             LogUtil.d(TAG, "preview / w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight() );
             assert texture != null;

@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Application;
+package kr.co.valuesys.vlog.mobile.application;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -41,10 +41,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import kr.co.valuesys.vlog.mobile.Activity.SplashActivity;
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.Constants;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.activity.SplashActivity;
+import kr.co.valuesys.vlog.mobile.common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.common.Constants;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 
 //import io.realm.Realm;
@@ -252,7 +252,7 @@ public class MobileApplication extends Application {
                 LogUtil.d("kakao ", "user id : " + response.getId());
                 LogUtil.d("kakao ", "nick name: " + response.getNickname());
 
-                mLoginName = response.getNickname();
+//                mLoginName = response.getNickname();
                 mLoginPlatform = Constants.Kakao;
 
 //                redirectMainActivity();

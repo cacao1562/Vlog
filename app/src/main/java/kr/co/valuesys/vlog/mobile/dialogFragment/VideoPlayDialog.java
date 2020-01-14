@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.DialogFragment;
+package kr.co.valuesys.vlog.mobile.dialogFragment;
 
 import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 
 import java.io.IOException;
 
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogVideoplayBinding;
 

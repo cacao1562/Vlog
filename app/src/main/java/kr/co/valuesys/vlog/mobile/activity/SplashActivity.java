@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Activity;
+package kr.co.valuesys.vlog.mobile.activity;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -7,7 +7,6 @@ import android.content.pm.Signature;
 import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.ViewDataBinding;
 
 import android.text.TextUtils;
 import android.util.Base64;
@@ -19,14 +18,14 @@ import com.kakao.auth.Session;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
-import kr.co.valuesys.vlog.mobile.Common.FileManager;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.common.FileManager;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivitySplashBinding;
 
-import static kr.co.valuesys.vlog.mobile.Common.Constants.FaceBook;
-import static kr.co.valuesys.vlog.mobile.Common.Constants.Kakao;
+import static kr.co.valuesys.vlog.mobile.common.Constants.FaceBook;
+import static kr.co.valuesys.vlog.mobile.common.Constants.Kakao;
 
 public class SplashActivity extends AppCompatActivity {
 

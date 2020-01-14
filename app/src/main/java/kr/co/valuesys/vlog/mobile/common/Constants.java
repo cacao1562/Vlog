@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Common;
+package kr.co.valuesys.vlog.mobile.common;
 
 public class Constants {
 

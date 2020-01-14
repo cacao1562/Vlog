@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Fragment;
+package kr.co.valuesys.vlog.mobile.fragment;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
@@ -19,11 +19,11 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.FileManager;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
-import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.common.FileManager;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
+import kr.co.valuesys.vlog.mobile.model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;

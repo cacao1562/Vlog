@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Activity;
+package kr.co.valuesys.vlog.mobile.activity;
 
 import android.content.Intent;
 import androidx.databinding.DataBindingUtil;
@@ -15,8 +15,8 @@ import com.kakao.auth.Session;
 
 import java.util.Arrays;
 
-import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
-import kr.co.valuesys.vlog.mobile.Common.KakaoSessionCallback;
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.common.KakaoSessionCallback;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityLoginBinding;
 

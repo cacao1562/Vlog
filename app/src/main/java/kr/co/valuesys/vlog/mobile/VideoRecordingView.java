@@ -2,10 +2,9 @@ package kr.co.valuesys.vlog.mobile;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.TextureView;
 
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 
 public class VideoRecordingView extends TextureView {
 

@@ -16,12 +16,12 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Date;
 
-import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.FileManager;
-import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
-import kr.co.valuesys.vlog.mobile.DialogFragment.VideoPlayDialog;
-import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.common.FileManager;
+import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
+import kr.co.valuesys.vlog.mobile.dialogFragment.VideoPlayDialog;
+import kr.co.valuesys.vlog.mobile.model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.databinding.VideoItemBinding;
 
 

@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.DialogFragment;
+package kr.co.valuesys.vlog.mobile.dialogFragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -18,16 +18,16 @@ import com.facebook.login.LoginManager;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
-import kr.co.valuesys.vlog.mobile.Activity.LoginActivity;
-import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.activity.LoginActivity;
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.BuildConfig;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
-import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
+import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentAppInfoBinding;
 
-import static kr.co.valuesys.vlog.mobile.Common.Constants.FaceBook;
-import static kr.co.valuesys.vlog.mobile.Common.Constants.Kakao;
+import static kr.co.valuesys.vlog.mobile.common.Constants.FaceBook;
+import static kr.co.valuesys.vlog.mobile.common.Constants.Kakao;
 
 public class AppInfoFragment extends DialogFragment {
 

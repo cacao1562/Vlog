@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.DialogFragment;
+package kr.co.valuesys.vlog.mobile.dialogFragment;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,10 +14,10 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.Constants;
-import kr.co.valuesys.vlog.mobile.Common.FileManager;
-import kr.co.valuesys.vlog.mobile.Common.SimpleAlert;
+import kr.co.valuesys.vlog.mobile.common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.common.Constants;
+import kr.co.valuesys.vlog.mobile.common.FileManager;
+import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogInputfilenameBinding;
 

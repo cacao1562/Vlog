@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Common;
+package kr.co.valuesys.vlog.mobile.common;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,14 +9,13 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
-
 public class FileManager {
 
     private static final String TEMP_PATH = "/DCIM/" + Constants.Temp_Folder_Name + "/";
     private static final String REAL_PATH = "/DCIM/" + Constants.Real_Folder_Name + "/";
 
     private static final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
+//    String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + "CameraViewFreeDrawing";
 
     /**
      * 파일 저장

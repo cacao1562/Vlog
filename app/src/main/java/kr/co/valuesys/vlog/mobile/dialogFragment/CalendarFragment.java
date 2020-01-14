@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.DialogFragment;
+package kr.co.valuesys.vlog.mobile.dialogFragment;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,10 +32,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 
-import kr.co.valuesys.vlog.mobile.Application.MobileApplication;
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
-import kr.co.valuesys.vlog.mobile.Model.VideoInfo;
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
+import kr.co.valuesys.vlog.mobile.model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCalendarBinding;
 

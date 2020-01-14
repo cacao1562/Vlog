@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Activity;
+package kr.co.valuesys.vlog.mobile.activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -13,12 +13,12 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
-import kr.co.valuesys.vlog.mobile.DialogFragment.AppInfoFragment;
-import kr.co.valuesys.vlog.mobile.DialogFragment.CalendarFragment;
-import kr.co.valuesys.vlog.mobile.DialogFragment.CameraFragment;
-import kr.co.valuesys.vlog.mobile.Fragment.VideoListFragment;
+import kr.co.valuesys.vlog.mobile.common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
+import kr.co.valuesys.vlog.mobile.dialogFragment.AppInfoFragment;
+import kr.co.valuesys.vlog.mobile.dialogFragment.CalendarFragment;
+import kr.co.valuesys.vlog.mobile.dialogFragment.Camera2Fragment;
+import kr.co.valuesys.vlog.mobile.fragment.VideoListFragment;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityMainBinding;
 
@@ -76,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
                 break;
 
             case 1:
-                CameraFragment cf = CameraFragment.newInstance();
+//                CameraFragment cf = CameraFragment.newInstance();
+                Camera2Fragment cf = Camera2Fragment.newInstance();
                 cf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
                 cf.show(getSupportFragmentManager(), "tag");
                 break;
@@ -194,9 +195,11 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
                 for(Fragment fragment : fragmentList) {
 
-                    if (fragment instanceof CameraFragment) {
+//                    if (fragment instanceof CameraFragment) {
+                    if (fragment instanceof Camera2Fragment) {
 
-                        ((CameraFragment) fragment).dismiss();
+//                        ((CameraFragment) fragment).dismiss();
+                        ((Camera2Fragment) fragment).dismiss();
 
                         if (vf != null) {
                             vf.refreshVideo(true);

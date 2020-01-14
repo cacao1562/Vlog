@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.Model;
+package kr.co.valuesys.vlog.mobile.model;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -6,20 +6,14 @@ import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.view.View;
 
-import com.prolificinteractive.materialcalendarview.CalendarDay;
-
-import java.util.Calendar;
 import java.util.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import kr.co.valuesys.vlog.mobile.Common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.Common.Constants;
-import kr.co.valuesys.vlog.mobile.Common.LogUtil;
+import kr.co.valuesys.vlog.mobile.common.CommonInterface;
+import kr.co.valuesys.vlog.mobile.common.Constants;
 
 public class VideoInfo {
 

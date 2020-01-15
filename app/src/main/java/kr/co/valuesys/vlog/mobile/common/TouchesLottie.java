@@ -3,23 +3,21 @@ package kr.co.valuesys.vlog.mobile.common;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.widget.AppCompatImageView;
+import com.airbnb.lottie.LottieAnimationView;
 
-import kr.co.valuesys.vlog.mobile.application.MobileApplication;
+public class TouchesLottie extends LottieAnimationView {
 
-public class TouchesImgView extends AppCompatImageView {
-    public TouchesImgView(Context context) {
+    public TouchesLottie(Context context) {
         super(context);
     }
 
-    public TouchesImgView(Context context, AttributeSet attrs) {
+    public TouchesLottie(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public TouchesImgView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public TouchesLottie(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -53,18 +51,18 @@ public class TouchesImgView extends AppCompatImageView {
                 LogUtil.d("www", " 우 하단 ");
                 this.setX(parent_width);
                 this.setY(parent_height);
-            // 좌 하단
+                // 좌 하단
             } else if (this.getX() < 0 && this.getY() > parent_height) {
                 LogUtil.d("www", " 좌 하단 ");
                 this.setX(0) ;
                 this.setY(parent_height);
 
-            // 우 상단
+                // 우 상단
             } else if (this.getX() > parent_width && this.getY() < 0) {
                 LogUtil.d("www", " 우 상단  ");
                 this.setX(parent_width);
                 this.setY(0);
-            // 좌 상단
+                // 좌 상단
             } else if (this.getX() < 0 && this.getY() < 0) {
                 LogUtil.d("www", " 좌 상단  ");
                 this.setX(0);
@@ -82,5 +80,4 @@ public class TouchesImgView extends AppCompatImageView {
         }
         return true;
     }
-
 }

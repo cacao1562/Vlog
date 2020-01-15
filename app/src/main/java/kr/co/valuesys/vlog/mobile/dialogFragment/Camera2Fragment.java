@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.Constants;
 import kr.co.valuesys.vlog.mobile.common.FileManager;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
@@ -406,7 +407,7 @@ public class Camera2Fragment extends DialogFragment {
         };
 
         binding.testButton.setOnClickListener(v -> {
-            
+
             if (binding.kakaoImgview.getVisibility() == View.VISIBLE) {
                 binding.kakaoImgview.setVisibility(View.INVISIBLE);
             }else {
@@ -414,6 +415,18 @@ public class Camera2Fragment extends DialogFragment {
             }
 
             binding.touchesView.setSomeView(binding.kakaoImgview);
+        });
+
+        binding.test2Button.setOnClickListener(v -> {
+
+            if (binding.lottieCat.getVisibility() == View.VISIBLE) {
+                binding.lottieCat.setVisibility(View.INVISIBLE);
+            }else {
+                binding.lottieCat.setVisibility(View.VISIBLE);
+            }
+
+            binding.touchesView.setSomeView(binding.lottieCat);
+
         });
 
     }

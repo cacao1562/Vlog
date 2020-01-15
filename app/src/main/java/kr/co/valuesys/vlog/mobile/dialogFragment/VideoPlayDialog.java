@@ -9,11 +9,14 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import java.io.IOException;
 
@@ -29,6 +32,8 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
 
     //    private SurfaceHolder mSurfaceHolder;
     private MediaPlayer mMediaPlayer;
+    private Runnable runnable;
+    private Handler handler;
 
     public VideoPlayDialog() { }
 
@@ -50,6 +55,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
 //        mSurfaceHolder = binding.videoPlaySurfaceView.getHolder();
 //        mSurfaceHolder.addCallback(this);
         binding.videoPlaySurfaceView.setSurfaceTextureListener(this);
+        handler = new Handler();
 
         return binding.getRoot();
     }
@@ -73,14 +79,14 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
 
             }else {
 
-                mMediaPlayer.start();
+                startPlay();
                 binding.videoPlayPlayButton.setVisibility(View.GONE);
             }
         });
 
         binding.videoPlayPlayButton.setOnClickListener(v -> {
 
-            mMediaPlayer.start();
+            startPlay();
             binding.videoPlayPlayButton.setVisibility(View.GONE);
 
         });
@@ -98,7 +104,38 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
             }
 
         });
+
+        binding.videoPlaySeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (isMoveSeek) {
+                    if (mMediaPlayer != null) {
+                        mMediaPlayer.seekTo(seekBar.getProgress());
+                    }
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                if (mMediaPlayer != null) {
+                    mMediaPlayer.pause();
+                    isMoveSeek = true;
+                }
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (mMediaPlayer != null) {
+                    isMoveSeek = false;
+                    mMediaPlayer.seekTo(seekBar.getProgress());
+                    startPlay();
+                }
+            }
+        });
     }
+
+
+    private boolean isMoveSeek;
 
 
     @Override
@@ -122,7 +159,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
         LogUtil.d("ddd", "onResume");
         if (mMediaPlayer != null) {
             if (!mMediaPlayer.isPlaying()) {
-                mMediaPlayer.start();
+                startPlay();
             }
         }
     }
@@ -140,6 +177,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
 //        mSurfaceHolder = null;
     }
 
+
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
 
@@ -147,7 +185,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
         Surface s = new Surface(surface);
 
         try {
-            mMediaPlayer= new MediaPlayer();
+            mMediaPlayer = new MediaPlayer();
             String path = getArguments().getString(ARG_MESSAGE);
             mMediaPlayer.setDataSource(path);
             mMediaPlayer.setLooping(true);
@@ -159,7 +197,19 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
 //            mMediaPlayer.setOnPreparedListener(this);
 //            mMediaPlayer.setOnVideoSizeChangedListener(this);
             mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mMediaPlayer.start();
+
+
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+
+                    mp.start();
+                    changeSeekbar();
+                }
+            });
+
+            binding.videoPlaySeekbar.setMax(mMediaPlayer.getDuration());
+            LogUtil.d("sss", "  getDuration = " + mMediaPlayer.getDuration());
 
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
@@ -185,8 +235,37 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+//        LogUtil.d("sss", "onSurfaceTextureUpdated  pos = " + mMediaPlayer.getCurrentPosition());
+//        binding.videoPlaySeekbar.setProgress(mMediaPlayer.getCurrentPosition());
+    }
+
+    private void startPlay() {
+        binding.videoPlayPlayButton.setVisibility(View.GONE);
+        mMediaPlayer.start();
+        changeSeekbar();
+    }
+
+    private void changeSeekbar() {
+
+        if (mMediaPlayer != null) {
+//            LogUtil.d("sss", " changeSeekbar = " + mMediaPlayer.getCurrentPosition() );
+            binding.videoPlaySeekbar.setProgress(mMediaPlayer.getCurrentPosition());
+            if (mMediaPlayer.isPlaying()) {
+                runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        changeSeekbar();
+                    }
+                };
+                handler.postDelayed(runnable, 10);
+            }
+        }
 
     }
 
-
+    @Override
+    public void onStop() {
+        super.onStop();
+        handler.removeCallbacks(runnable);
+    }
 }

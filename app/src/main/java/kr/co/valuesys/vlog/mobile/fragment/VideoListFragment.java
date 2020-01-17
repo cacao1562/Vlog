@@ -210,7 +210,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         @Override
         protected Void doInBackground(Void... voids) {
             if (fragment.getActivity() != null) {
-                fragment.info = VideoInfo.getVideo(fragment.getActivity(), true, listener);
+                fragment.info = VideoInfo.getVideo(fragment.getActivity(), false, listener);
             }
             return null;
         }
@@ -268,7 +268,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
 
                 if (result) {
 
-                    fragment.info = VideoInfo.getVideo(fragment.getActivity(), true, null);
+                    fragment.info = VideoInfo.getVideo(fragment.getActivity(), false, null);
                     fragment.onLoading(false);
                     if (fragment.info.size() == 0) {
                         fragment.onCallbackToList(true);

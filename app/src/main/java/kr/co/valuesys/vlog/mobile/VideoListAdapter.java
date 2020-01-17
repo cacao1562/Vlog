@@ -4,13 +4,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -66,7 +70,14 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
 //        Uri uri = videoInfo.getUri();
 
         binding.itemTitleTextview.setText(title);
-        binding.itemThumbnailImgview.setImageBitmap(img);
+//        binding.itemThumbnailImgview.setImageBitmap(img);
+        if (mVideoInfo.get(position).getImg() == null) {
+            binding.itemThumbnailImgview.setImageResource(0);
+            new makeThumnail(position, videoInfo.getData(), binding.itemThumbnailImgview).execute();
+        }else {
+            binding.itemThumbnailImgview.setImageBitmap(img);
+        }
+
         binding.itemDateTextview.setText(date);
         binding.itemUserNameTextview.setText(userNamee + "  |  ");
 
@@ -191,6 +202,53 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+        }
+    }
+
+
+    private class makeThumnail extends AsyncTask<Void, Void, Bitmap> {
+
+        private int itemPosition;
+        private String thumbData;
+        private ImageView imageView;
+
+        public makeThumnail(int position, String data, ImageView imgview) {
+            this.itemPosition = position;
+            this.thumbData = data;
+            this.imageView = imgview;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected Bitmap doInBackground(Void... voids) {
+
+            Bitmap thumbnail = null;
+
+            // 썸네일 크기 변경할 때.
+            try {
+                // 썸네일 추출후 리사이즈해서 다시 비트맵 생성
+                Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(thumbData, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+//                        thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 1024, 512);
+                thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 960, 480);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            return thumbnail;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            mVideoInfo.get(itemPosition).setImg(bitmap);
+            this.imageView.setImageBitmap(bitmap);
         }
     }
 

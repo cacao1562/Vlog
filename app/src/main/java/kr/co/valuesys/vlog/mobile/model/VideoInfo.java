@@ -22,11 +22,13 @@ public class VideoInfo {
     private Bitmap img;
     private Uri uri;
     private Date date;
+    private String data;
 
-    public VideoInfo(String title, Bitmap img, Uri uri, Date date) {
+    public VideoInfo(String title, Bitmap img, String data, Uri uri, Date date) {
         this.title = title;
         this.img = img;
         this.uri = uri;
+        this.data = data;
         this.date = date;
     }
 
@@ -46,8 +48,11 @@ public class VideoInfo {
         return date;
     }
 
+    public String getData() { return data; }
 
-// 전체 비디오 목록 에서 앨범 이름이 TestVideo 인 것만 리스트에 추가
+    public void setImg(Bitmap img) { this.img = img; }
+
+    // 전체 비디오 목록 에서 앨범 이름이 TestVideo 인 것만 리스트에 추가
     public static ArrayList<VideoInfo> getVideo(Context context, boolean getThumbnail, CommonInterface.OnCallbackEmptyVideo callback) {
 
         String[] proj = {
@@ -76,6 +81,7 @@ public class VideoInfo {
 
             if (cursor.getString(3) != null) {
 
+                /** 폴더 이름이 valuesys 인 것만 가져옴 */
                 if (cursor.getString(3).equals(Constants.Real_Folder_Name)) {
 
                     String title = cursor.getString(1);
@@ -117,7 +123,7 @@ public class VideoInfo {
 
                     long dateTime = cursor.getLong(4);
 
-                    videoList.add(new VideoInfo(title, thumbnail, Uri.parse(data), new Date(dateTime)));
+                    videoList.add(new VideoInfo(title, thumbnail, data, Uri.parse(data), new Date(dateTime)));
 
 //                LogUtil.d("aaa", "cursor getstring id = " + cursor.getString(0) );
 //                LogUtil.d("aaa", "cursor getstring title = " + title );

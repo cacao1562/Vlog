@@ -44,14 +44,14 @@ public class VideoRecordingView extends TextureView {
         if (0 == mRatioWidth || 0 == mRatioHeight) {
             setMeasuredDimension(width, height);
         } else {
-            setMeasuredDimension(width, height);
-//            if (width < height * mRatioWidth / mRatioHeight) {
-//                setMeasuredDimension(width, width * mRatioHeight / mRatioWidth);
-//                LogUtil.d("aaa", "w < h  // w = " + width + "  h  = " + width * mRatioHeight / mRatioWidth );
-//            } else {
-//                setMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
-//                LogUtil.d("aaa", "w > h //  w = " + height * mRatioWidth / mRatioHeight + "  h  = " + height );
-//            }
+//            setMeasuredDimension(width, height);
+            if (width < height * mRatioWidth / mRatioHeight) {
+                setMeasuredDimension(width, width * mRatioHeight / mRatioWidth);
+                LogUtil.d("aaa", "w > h  // w = " + width + "  h  = " + width * mRatioHeight / mRatioWidth );
+            } else {
+                setMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
+                LogUtil.d("aaa", "w < h //  w = " + height * mRatioWidth / mRatioHeight + "  h  = " + height );
+            }
         }
     }
 }

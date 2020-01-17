@@ -18,6 +18,7 @@ import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.dialogFragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.CalendarFragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.Camera2Fragment;
+import kr.co.valuesys.vlog.mobile.dialogFragment.CameraFragment;
 import kr.co.valuesys.vlog.mobile.fragment.VideoListFragment;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityMainBinding;
@@ -76,8 +77,8 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
                 break;
 
             case 1:
-//                CameraFragment cf = CameraFragment.newInstance();
-                Camera2Fragment cf = Camera2Fragment.newInstance();
+                CameraFragment cf = CameraFragment.newInstance();
+//                Camera2Fragment cf = Camera2Fragment.newInstance();
                 cf.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
                 cf.show(getSupportFragmentManager(), "tag");
                 break;
@@ -195,11 +196,11 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
                 for(Fragment fragment : fragmentList) {
 
-//                    if (fragment instanceof CameraFragment) {
-                    if (fragment instanceof Camera2Fragment) {
+                    if (fragment instanceof CameraFragment) {
+//                    if (fragment instanceof Camera2Fragment) {
 
-//                        ((CameraFragment) fragment).dismiss();
-                        ((Camera2Fragment) fragment).dismiss();
+                        ((CameraFragment) fragment).dismiss();
+//                        ((Camera2Fragment) fragment).dismiss();
 
                         if (vf != null) {
                             vf.refreshVideo(true);

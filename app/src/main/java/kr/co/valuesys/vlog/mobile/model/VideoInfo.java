@@ -100,7 +100,8 @@ public class VideoInfo {
                         try {
                             // 썸네일 추출후 리사이즈해서 다시 비트맵 생성
                             Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(data, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
-                            thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 1024, 512);
+//                            thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 1024, 512);
+                            thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 960, 480);
 
                         } catch (Exception e) {
                             e.printStackTrace();

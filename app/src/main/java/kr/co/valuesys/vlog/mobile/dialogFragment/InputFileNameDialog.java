@@ -115,7 +115,9 @@ public class InputFileNameDialog extends DialogFragment {
                             dismiss();       // DialogFragment dismiss
 //                            getActivity().finish();
 //                            getDialog().dismiss();
-                            mListener.oncallbackMain(1);
+                            if (mListener != null) {
+                                mListener.oncallbackMain(1);
+                            }
 
                         });
 

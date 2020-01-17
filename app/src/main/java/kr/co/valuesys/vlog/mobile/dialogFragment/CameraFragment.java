@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import androidx.databinding.DataBindingUtil;
 
 import android.graphics.Color;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.RectF;
@@ -21,6 +22,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,6 +46,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -190,9 +193,9 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
 // 삳태바 투명
-        getDialog().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        getDialog().getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getDialog().getWindow().setNavigationBarColor(Color.TRANSPARENT);
+//        getDialog().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        getDialog().getWindow().setStatusBarColor(Color.BLACK);
+        getDialog().getWindow().setNavigationBarColor(Color.BLACK);
 
         binding.pictureBtn.setOnClickListener(this);
         binding.switchImgBtn.setOnClickListener(this);
@@ -401,8 +404,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
             LogUtil.d(TAG, "onSurfaceTextureAvailable  w = " + width + "  h  = " + height );
-            openCamera(binding.preview.getWidth(), binding.preview.getHeight());
-//            openCamera(width, height);
+//            openCamera(binding.preview.getWidth(), binding.preview.getHeight());
+            openCamera(width, height);
         }
 
         @Override
@@ -484,6 +487,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
             Size[] ms = scm.getOutputSizes(MediaRecorder.class); // 기기가 촬영할 수 있는 해상도 범위
             Size[] ss = scm.getOutputSizes(SurfaceTexture.class); // 프리뷰 해상도 범위
+            Size[] saa = scm.getOutputSizes(ImageFormat.YUV_420_888);
 
             for (Size s : ms) {
                 LogUtil.d(TAG, "Media size //  w = " + s.getWidth() + "  h = " + s.getHeight() );
@@ -493,7 +497,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
                 LogUtil.d(TAG, "SurfaceTexture size //  w = " + s.getWidth() + "  h = " + s.getHeight() );
             }
 
-            mVideoSize = chooseVideoSize(scm.getOutputSizes(MediaRecorder.class));
 
 // 전면카메라 프리뷰 비율이 안맞아서 16:9 비율로 고정 (다른 기기도 테스트 해봐야함)
 //            mPreviewSize = new Size(1280, 720);
@@ -524,6 +527,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 ////                mPreviewSize = new Size((int) dd, dwidth);
 //                mPreviewSize = chooseOptimalSize(scm.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
 //            }
+            mVideoSize = chooseVideoSize2(scm.getOutputSizes(MediaRecorder.class));
             mPreviewSize = chooseOptimalSize(scm.getOutputSizes(SurfaceTexture.class), width, height, mVideoSize);
 
             LogUtil.d(TAG , " open size // w = " + width + "  h = " + height );
@@ -566,38 +570,57 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 //                return size;
 //            }
 //            if (mCamId == CAM_FRONT) {
-//                Log.d("ddd", "w = " + size.getWidth() + "  h = " + size.getHeight() );
-//                if(size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080){
+//
+//                if(size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080) {
+//                    Log.d("ddd", "front w = " + size.getWidth() + "  h = " + size.getHeight() );
 //                    return size;
 //                }
 //            }
-//            if (size.getWidth() == size.getHeight() * 16 / 9 && size.getWidth() <= 1080) {
-//                return size;
-//            }
+            if (size.getWidth() == size.getHeight() * 16 / 9 && size.getWidth() <= 1080) {
+                return size;
+            }
 
 
 // 갤럭시s10e 해상도는 1080x2280 이지만 촬영 가능 해상도에 1080x2280이 없고 2288이 있음
-            if ( (size.getWidth() - mScreen_height) > 50 || (size.getHeight() - mScreen_width) > 50 ) {
-                continue;
-            }
-
-            if (size.getWidth() == mScreen_height && size.getHeight() == mScreen_width) {
-                return size;
-            }
-            if ( Math.abs(size.getWidth() - mScreen_height) <= 50 && Math.abs(size.getHeight() - mScreen_width) <= 50 ) {
-                return size;
-            }
-            if ((double) size.getWidth() / size.getHeight() == (double) mScreen_height / mScreen_width) {
-                return size;
-            }
-            if(size.getWidth() == size.getHeight() * 16 / 9 && size.getWidth() <= 1920) {
-                return size;
-            }
+//            if ( (size.getWidth() - mScreen_height) > 50 || (size.getHeight() - mScreen_width) > 50 ) {
+//                continue;
+//            }
+//
+//            if (size.getWidth() == mScreen_height && size.getHeight() == mScreen_width) {
+//                return size;
+//            }
+//            if ( Math.abs(size.getWidth() - mScreen_height) <= 50 && Math.abs(size.getHeight() - mScreen_width) <= 50 ) {
+//                return size;
+//            }
+//            if ((double) size.getWidth() / size.getHeight() == (double) mScreen_height / mScreen_width) {
+//                return size;
+//            }
+//            if(size.getWidth() == size.getHeight() * 16 / 9 && size.getWidth() <= 1920) {
+//                return size;
+//            }
         }
         return choices[choices.length - 1];
     }
 
-    private static Size chooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio) {
+    private Size chooseVideoSize2(Size[] choices) {
+        List<Size> videoSizes = Arrays.asList(choices);
+        List<Size> supportedVideoSizes = new ArrayList<>();
+        Collections.sort(videoSizes, new CompareSizesByArea());
+        for (int i = videoSizes.size() - 1; i >= 0; i--) {
+            LogUtil.d(TAG, "// chooseVideoSize2 // w = " + videoSizes.get(i).getWidth() + "  h = " + videoSizes.get(i).getHeight() );
+            if (videoSizes.get(i).getWidth() <= 1920 &&
+                    videoSizes.get(i).getHeight() <= 1080) {
+                supportedVideoSizes.add(videoSizes.get(i));
+                if (videoSizes.get(i).getWidth() == videoSizes.get(i).getHeight() *
+                        16 / 9) {
+                    return videoSizes.get(i);
+                }
+            }
+        }
+        return supportedVideoSizes.size() > 0 ? supportedVideoSizes.get(0) : choices[choices.length - 1];
+    }
+
+    private Size chooseOptimalSize(Size[] choices, int width, int height, Size aspectRatio) {
 
         LogUtil.d(TAG, "// chooseOptimalSize // w = " + width + "  h = " + height + "  ratio  w = " + aspectRatio.getWidth() + " ratio h = " + aspectRatio.getHeight());
         List<Size> bigEnough = new ArrayList<>();
@@ -617,11 +640,24 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 //            }else {
 //                notBigEnough.add(ops);
 //            }
-            if (ops.getWidth() == aspectRatio.getWidth() && ops.getHeight() == aspectRatio.getHeight() ) {
-                return ops;
-            }
-            if(ops.getHeight() == (ops.getWidth() * h / w) && (ops.getWidth() >= width && ops.getHeight() >= height)) {
-                bigEnough.add(ops);
+//            if (ops.getWidth() == aspectRatio.getWidth() && ops.getHeight() == aspectRatio.getHeight() ) {
+//                return ops;
+//            }
+//            if(ops.getHeight() == (ops.getWidth() * h / w) && (ops.getWidth() >= width && ops.getHeight() >= height)) {
+//                bigEnough.add(ops);
+//            }
+
+
+            if (ops.getWidth() <= 1920 && ops.getHeight() <= 1080) {
+//                mPreviewSizes.add(new cn.lytcom.camera2kit.Size(option.getWidth(), option.getHeight()));
+                if (ops.getHeight() == ops.getWidth() * 9 / 16) {
+                    if (ops.getWidth() >= binding.preview.getWidth() &&
+                            ops.getHeight() >= binding.preview.getHeight()) {
+                        bigEnough.add(ops);
+                    } else {
+                        notBigEnough.add(ops);
+                    }
+                }
             }
         }
 
@@ -630,6 +666,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             return Collections.min(bigEnough, new CompareSizesByArea());
 //        } else if (notBigEnough.size() > 0) {
 //            return Collections.max(notBigEnough, new CompareSizesByArea());
+        } else if (notBigEnough.size() > 0) {
+            return Collections.max(notBigEnough, new CompareSizesByArea());
         } else {
             Log.e(TAG, "Couldn't find any suitable preview size");
             return choices[0];
@@ -728,6 +766,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
     private void configureTransform(int viewWidth, int viewHeight) {
 
+//        configurationTranform2(viewWidth, viewHeight);
+
         LogUtil.d(TAG, "configureTransform  w = " + viewWidth + "  h  = " + viewHeight );
 
         Activity activity = getActivity();
@@ -740,7 +780,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getWidth(), mPreviewSize.getHeight());
+//        RectF bufferRect = new RectF(0, 0, mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
 
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
@@ -756,10 +797,43 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             );
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        }else if (Surface.ROTATION_180 == rotation) {
+            matrix.postRotate(180, centerX, centerY);
         }
 
 //        activity.runOnUiThread(() -> binding.preview.setTransform(matrix));
         binding.preview.setTransform(matrix);
+    }
+
+
+    private void configurationTranform2(int width, int height) {
+
+        Activity activity = getActivity();
+
+        if (null == binding.preview || null == mPreviewSize || null == activity) {
+            return;
+        }
+
+        try {
+                Matrix matrix = new Matrix();
+                int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+                RectF textureRectF = new RectF(0, 0, width, height);
+                RectF previewRectF = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
+                float centerX = textureRectF.centerX();
+                float centerY = textureRectF.centerY();
+
+                if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+                    previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY());
+                    matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL);
+                    float scale = Math.max((float) width / width, (float) height / width);
+                    matrix.postScale(scale, scale, centerX, centerY);
+                    matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+                }
+            binding.preview.setTransform(matrix);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void startBackgroundThread() {
@@ -843,7 +917,8 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
         mMediaRecorder.setOutputFile(mNextVideoAbsolutePath);
 
-        mMediaRecorder.setVideoEncodingBitRate(10000000);
+//        mMediaRecorder.setVideoEncodingBitRate(10000000);
+        mMediaRecorder.setVideoEncodingBitRate(3000000);
 //        mMediaRecorder.setVideoEncodingBitRate(1024 * 1024);
         mMediaRecorder.setAudioSamplingRate(16000);
 
@@ -889,6 +964,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
             SurfaceTexture texture = binding.preview.getSurfaceTexture();
             LogUtil.d(TAG, "preview / w = " + binding.preview.getWidth() + " h = " + binding.preview.getHeight() );
             assert texture != null;
+            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             mCaptureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
 
             List<Surface> surfaces = new ArrayList<>();

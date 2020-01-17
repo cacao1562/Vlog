@@ -194,6 +194,14 @@ public class Camera2Fragment extends DialogFragment {
             LogUtil.d("vvv", "getSize = " + result.getSize());
             LogUtil.d("vvv", "getMaxSize = " + result.getMaxSize());
             LogUtil.d("vvv", "getMaxDuration = " + result.getMaxDuration());
+            LogUtil.d("vvv", "getVideoFrameRate = " + result.getVideoFrameRate());
+            LogUtil.d("vvv", "getVideoBitRate = " + result.getVideoBitRate());
+            LogUtil.d("vvv", "getAudioBitRate = " + result.getAudioBitRate());
+            LogUtil.d("vvv", "getMaxSize = " + result.getMaxSize());
+            LogUtil.d("vvv", "getWidth = " + binding.camera.getWidth());
+            LogUtil.d("vvv", "getHeight = " + binding.camera.getHeight());
+            LogUtil.d("vvv", "getMeasuredWidth = " + binding.camera.getMeasuredWidth());
+            LogUtil.d("vvv", "getMeasuredHeight = " + binding.camera.getMeasuredHeight());
 
             binding.camera.close();
             // refresh gallery
@@ -426,6 +434,18 @@ public class Camera2Fragment extends DialogFragment {
             }
 
             binding.touchesView.setSomeView(binding.lottieCat);
+
+        });
+
+        binding.test3Button.setOnClickListener(v -> {
+
+            if (binding.maskImgview.getVisibility() == View.VISIBLE) {
+                binding.maskImgview.setVisibility(View.INVISIBLE);
+            }else {
+                binding.maskImgview.setVisibility(View.VISIBLE);
+            }
+
+            binding.touchesView.setSomeView(binding.maskImgview);
 
         });
 

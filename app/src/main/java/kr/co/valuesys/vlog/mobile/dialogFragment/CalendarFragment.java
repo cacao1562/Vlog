@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
@@ -42,7 +43,7 @@ import kr.co.valuesys.vlog.mobile.databinding.FragmentCalendarBinding;
 public class CalendarFragment extends DialogFragment {
 
     private FragmentCalendarBinding binding;
-    private ArrayList<CalendarDay> mVideosDate;
+    private List<CalendarDay> mVideosDate;
 
     public static CalendarFragment newInstance() { return new CalendarFragment(); }
 
@@ -138,10 +139,10 @@ public class CalendarFragment extends DialogFragment {
     }
 
     // 비디오 생성 date 리스트에 넣어서 달력에 표시하기 위해
-    private ArrayList<CalendarDay> getVideosDate() {
+    private List<CalendarDay> getVideosDate() {
 
-        ArrayList<CalendarDay> dateList =  new ArrayList<>();
-        ArrayList<VideoInfo> videoInfos = VideoInfo.getVideo(getActivity(), false, null);
+        List<CalendarDay> dateList =  new ArrayList<>();
+        List<VideoInfo> videoInfos = VideoInfo.getVideo(getActivity(), false, null);
 
         if (videoInfos != null) {
 

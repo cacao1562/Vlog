@@ -4,7 +4,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,8 +41,19 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -115,10 +128,17 @@ public class MobileApplication extends Application {
     }
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd");
+    private static final SimpleDateFormat sdf2 = new SimpleDateFormat(" yyyy-MM-dd HH:mm:ss");
 
     public static String convertDateToString(Date date) {
 
         String str = sdf.format(date);
+        return str;
+    }
+
+    public static String convertDateToString_time(Date date) {
+
+        String str = sdf2.format(date);
         return str;
     }
 
@@ -236,11 +256,11 @@ public class MobileApplication extends Application {
                 if (response != null) {
                     if (response.getKakaoAccount() != null) {
                         userAccount = response.getKakaoAccount();
-                        LogUtil.d("kakao ", "userAccount  : " + userAccount.toString() );
+                        LogUtil.d("kakao ", "userAccount  : " + userAccount.toString());
                         if (userAccount.profileNeedsAgreement() != null) {
                             if (userAccount.profileNeedsAgreement().getBoolean()) {
                                 handleScopeError(userAccount);
-                            }else {
+                            } else {
                                 if (userAccount.getProfile() != null) {
                                     if (userAccount.getProfile().getNickname() != null) {
                                         LogUtil.d("kakao ", "profile nick name: " + userAccount.getProfile().getNickname());
@@ -257,7 +277,7 @@ public class MobileApplication extends Application {
 
 //                mLoginName = response.getNickname();
                 mLoginPlatform = Constants.Kakao;
-
+                writeLog(mLoginName);
 //                redirectMainActivity();
                 callback.onFileCallback(true);
             }
@@ -296,7 +316,9 @@ public class MobileApplication extends Application {
         mLoginName = Profile.getCurrentProfile().getName();
     }
 
-    // facebook 로그인 정보 가져오기
+    /**
+     * facebook 로그인 정보 가져오기
+     */
     public void useLoginInformation(AccessToken accessToken, CommonInterface.OnFileCallback callback) {
         /**
          Creating the GraphRequest to fetch user details
@@ -317,6 +339,7 @@ public class MobileApplication extends Application {
                     LogUtil.d("facebook", " name = " + name);
                     mLoginName = name;
                     mLoginPlatform = Constants.FaceBook;
+                    writeLog(mLoginName);
                     callback.onFileCallback(true);
 
                 } catch (JSONException e) {
@@ -373,6 +396,59 @@ public class MobileApplication extends Application {
         builder.setCancelable(false);
 
         return builder;
+    }
+
+
+    /**
+     * 파일에 로그인 로그 쓰기
+     *
+     * @param str
+     */
+    public void writeLog(String str) {
+
+//        String str_Path_Full = Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/log.txt";
+//        String str_Path_Full = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+        String path = "";
+        String folderName = "/vlogLog";
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                path = mobileApplication.getExternalFilesDir(null).getAbsolutePath() + folderName;
+            } else {
+                path = Environment.getExternalStorageDirectory().getAbsolutePath() + folderName;
+            }
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        str += " \t " + convertDateToString_time(Calendar.getInstance().getTime());
+//        LogUtil.d("lll", " path 1 = " + str_Path_Full);
+        LogUtil.d("lll", " path 2 = " + path);
+        File file = new File(path);
+        if (file.exists() == false) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+//                BufferedWriter bfw = new BufferedWriter(new FileWriter(path,true));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "MS949"));
+            bw.append()
+            bw.write(str);
+            bw.write("\n");
+            bw.flush();
+            bw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 }

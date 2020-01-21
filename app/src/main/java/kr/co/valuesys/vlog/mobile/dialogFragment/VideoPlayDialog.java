@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -173,6 +174,13 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
             mMediaPlayer = null;
         }
 
+        if (handler != null) {
+            handler = null;
+        }
+
+        if (runnable != null) {
+            runnable = null;
+        }
 //        mSurfaceHolder.removeCallback(this);
 //        mSurfaceHolder = null;
     }
@@ -187,7 +195,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
         try {
             mMediaPlayer = new MediaPlayer();
             String path = getArguments().getString(ARG_MESSAGE);
-            mMediaPlayer.setDataSource(path);
+            mMediaPlayer.setDataSource(getContext(), Uri.parse(path));
             mMediaPlayer.setLooping(true);
 
             mMediaPlayer.setSurface(s);

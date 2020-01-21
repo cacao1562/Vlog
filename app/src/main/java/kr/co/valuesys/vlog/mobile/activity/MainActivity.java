@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 //                        ((Camera2Fragment) fragment).dismiss();
 
                         if (vf != null) {
-                            vf.refreshVideo(true);
+                            vf.refreshVideo();
                         }
 
                     }

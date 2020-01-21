@@ -1,5 +1,6 @@
 package kr.co.valuesys.vlog.mobile.model;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -11,9 +12,11 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.Constants;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 
 public class VideoInfo {
 
@@ -53,7 +56,7 @@ public class VideoInfo {
     public void setImg(Bitmap img) { this.img = img; }
 
     // 전체 비디오 목록 에서 앨범 이름이 TestVideo 인 것만 리스트에 추가
-    public static ArrayList<VideoInfo> getVideo(Context context, boolean getThumbnail, CommonInterface.OnCallbackEmptyVideo callback) {
+    public static List<VideoInfo> getVideo(Context context, boolean getThumbnail, CommonInterface.OnCallbackEmptyVideo callback) {
 
         String[] proj = {
                 MediaStore.Video.Media._ID,
@@ -71,11 +74,17 @@ public class VideoInfo {
 //        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getAbsoluteFile().getPath() + "/DCIM/TestVideo/");
 //        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath() + "/DCIM/TestVideo/");
 
-        Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+        Cursor cursor = context.getContentResolver().query(uri, proj, null, null, MediaStore.Video.VideoColumns.DATE_TAKEN + " DESC");
 
-        ArrayList<VideoInfo> videoList = new ArrayList<>();
 
-        assert cursor != null;
+
+//        assert cursor != null;
+        /** cursor가 null 이거나 미디어가 없을때 */
+        if (cursor == null) {
+            return null;
+        }
+
+        List<VideoInfo> videoList = new ArrayList<>();
 
         while (cursor.moveToNext()) {
 
@@ -123,7 +132,16 @@ public class VideoInfo {
 
                     long dateTime = cursor.getLong(4);
 
-                    videoList.add(new VideoInfo(title, thumbnail, data, Uri.parse(data), new Date(dateTime)));
+                    int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
+                    long id = cursor.getLong(idColumn);
+                    Uri uri2 = Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, String.valueOf(id));
+//                    Uri uri3 = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+                    LogUtil.d("uuu", " uri = " + Uri.parse(data));
+                    LogUtil.d("uuu", " uri2 = " + uri2);
+
+
+//                    videoList.add(new VideoInfo(title, thumbnail, data, Uri.parse(data), new Date(dateTime)));
+                    videoList.add(new VideoInfo(title, thumbnail, data, uri2, new Date(dateTime)));
 
 //                LogUtil.d("aaa", "cursor getstring id = " + cursor.getString(0) );
 //                LogUtil.d("aaa", "cursor getstring title = " + title );
@@ -138,6 +156,7 @@ public class VideoInfo {
             }
 
         }
+        cursor.close();
 
         if (callback != null) {
 
@@ -152,16 +171,16 @@ public class VideoInfo {
             }
         }
 
-        cursor.close();
+
 
 // date 날짜 기준으로 비디오 리스트를 내림차순 정렬
-        Collections.sort(videoList, new Comparator<VideoInfo>() {
-            @Override
-            public int compare(VideoInfo o1, VideoInfo o2) {
-                return o2.getDate().compareTo(o1.getDate());
-            }
-        });
-
+//        Collections.sort(videoList, new Comparator<VideoInfo>() {
+//            @Override
+//            public int compare(VideoInfo o1, VideoInfo o2) {
+//                return o2.getDate().compareTo(o1.getDate());
+//            }
+//        });
+        LogUtil.d("xxx", " return size = " + videoList.size() );
         return videoList;
     }
 }

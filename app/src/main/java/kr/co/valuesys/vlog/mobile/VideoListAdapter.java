@@ -23,17 +23,20 @@ import java.util.Date;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.FileManager;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.dialogFragment.VideoPlayDialog;
 import kr.co.valuesys.vlog.mobile.model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.databinding.VideoItemBinding;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoListHolder> {
 
     private Activity activity;
     private Context context;
-    private ArrayList<VideoInfo> mVideoInfo = new ArrayList<>();
+    private List<VideoInfo> mVideoInfo = new ArrayList<>();
     private CommonInterface.OnCallbackEmptyVideoToList mCallbackToList;
     private CommonInterface.OnLoadingCallback mCallbackLoading;
     private CommonInterface.OnRemoveCallback mCallbackRemove;
@@ -68,12 +71,16 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         Bitmap img = videoInfo.getImg();
         String date = MobileApplication.convertDateToString(videoInfo.getDate());
 //        Uri uri = videoInfo.getUri();
-
+        if (position == 1) {
+            LogUtil.d("ppp" , " urri = " + mVideoInfo.get(position).getUri() );
+            LogUtil.d("ppp" , " title = " + mVideoInfo.get(position).getTitle() );
+            LogUtil.d("ppp" , " data = " + mVideoInfo.get(position).getData() );
+        }
         binding.itemTitleTextview.setText(title);
 //        binding.itemThumbnailImgview.setImageBitmap(img);
         if (mVideoInfo.get(position).getImg() == null) {
             binding.itemThumbnailImgview.setImageResource(0);
-            new makeThumnail(position, videoInfo.getData(), binding.itemThumbnailImgview).execute();
+            new makeThumnail(this, position, videoInfo.getData(), binding.itemThumbnailImgview).execute();
         }else {
             binding.itemThumbnailImgview.setImageBitmap(img);
         }
@@ -101,16 +108,20 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         return mVideoInfo.size();
     }
 
-    public void setUp(ArrayList<VideoInfo> videoInfos) {
+    public void setUp(List<VideoInfo> videoInfos) {
+
+        this.mVideoInfo.clear();
         this.mVideoInfo = videoInfos;
 
-        activity.runOnUiThread(() -> {
-            notifyDataSetChanged();
-        });
+        if (activity != null) {
+            activity.runOnUiThread(() -> {
+                notifyDataSetChanged();
+            });
+        }
 
     }
 
-    public void setUpInsert(ArrayList<VideoInfo> videoInfos) {
+    public void setUpInsert(List<VideoInfo> videoInfos) {
         this.mVideoInfo = videoInfos;
 
         activity.runOnUiThread(() -> {
@@ -161,58 +172,62 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     }
 
 
-    private class RemoveLoading extends AsyncTask<Void, Void, Void> {
+//    private class RemoveLoading extends AsyncTask<Void, Void, Void> {
+//
+//        private int position;
+//
+//        public RemoveLoading(int index) {
+//            position = index;
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Void... voids) {
+//
+//            FileManager.deleteVideo(activity, mVideoInfo.get(position).getUri().toString(), result -> {
+//
+//                if (result) {
+//
+//                    setUp(VideoInfo.getVideo(activity, true, show -> {
+//
+//                        mCallbackLoading.onLoading(false);
+//                        mCallbackToList.onCallbackToList(show);
+//
+//                    }));
+//
+//                }else {
+//
+//                    mCallbackLoading.onLoading(false);
+//                    Toast.makeText(activity, "파일 삭제 실패", Toast.LENGTH_SHORT).show();
+//
+//                }
+//
+//            });
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
+//        }
+//    }
 
-        private int position;
 
-        public RemoveLoading(int index) {
-            position = index;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            FileManager.deleteVideo(activity, mVideoInfo.get(position).getUri().toString(), result -> {
-
-                if (result) {
-
-                    setUp(VideoInfo.getVideo(activity, true, show -> {
-
-                        mCallbackLoading.onLoading(false);
-                        mCallbackToList.onCallbackToList(show);
-
-                    }));
-
-                }else {
-
-                    mCallbackLoading.onLoading(false);
-                    Toast.makeText(activity, "파일 삭제 실패", Toast.LENGTH_SHORT).show();
-
-                }
-
-            });
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
-
-
-    private class makeThumnail extends AsyncTask<Void, Void, Bitmap> {
+    private static class makeThumnail extends AsyncTask<Void, Void, Bitmap> {
 
         private int itemPosition;
         private String thumbData;
         private ImageView imageView;
+        private WeakReference<VideoListAdapter> wrAdapter;
+        private VideoListAdapter adapter;
 
-        public makeThumnail(int position, String data, ImageView imgview) {
+        public makeThumnail(VideoListAdapter videoListAdapter, int position, String data, ImageView imgview) {
+            this.wrAdapter = new WeakReference<>(videoListAdapter);
+            this.adapter = wrAdapter.get();
             this.itemPosition = position;
             this.thumbData = data;
             this.imageView = imgview;
@@ -221,11 +236,21 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            if (adapter == null || adapter.activity == null || adapter.activity.isFinishing()) {
+                LogUtil.d("bbb", "-------- cancel ------ onPreExecute ");
+                cancel(true);
+            }
         }
 
 
         @Override
         protected Bitmap doInBackground(Void... voids) {
+
+            if (adapter == null || adapter.activity == null || adapter.activity.isFinishing()) {
+                LogUtil.d("bbb", "-------- cancel ------ doInBackground ");
+                cancel(true);
+                return null;
+            }
 
             Bitmap thumbnail = null;
 
@@ -240,14 +265,21 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                 e.printStackTrace();
                 return null;
             }
-
+            LogUtil.d("bbb", "doInBackground ... ");
             return thumbnail;
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-            mVideoInfo.get(itemPosition).setImg(bitmap);
+
+            if (adapter == null || adapter.activity == null || adapter.activity.isFinishing()) {
+                LogUtil.d("bbb", "-------- cancel ------ onPostExecute ");
+                cancel(true);
+                return;
+            }
+
+            adapter.mVideoInfo.get(itemPosition).setImg(bitmap);
             this.imageView.setImageBitmap(bitmap);
         }
     }

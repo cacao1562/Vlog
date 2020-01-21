@@ -12,38 +12,38 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/sp_logo"
-            android:layout_width="240dp"
-            android:layout_height="70dp"
-            android:layout_marginTop="60dp"
-            android:src="@drawable/valuesys"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/intro_img"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="V-Log\n 비디오 일기장"
-            android:textAlignment="center"
-            android:textSize="40dp"
-            android:textStyle="bold"
-            android:lineSpacingExtra="10dp"
-            android:textColor="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="V-Log\n 비디오 일기장"-->
+<!--            android:textAlignment="center"-->
+<!--            android:textSize="40dp"-->
+<!--            android:textStyle="bold"-->
+<!--            android:lineSpacingExtra="10dp"-->
+<!--            android:textColor="@color/black"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintLeft_toLeftOf="parent"-->
+<!--            app:layout_constraintRight_toRightOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginBottom="25dp"
-            android:text="Copyright © 2019 VALUESYS. All rights reserved."/>
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintLeft_toLeftOf="parent"-->
+<!--            app:layout_constraintRight_toRightOf="parent"-->
+<!--            android:layout_marginBottom="25dp"-->
+<!--            android:text="Copyright © 2019 VALUESYS. All rights reserved."/>-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

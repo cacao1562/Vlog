@@ -32,6 +32,8 @@ import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -99,7 +101,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 // 촹영 중 상태인지
     private boolean mIsRecordingVideo;
 
-    private static final int Max_duration = 15000;
+    private static final int Max_duration = 30 * 1000;
 
 // 기기 해상도
     private int mScreen_width;
@@ -108,7 +110,9 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 //    private CommonInterface.OnCameraPauseListener mCallbackPause;
 
     private CountDownTimer mCountDownTimer;
+    public CameraFragment() {
 
+    }
     public static CameraFragment newInstance() {
         return new CameraFragment();
     }
@@ -416,12 +420,17 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-//            closeCamera();
-            if (mCameraDevice != null) {
-                closeCamera();
-                mCameraDevice = null;
+
+            LogUtil.d(TAG, "onSurfaceTextureDestroyed  " );
+            closeCamera();
+//            if (mCameraDevice != null) {
+//                closeCamera();
+//                mCameraDevice = null;
+//            }
+            if (binding.preview != null) {
+                binding.preview.setSurfaceTextureListener(null);
             }
-            return false;
+            return true;
         }
 
         @Override

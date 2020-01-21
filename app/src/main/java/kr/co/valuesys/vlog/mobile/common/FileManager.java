@@ -1,13 +1,25 @@
 package kr.co.valuesys.vlog.mobile.common;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class FileManager {
 
@@ -38,6 +50,8 @@ public class FileManager {
         }
 
         File newFile = new File(path + newFileName + ".mp4");
+
+//        saveVideo(mActivity, path);
 
         if (tempFile.exists()) {
 
@@ -87,7 +101,13 @@ public class FileManager {
 
                 if (file.delete()) {
 
-                    mActivity.getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+//                    mActivity.getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+                    MediaScannerConnection.scanFile(mActivity.getApplicationContext(),
+                            new String[]{Uri.fromFile(file).toString()}, null,
+                            (fPath, uri) -> {
+                                LogUtil.d("xxx", "Scanned " + fPath + ":");
+                                LogUtil.d("xxx", "-> uri=" + uri);
+                            });
                     callback.onFileCallback(true);
 
                 } else {
@@ -100,11 +120,48 @@ public class FileManager {
                 callback.onFileCallback(false);
             }
 
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
 
             callback.onFileCallback(false);
             e.printStackTrace();
         }
+
+    }
+
+
+    /**
+     * 비디오 파일 삭제 uri
+     */
+    public static void deleteVideo(Activity mActivity, Uri uri, CommonInterface.OnFileCallback callback) {
+
+        if (uri == null || mActivity == null) {
+            callback.onFileCallback(false);
+            return;
+        }
+
+        try {
+
+           int result = mActivity.getContentResolver().delete(uri, null, null);
+           LogUtil.d("ggg", " remove = " + result);
+           if (result > 0) {
+               callback.onFileCallback(true);
+           }
+
+        }catch (Exception e) {
+
+            e.printStackTrace();
+            callback.onFileCallback(false);
+        }
+
+//        Cursor c = mActivity.getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, "_data='" + filePath + "'", null, null);
+//        c.moveToNext();
+//        int id = c.getInt(0);
+//        Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+//
+//        int idColumn = c.getColumnIndexOrThrow(MediaStore.Video.Media._ID);
+//        long idd = c.getLong(idColumn);
+//        Uri uri2 = Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, String.valueOf(idd));
+
 
     }
 
@@ -156,4 +213,62 @@ public class FileManager {
     }
 
 
+
+    public static void saveVideo(Activity activity, String filepath) {
+        String videoFileName = "video_" + System.currentTimeMillis() + ".mp4";
+
+        ContentValues valuesvideos;
+        valuesvideos = new ContentValues();
+//        valuesvideos.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "Folder");
+        valuesvideos.put(MediaStore.Video.Media.TITLE, videoFileName);
+        valuesvideos.put(MediaStore.Video.Media.DISPLAY_NAME, videoFileName);
+        valuesvideos.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+        valuesvideos.put(MediaStore.Video.Media.DATE_ADDED, System.currentTimeMillis() / 1000);
+        valuesvideos.put(MediaStore.Video.Media.DATE_TAKEN, System.currentTimeMillis());
+        valuesvideos.put(MediaStore.Video.Media.DATA, filepath);
+//        valuesvideos.put(MediaStore.Video.Media.IS_PENDING, 1);
+        ContentResolver resolver = activity.getContentResolver();
+//        Uri collection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        Uri uriSavedVideo = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, valuesvideos);
+
+
+//        ParcelFileDescriptor pfd;
+//
+//        try {
+//            pfd = mContext.getContentResolver().openFileDescriptor(uriSavedVideo, "w");
+//
+//            FileOutputStream out = new FileOutputStream(pfd.getFileDescriptor());
+//
+//// Get the already saved video as fileinputstream from here
+//            File storageDir = new File(mContext.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Folder");
+//            File imageFile = new File(storageDir, "Myvideo");
+//
+//            FileInputStream in = new FileInputStream(imageFile);
+//
+//
+//            byte[] buf = new byte[8192];
+//            int len;
+//            while ((len = in.read(buf)) > 0) {
+//
+//                out.write(buf, 0, len);
+//            }
+//
+//
+//            out.close();
+//            in.close();
+//            pfd.close();
+//
+//
+//
+//
+//        } catch (Exception e) {
+//
+//            e.printStackTrace();
+//        }
+//
+//
+//        valuesvideos.clear();
+//        valuesvideos.put(MediaStore.Video.Media.IS_PENDING, 0);
+//        mContext.getContentResolver().update(uriSavedVideo, valuesvideos, null, null);
+    }
 }

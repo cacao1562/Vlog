@@ -29,6 +29,7 @@ import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo,
                                                            CommonInterface.OnCallbackEmptyVideoToList,
@@ -37,7 +38,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
 
     private FragmentVideoListBinding binding;
     private VideoListAdapter adapter;
-    private ArrayList<VideoInfo> info;
+    private List<VideoInfo> info;
     private AlertDialog loading;
 
     public static VideoListFragment newInstance() {
@@ -64,7 +65,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         binding.videoListRecyclerview.setAdapter(adapter);
 
 //        adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
-        refreshVideo(false);
+        refreshVideo();
 
         return binding.getRoot();
 //        return inflater.inflate(R.layout.fragment_video_list, container, false);
@@ -188,12 +189,10 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         private CommonInterface.OnCallbackEmptyVideo listener;
         private WeakReference<VideoListFragment> wrFragment;
         private VideoListFragment fragment;
-        private boolean isInsert;
 
-        UpdateVideo(VideoListFragment videoListFragment, boolean insert, CommonInterface.OnCallbackEmptyVideo callback) {
+        UpdateVideo(VideoListFragment videoListFragment, CommonInterface.OnCallbackEmptyVideo callback) {
             this.wrFragment = new WeakReference<>(videoListFragment);
             this.listener = callback;
-            this.isInsert = insert;
         }
 
         @Override
@@ -211,6 +210,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         protected Void doInBackground(Void... voids) {
             if (fragment.getActivity() != null) {
                 fragment.info = VideoInfo.getVideo(fragment.getActivity(), false, listener);
+                LogUtil.d("zzz", "update size = " + fragment.info.size());
             }
             return null;
         }
@@ -219,14 +219,12 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
+                loading.dismiss();
                 return;
             }
             if (fragment.info != null) {
-                if (isInsert) {
-                    fragment.adapter.setUpInsert(fragment.info);
-                }else {
-                    fragment.adapter.setUp(fragment.info);
-                }
+
+                fragment.adapter.setUp(fragment.info);
 
                 loading.dismiss();
                 fragment.binding.videoListRecyclerview.smoothScrollToPosition(0);
@@ -263,12 +261,16 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
             if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
                 return null;
             }
-
-            FileManager.deleteVideo(fragment.getActivity(), fragment.info.get(position).getUri().toString(), result -> {
+            LogUtil.d("xxx", "remove uri = " + fragment.info.get(position).getUri().toString());
+            LogUtil.d("xxx", "remove position = " + position );
+            FileManager.deleteVideo(fragment.getActivity(), fragment.info.get(position).getUri(), result -> {
 
                 if (result) {
 
-                    fragment.info = VideoInfo.getVideo(fragment.getActivity(), false, null);
+                    fragment.info.clear();
+                    List<VideoInfo> info = VideoInfo.getVideo(fragment.getActivity(), false, null);
+                    fragment.info = info;
+                    LogUtil.d("zzz", "remove size = " + fragment.info.size());
                     fragment.onLoading(false);
                     if (fragment.info.size() == 0) {
                         fragment.onCallbackToList(true);
@@ -281,7 +283,12 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
                 }else {
 
                     fragment.onLoading(false);
-                    Toast.makeText(fragment.getActivity(), "파일 삭제 실패", Toast.LENGTH_SHORT).show();
+                    if (fragment.getActivity() != null) {
+                        fragment.getActivity().runOnUiThread(() -> {
+                            Toast.makeText(fragment.getActivity(), "파일 삭제 실패", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+
 
                 }
 
@@ -298,9 +305,9 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     /**
      * 로딩 보여주면서 비디오 목록 업데이트
      */
-    public void refreshVideo(boolean insert) {
+    public void refreshVideo() {
 
-        new UpdateVideo(this, insert, this).execute();
+        new UpdateVideo(this, this).execute();
 
     }
 

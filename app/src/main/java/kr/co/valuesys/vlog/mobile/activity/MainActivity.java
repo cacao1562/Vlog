@@ -15,6 +15,7 @@ import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
+import kr.co.valuesys.vlog.mobile.common.PermissionUtils;
 import kr.co.valuesys.vlog.mobile.dialogFragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.CalendarFragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.Camera2Fragment;
@@ -32,14 +33,7 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
     private ActivityMainBinding binding;
 
 //    private VideoListFragment videoListFragment = VideoListFragment.newInstance();
-
-    private static String[] PERMISSIONS = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-    };
-
+    private PermissionUtils m_permissionUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 //        setContentView(R.layout.activity_main);
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        m_permissionUtils = new PermissionUtils(this, this);
 
         requestPermission();
 
@@ -62,10 +57,11 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
     private void presentBlankActivity(int id) {
 
-        if (!isPermission) {
+        if (m_permissionUtils.checkPermission() == false) {
             Toast.makeText(this,"접근 권한을 허용해 주세요", Toast.LENGTH_LONG).show();
-            requestPermission();
+            m_permissionUtils.requestPermission();
             return;
+
         }
 
         switch (id) {
@@ -95,44 +91,45 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode) {
+//        switch (requestCode) {
+//
+//            case Permission_Request_Code:
+//
+//                for (int i=0; i<grantResults.length; i++) {
+//
+//                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+//
+//                        isPermission = false;
+//                        Toast.makeText(this,"permission not granted = " + permissions[i], Toast.LENGTH_LONG).show();
+//                        LogUtil.d(TAG, "permission not granted = " + permissions[i] );
+//                    }
+//                }
+//
+//                if (isPermission) {
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
+//                }
+//                break;
+//        }
 
-            case Permission_Request_Code:
-
-                for (int i=0; i<grantResults.length; i++) {
-
-                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-
-                        isPermission = false;
-                        Toast.makeText(this,"permission not granted = " + permissions[i], Toast.LENGTH_LONG).show();
-                        LogUtil.d(TAG, "permission not granted = " + permissions[i] );
-                    }
-                }
-
-                if (isPermission) {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
-                }
-                break;
+        if (m_permissionUtils.permissionResult(requestCode, permissions, grantResults) == false) {
+            m_permissionUtils.requestPermission();
+        }else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
         }
 
     }
 
     private void requestPermission() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ) {
+        if (m_permissionUtils.checkPermission() == false) {
+            m_permissionUtils.requestPermission();
 
-            ActivityCompat.requestPermissions(this
-                    , PERMISSIONS
-                    , Permission_Request_Code);
         }else {
-
             getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
         }
+
     }
 
     @Override

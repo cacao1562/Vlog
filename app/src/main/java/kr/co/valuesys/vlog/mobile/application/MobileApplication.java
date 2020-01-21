@@ -1,9 +1,12 @@
 package kr.co.valuesys.vlog.mobile.application;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -277,7 +280,7 @@ public class MobileApplication extends Application {
 
 //                mLoginName = response.getNickname();
                 mLoginPlatform = Constants.Kakao;
-                writeLog(mLoginName);
+
 //                redirectMainActivity();
                 callback.onFileCallback(true);
             }
@@ -339,7 +342,7 @@ public class MobileApplication extends Application {
                     LogUtil.d("facebook", " name = " + name);
                     mLoginName = name;
                     mLoginPlatform = Constants.FaceBook;
-                    writeLog(mLoginName);
+
                     callback.onFileCallback(true);
 
                 } catch (JSONException e) {
@@ -412,11 +415,12 @@ public class MobileApplication extends Application {
         String path = "";
         String folderName = "/vlogLog";
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                path = mobileApplication.getExternalFilesDir(null).getAbsolutePath() + folderName;
-            } else {
-                path = Environment.getExternalStorageDirectory().getAbsolutePath() + folderName;
-            }
+            path = mobileApplication.getExternalFilesDir(null).getAbsolutePath() + folderName;
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                path = mobileApplication.getExternalFilesDir(null).getAbsolutePath() + folderName;
+//            } else {
+//                path = Environment.getExternalStorageDirectory().getAbsolutePath() + folderName;
+//            }
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -426,20 +430,26 @@ public class MobileApplication extends Application {
         LogUtil.d("lll", " path 2 = " + path);
         File file = new File(path);
         if (file.exists() == false) {
+            LogUtil.d("lll", " not exists ");
+            file.mkdir();
+
+        }
+
+        File txtfile = new File(path + "/log.txt");
+        if (txtfile.exists() == false) {
             try {
-                file.createNewFile();
+                txtfile.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-//                BufferedWriter bfw = new BufferedWriter(new FileWriter(path,true));
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "MS949"));
-            bw.append()
-            bw.write(str);
-            bw.write("\n");
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + "/log.txt" , true), "MS949"));
+            bw.append(str);
+            bw.newLine();
+//            bw.write(str);
+//            bw.write("\n");
             bw.flush();
             bw.close();
         } catch (FileNotFoundException e) {

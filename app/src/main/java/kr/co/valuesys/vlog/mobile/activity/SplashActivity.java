@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +24,7 @@ import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.FileManager;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
+import kr.co.valuesys.vlog.mobile.common.PermissionUtils;
 import kr.co.valuesys.vlog.mobile.databinding.ActivitySplashBinding;
 
 import static kr.co.valuesys.vlog.mobile.common.Constants.FaceBook;
@@ -37,6 +40,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private String session;
 
+    private PermissionUtils m_permissionUtils;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +50,7 @@ public class SplashActivity extends AppCompatActivity {
 
         getHashKey();
         FileManager.deleteTempFiles(this);
+        m_permissionUtils = new PermissionUtils(this, this);
 
         LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
         LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
@@ -116,9 +122,18 @@ public class SplashActivity extends AppCompatActivity {
 
             if (!TextUtils.isEmpty(session)) {
 
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                if (m_permissionUtils.checkPermission() == false) {
+                    m_permissionUtils.requestPermission();
+
+                }else {
+
+                    MobileApplication.getContext().writeLog(MobileApplication.getContext().getLoginkName());
+
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
 
             } else {
 
@@ -131,6 +146,17 @@ public class SplashActivity extends AppCompatActivity {
         }, 1000);
 
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (m_permissionUtils.permissionResult(requestCode, permissions, grantResults) == false) {
+            m_permissionUtils.requestPermission();
+        }else {
+            presentNext();
+        }
+    }
+
     /**
      * 카카오 sdk 홈페이지에 입력 해야할 해시키값 , 페이스북도 마찬가지
      */

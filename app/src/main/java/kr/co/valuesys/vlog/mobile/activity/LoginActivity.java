@@ -1,6 +1,8 @@
 package kr.co.valuesys.vlog.mobile.activity;
 
 import android.content.Intent;
+
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import java.util.Arrays;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.KakaoSessionCallback;
 import kr.co.valuesys.vlog.mobile.R;
+import kr.co.valuesys.vlog.mobile.common.PermissionUtils;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
@@ -30,12 +33,15 @@ public class LoginActivity extends AppCompatActivity {
 // facebook
     private CallbackManager callbackManager;
 
+    private PermissionUtils m_permissionUtils;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_login);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         binding.facebookButton.setPermissions(Arrays.asList("email", "public_profile"));
+        m_permissionUtils = new PermissionUtils(this, this);
 
 //        LogUtil.d("123", " kaako " + Session.getCurrentSession().checkAndImplicitOpen() );
 //        LogUtil.d("123", " facebook " + AccessToken.isCurrentAccessTokenActive() );
@@ -50,9 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (res) {
 
-                        final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        checkPermission();
 
                     }
 
@@ -79,9 +83,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (result) {
 
-                        final Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        checkPermission();
 
                     }
 
@@ -114,6 +116,36 @@ public class LoginActivity extends AppCompatActivity {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    private void checkPermission() {
+
+        if (m_permissionUtils.checkPermission() == false) {
+            m_permissionUtils.requestPermission();
+
+        }else {
+            presentMain();
+        }
+    }
+
+    private void presentMain() {
+
+        MobileApplication.getContext().writeLog(MobileApplication.getContext().getLoginkName());
+
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (m_permissionUtils.permissionResult(requestCode, permissions, grantResults) == false) {
+            m_permissionUtils.requestPermission();
+        }else {
+            presentMain();
+        }
+    }
+
 
     @Override
     protected void onDestroy() {

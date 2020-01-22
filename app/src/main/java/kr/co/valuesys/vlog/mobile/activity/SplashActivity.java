@@ -7,13 +7,16 @@ import android.content.pm.Signature;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.text.TextUtils;
 import android.util.Base64;
 
 import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.kakao.auth.ISessionCallback;
 import com.kakao.auth.Session;
 
@@ -48,41 +51,62 @@ public class SplashActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_splash);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash);
 
-        getHashKey();
+//        getHashKey();
         FileManager.deleteTempFiles(this);
-        m_permissionUtils = new PermissionUtils(this, this);
 
-        LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
-        LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
-        LogUtil.d(TAG, " facebook 22 " + AccessToken.isDataAccessActive());
-        LogUtil.d(TAG, " facebook 33 " + AccessToken.getCurrentAccessToken());
+        binding.spLogo.postDelayed(() -> {
 
-        session = MobileApplication.getLoginSession();
 
-        if (TextUtils.equals(session, Kakao)) {
+//            MobileApplication.getContext().writeLog(MobileApplication.getContext().getLoginkName());
 
-            MobileApplication.getContext().requestMe(result -> {
+            Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
 
-                presentNext();
 
-            });
+        }, 1000);
 
-        }else if (TextUtils.equals(session, FaceBook)) {
-
-            if (AccessToken.getCurrentAccessToken() != null) {
-
-                MobileApplication.getContext().useLoginInformation(AccessToken.getCurrentAccessToken(), result -> {
-
-                    presentNext();
-
-                });
-            }
-
-        }else {
-
-            presentNext();
-
-        }
+//        m_permissionUtils = new PermissionUtils(this, this);
+//
+//        LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
+//        LogUtil.d(TAG, " kaako oepn " + Session.getCurrentSession().isOpenable());
+//
+//        LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
+//        LogUtil.d(TAG, " facebook 22 " + AccessToken.isDataAccessActive());
+//        LogUtil.d(TAG, " facebook 33 " + AccessToken.getCurrentAccessToken());
+//
+//
+//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+//        LogUtil.d(TAG, " facebook 444 " + isLoggedIn);
+//
+//        session = MobileApplication.getLoginSession();
+//        LogUtil.d(TAG, " session = " + session);
+//
+//        if (TextUtils.equals(session, Kakao)) {
+//
+//            MobileApplication.getContext().requestMe(result -> {
+//
+//                presentNext();
+//
+//            });
+//
+//        } else if (TextUtils.equals(session, FaceBook)) {
+//
+//            if (AccessToken.getCurrentAccessToken() != null) {
+//
+//                MobileApplication.getContext().useLoginInformation(AccessToken.getCurrentAccessToken(), result -> {
+//
+//                    presentNext();
+//
+//                });
+//            }
+//
+//        } else {
+//
+//            presentNext();
+//
+//        }
 
 
 //        callback = new KakaoSessionCallback( (result, exception) -> {
@@ -125,7 +149,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (m_permissionUtils.checkPermission() == false) {
                     m_permissionUtils.requestPermission();
 
-                }else {
+                } else {
 
                     MobileApplication.getContext().writeLog(MobileApplication.getContext().getLoginkName());
 
@@ -152,7 +176,7 @@ public class SplashActivity extends AppCompatActivity {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (m_permissionUtils.permissionResult(requestCode, permissions, grantResults) == false) {
             m_permissionUtils.requestPermission();
-        }else {
+        } else {
             presentNext();
         }
     }
@@ -181,7 +205,6 @@ public class SplashActivity extends AppCompatActivity {
         super.onDestroy();
 //        Session.getCurrentSession().removeCallback(callback);
     }
-
 
 
 }

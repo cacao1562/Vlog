@@ -73,6 +73,10 @@ public class PermissionUtils {
                 if (grantResults[i] == -1) {
                     return false;
                 }
+                //[다시보지 않기] 거부
+//                if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i])) {
+//                    return false;
+//                }
             }
         }
         return true;

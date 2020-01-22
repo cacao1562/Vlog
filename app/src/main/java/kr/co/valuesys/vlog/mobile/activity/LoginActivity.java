@@ -20,10 +20,13 @@ import java.util.Arrays;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.KakaoSessionCallback;
 import kr.co.valuesys.vlog.mobile.R;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.PermissionUtils;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private static final String TAG = LoginActivity.class.getSimpleName();
 
     private ActivityLoginBinding binding;
 
@@ -33,30 +36,26 @@ public class LoginActivity extends AppCompatActivity {
 // facebook
     private CallbackManager callbackManager;
 
-    private PermissionUtils m_permissionUtils;
+//    private PermissionUtils m_permissionUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_login);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
-        binding.facebookButton.setPermissions(Arrays.asList("email", "public_profile"));
-        m_permissionUtils = new PermissionUtils(this, this);
 
-//        LogUtil.d("123", " kaako " + Session.getCurrentSession().checkAndImplicitOpen() );
-//        LogUtil.d("123", " facebook " + AccessToken.isCurrentAccessTokenActive() );
-//        LogUtil.d("123", " facebook 22 " + AccessToken.isDataAccessActive() );
-//        LogUtil.d("123", " facebook 33 " + AccessToken.getCurrentAccessToken() );
+//        m_permissionUtils = new PermissionUtils(this, this);
 
         callback = new KakaoSessionCallback( (result, exception) -> {
-
+            LogUtil.d(TAG, " KakaoSessionCallback result " + result );
             if (result) {
 
                 MobileApplication.getContext().requestMe(res -> {
-
+                    LogUtil.d(TAG, " requestMe result " + res );
                     if (res) {
 
-                        checkPermission();
+//                        checkPermission();
+                        presentMain();
 
                     }
 
@@ -70,8 +69,42 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         });
+        Session.getCurrentSession().addCallback(callback);
 
+        binding.facebookButton.setPermissions(Arrays.asList("email", "public_profile"));
         callbackManager = CallbackManager.Factory.create();
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
+        LogUtil.d(TAG, " facebook 444 " + isLoggedIn );
+
+        if (isLoggedIn) {
+            MobileApplication.getContext().useLoginInformation(accessToken, result -> {
+
+                if (result) {
+
+//                    checkPermission();
+                    presentMain();
+                }
+
+            });
+        }else {
+            Session.getCurrentSession().checkAndImplicitOpen();
+        }
+
+
+
+
+//        LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
+//        LogUtil.d(TAG, " kaako oepn " + Session.getCurrentSession().isOpenable());
+//        LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
+//        LogUtil.d(TAG, " facebook 22 " + AccessToken.isDataAccessActive());
+//        LogUtil.d(TAG, " facebook 33 " + AccessToken.getCurrentAccessToken());
+
+
+
+
+
+
 
         binding.facebookButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
@@ -83,7 +116,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (result) {
 
-                        checkPermission();
+//                        checkPermission();
+                        presentMain();
 
                     }
 
@@ -101,31 +135,32 @@ public class LoginActivity extends AppCompatActivity {
 
         });
 
-        Session.getCurrentSession().addCallback(callback);
-        Session.getCurrentSession().checkAndImplicitOpen();
+
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-
+        LogUtil.d(TAG, "onActivityResult requestCode = " + requestCode);
+        LogUtil.d(TAG, "onActivityResult resultCode = " + resultCode);
+        LogUtil.d(TAG, "onActivityResult data = " + data);
         if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
             return;
         }
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void checkPermission() {
-
-        if (m_permissionUtils.checkPermission() == false) {
-            m_permissionUtils.requestPermission();
-
-        }else {
-            presentMain();
-        }
-    }
+//    private void checkPermission() {
+//
+//        if (m_permissionUtils.checkPermission() == false) {
+//            m_permissionUtils.requestPermission();
+//
+//        }else {
+//            presentMain();
+//        }
+//    }
 
     private void presentMain() {
 
@@ -136,15 +171,15 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (m_permissionUtils.permissionResult(requestCode, permissions, grantResults) == false) {
-            m_permissionUtils.requestPermission();
-        }else {
-            presentMain();
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+////        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (m_permissionUtils.permissionResult(requestCode, permissions, grantResults) == false) {
+//            m_permissionUtils.requestPermission();
+//        }else {
+//            presentMain();
+//        }
+//    }
 
 
     @Override

@@ -250,6 +250,7 @@ public class MobileApplication extends Application {
             public void onSessionClosed(ErrorResult errorResult) {
 //                redirectLoginActivity()
                 LogUtil.d("kakao requestMe ", "onSessionClosed");
+                callback.onFileCallback(false);
             }
 
             @Override

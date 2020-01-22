@@ -4,7 +4,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import android.graphics.Rect;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
@@ -26,7 +24,7 @@ import kr.co.valuesys.vlog.mobile.common.FileManager;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.model.VideoInfo;
 import kr.co.valuesys.vlog.mobile.R;
-import kr.co.valuesys.vlog.mobile.VideoListAdapter;
+import kr.co.valuesys.vlog.mobile.adapter.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
 import java.lang.ref.WeakReference;
 import java.util.List;

@@ -51,4 +51,8 @@ public interface CommonInterface {
         void onRemove(int index);
     }
 
+    interface OnSelectedCallback {
+        void onSelected(int positon);
+    }
+
 }

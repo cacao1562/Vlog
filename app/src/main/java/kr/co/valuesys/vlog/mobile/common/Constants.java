@@ -7,8 +7,8 @@ public class Constants {
 
     public static final boolean Print_Log = true;
 
-    public static final String Kakao = "kakao";
-    public static final String FaceBook = "faceBook";
+    public static final String Kakao = "KakaoTalk";
+    public static final String FaceBook = "Facebook";
 
     public static final String ARG_Key = "tempPath_key";
 

@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.common;
+package kr.co.valuesys.vlog.mobile.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 
 public class TouchesImgView extends AppCompatImageView {
     public TouchesImgView(Context context) {

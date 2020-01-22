@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile.common;
+package kr.co.valuesys.vlog.mobile.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,6 +6,8 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 import com.airbnb.lottie.LottieAnimationView;
+
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 
 public class TouchesLottie extends LottieAnimationView {
 

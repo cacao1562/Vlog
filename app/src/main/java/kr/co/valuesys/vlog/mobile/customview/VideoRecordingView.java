@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile;
+package kr.co.valuesys.vlog.mobile.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;

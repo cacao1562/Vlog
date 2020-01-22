@@ -1,4 +1,4 @@
-package kr.co.valuesys.vlog.mobile;
+package kr.co.valuesys.vlog.mobile.adapter;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,14 +15,13 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
 
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
-import kr.co.valuesys.vlog.mobile.common.FileManager;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.dialogFragment.VideoPlayDialog;
@@ -41,7 +40,6 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
     private CommonInterface.OnLoadingCallback mCallbackLoading;
     private CommonInterface.OnRemoveCallback mCallbackRemove;
     private String userNamee;
-
 
     public VideoListAdapter(Activity activity,
                             CommonInterface.OnCallbackEmptyVideoToList callbackToList,
@@ -159,9 +157,14 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                 AlertDialog alert = SimpleAlert.createAlert(activity, "삭제 하시겠습니까?", true, dialog -> {
 
                     dialog.dismiss();
-                    mCallbackLoading.onLoading(true);
+                    if (mCallbackLoading != null) {
+                        mCallbackLoading.onLoading(true);
+                    }
+                    if (mCallbackRemove != null) {
+                        mCallbackRemove.onRemove(getAdapterPosition());
+                    }
 //                    new RemoveLoading(getAdapterPosition()).execute();
-                    mCallbackRemove.onRemove(getAdapterPosition());
+
                 });
 
                 alert.show();

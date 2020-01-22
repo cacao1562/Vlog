@@ -136,7 +136,13 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
+        binding.customFbButton.setOnClickListener(v -> {
+            binding.facebookButton.performClick();
+        });
 
+        binding.customKakaoButton.setOnClickListener(v -> {
+            binding.kakaoButton.performClick();
+        });
     }
 
     @Override

@@ -27,8 +27,6 @@ import kr.co.valuesys.vlog.mobile.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity implements CommonInterface.OnCallbackToMain {
 
     private static final String TAG = "MainActivity";
-    private static final int Permission_Request_Code = 200;
-    private boolean isPermission = true;
 
     private ActivityMainBinding binding;
 

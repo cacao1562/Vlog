@@ -12,7 +12,7 @@
             style="@android:style/Widget.Material.Light.Button.Borderless.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/btn_close"
+            android:src="@drawable/btn_arrow"
             app:layout_constraintBottom_toBottomOf="@+id/line"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

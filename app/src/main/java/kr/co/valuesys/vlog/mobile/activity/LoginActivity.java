@@ -3,6 +3,7 @@ package kr.co.valuesys.vlog.mobile.activity;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import kr.co.valuesys.vlog.mobile.common.KakaoSessionCallback;
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.PermissionUtils;
+import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
@@ -38,6 +40,8 @@ public class LoginActivity extends AppCompatActivity {
 
 //    private PermissionUtils m_permissionUtils;
 
+    private AlertDialog alertDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,18 +49,25 @@ public class LoginActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
 
 //        m_permissionUtils = new PermissionUtils(this, this);
+//        LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
+//        LogUtil.d(TAG, " kaako oepn " + Session.getCurrentSession().isOpenable());
+//        LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
+//        LogUtil.d(TAG, " facebook 22 " + AccessToken.isDataAccessActive());
+//        LogUtil.d(TAG, " facebook 33 " + AccessToken.getCurrentAccessToken());
 
         callback = new KakaoSessionCallback( (result, exception) -> {
             LogUtil.d(TAG, " KakaoSessionCallback result " + result );
             if (result) {
 
-                MobileApplication.getContext().requestMe(res -> {
+                MobileApplication.getContext().requestMe( (res, msg) -> {
                     LogUtil.d(TAG, " requestMe result " + res );
                     if (res) {
-
 //                        checkPermission();
                         presentMain();
 
+                    }else {
+
+                        showAlert(msg);
                     }
 
                 });
@@ -64,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
             }else {
 
                 if (exception != null) {
+                    showAlert(exception.toString());
                     exception.printStackTrace();
                 }
             }
@@ -73,37 +85,32 @@ public class LoginActivity extends AppCompatActivity {
 
         binding.facebookButton.setPermissions(Arrays.asList("email", "public_profile"));
         callbackManager = CallbackManager.Factory.create();
+
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        /** facebook 로그인 한 번이라도 했는지 체크 */
         boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
         LogUtil.d(TAG, " facebook 444 " + isLoggedIn );
 
         if (isLoggedIn) {
-            MobileApplication.getContext().useLoginInformation(accessToken, result -> {
+            MobileApplication.getContext().useLoginInformation(accessToken, (result, msg) -> {
 
                 if (result) {
 
 //                    checkPermission();
                     presentMain();
+
+                }else {
+                    showAlert(msg);
                 }
 
             });
         }else {
+
+            /** 카카오 로그인 한 번 했으면 자동 로그인 됨
+             * KakaoSessionCallback 으로 콜백 됨
+             * */
             Session.getCurrentSession().checkAndImplicitOpen();
         }
-
-
-
-
-//        LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
-//        LogUtil.d(TAG, " kaako oepn " + Session.getCurrentSession().isOpenable());
-//        LogUtil.d(TAG, " facebook " + AccessToken.isCurrentAccessTokenActive());
-//        LogUtil.d(TAG, " facebook 22 " + AccessToken.isDataAccessActive());
-//        LogUtil.d(TAG, " facebook 33 " + AccessToken.getCurrentAccessToken());
-
-
-
-
-
 
 
         binding.facebookButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -112,13 +119,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(LoginResult loginResult) {
 
                 AccessToken token = loginResult.getAccessToken();
-                MobileApplication.getContext().useLoginInformation(token, result -> {
+                MobileApplication.getContext().useLoginInformation(token, (result, msg) -> {
 
                     if (result) {
 
 //                        checkPermission();
                         presentMain();
 
+                    }else {
+                        showAlert(msg);
                     }
 
                 });
@@ -131,6 +140,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(FacebookException error) {
+                showAlert(error.getMessage());
             }
 
         });
@@ -150,9 +160,13 @@ public class LoginActivity extends AppCompatActivity {
         LogUtil.d(TAG, "onActivityResult requestCode = " + requestCode);
         LogUtil.d(TAG, "onActivityResult resultCode = " + resultCode);
         LogUtil.d(TAG, "onActivityResult data = " + data);
+
+        /** 카카오 간편 로그인 뷰 띄워서 로그인 결과가 들어옴. 다시 되돌아 왔을때 */
         if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
             return;
         }
+
+        /** 페이스북 로그인 뷰가 나타나서 로그인 결과가 들어옴. 로그인 되면 페북 제공 버튼이 자동으로 로그아웃 텍스트로 바뀜 */
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
         super.onActivityResult(requestCode, resultCode, data);
@@ -187,6 +201,24 @@ public class LoginActivity extends AppCompatActivity {
 //        }
 //    }
 
+    private void showAlert(String msg) {
+        alertDialog = SimpleAlert.createAlert(this, msg, false, dialog -> {
+
+            dialog.dismiss();
+        });
+        alertDialog.show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (alertDialog != null) {
+            if (alertDialog.isShowing()) {
+                alertDialog.dismiss();
+                alertDialog = null;
+            }
+        }
+    }
 
     @Override
     protected void onDestroy() {
@@ -195,6 +227,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onDestroy();
 
     }
+
+
 
 
 }

@@ -1,21 +1,13 @@
 package kr.co.valuesys.vlog.mobile.application;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -44,15 +36,11 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -230,7 +218,7 @@ public class MobileApplication extends Application {
     /**
      * kakao 사용자 정보 가져오기
      */
-    public void requestMe(CommonInterface.OnFileCallback callback) {
+    public void requestMe(CommonInterface.OnRequestGetLoginInfo callback) {
 
         List<String> keys = new ArrayList<>();
         keys.add("properties.nickname");
@@ -243,14 +231,14 @@ public class MobileApplication extends Application {
             public void onFailure(ErrorResult errorResult) {
                 String message = "failed to get user info. msg=" + errorResult;
                 LogUtil.d("kakao requestMe onFailure", message);
-                callback.onFileCallback(false);
+                callback.onCallback(false, errorResult.toString());
             }
 
             @Override
             public void onSessionClosed(ErrorResult errorResult) {
 //                redirectLoginActivity()
                 LogUtil.d("kakao requestMe ", "onSessionClosed");
-                callback.onFileCallback(false);
+//                callback.onCallback(false, errorResult.toString());
             }
 
             @Override
@@ -283,7 +271,7 @@ public class MobileApplication extends Application {
                 mLoginPlatform = Constants.Kakao;
 
 //                redirectMainActivity();
-                callback.onFileCallback(true);
+                callback.onCallback(true, "");
             }
 
         });
@@ -323,7 +311,7 @@ public class MobileApplication extends Application {
     /**
      * facebook 로그인 정보 가져오기
      */
-    public void useLoginInformation(AccessToken accessToken, CommonInterface.OnFileCallback callback) {
+    public void useLoginInformation(AccessToken accessToken, CommonInterface.OnRequestGetLoginInfo callback) {
         /**
          Creating the GraphRequest to fetch user details
          1st Param - AccessToken
@@ -334,6 +322,14 @@ public class MobileApplication extends Application {
             //OnCompleted is invoked once the GraphRequest is successful
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
+
+                if (object == null || response.getError() != null) {
+                    if (callback != null) {
+                        callback.onCallback(false, response.getError().getErrorMessage());
+                        return;
+                    }
+                    return;
+                }
                 try {
                     String name = object.getString("name");
                     String email = object.getString("email");
@@ -344,11 +340,11 @@ public class MobileApplication extends Application {
                     mLoginName = name;
                     mLoginPlatform = Constants.FaceBook;
 
-                    callback.onFileCallback(true);
+                    callback.onCallback(true, "");
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    callback.onFileCallback(false);
+                    callback.onCallback(false, e.getMessage());
                 }
             }
         });

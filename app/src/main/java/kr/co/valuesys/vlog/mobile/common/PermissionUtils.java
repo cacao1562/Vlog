@@ -70,13 +70,21 @@ public class PermissionUtils {
             for (int i = 0; i < grantResults.length; i++) {
                 //grantResults 가 0이면 사용자가 허용한 것이고 / -1이면 거부한 것입니다.
                 // -1이 있는지 체크하여 하나라도 -1이 나온다면 false를 리턴해주었습니다.
+                boolean result = true;
+
                 if (grantResults[i] == -1) {
-                    return false;
+                    LogUtil.d("ppp", " permission utils =  grant -1 ");
+                    result = false;
                 }
                 //[다시보지 않기] 거부
-//                if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i])) {
-//                    return false;
-//                }
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[i])) {
+                    LogUtil.d("ppp", " permission utils =  다시 거부  ");
+                    result = false;
+                }
+
+                if (result == false) {
+                    return false;
+                }
             }
         }
         return true;

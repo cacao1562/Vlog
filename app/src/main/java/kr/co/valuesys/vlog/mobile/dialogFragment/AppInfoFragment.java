@@ -1,8 +1,9 @@
 package kr.co.valuesys.vlog.mobile.dialogFragment;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 import androidx.annotation.NonNull;

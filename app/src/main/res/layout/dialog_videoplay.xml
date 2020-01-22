@@ -8,10 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-
-
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -27,19 +23,19 @@
 
             <ImageButton
                 android:id="@+id/videoPlay_playButton"
-                style="@android:style/Widget.Material.Light.Button.Borderless.Small"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:src="@drawable/btn_play"
+                style="@android:style/Widget.Material.Light.Button.Borderless"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
             <ImageButton
                 android:id="@+id/videoPlay_backButton"
-                style="@android:style/Widget.Material.Light.Button.Borderless.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@android:style/Widget.Material.Light.Button.Borderless.Small"
                 android:src="@drawable/btn_close"
                 android:layout_marginTop="50dp"
                 android:layout_marginLeft="10dp" />

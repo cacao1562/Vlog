@@ -514,6 +514,13 @@ public class Camera2Fragment extends DialogFragment {
 
     private void deleteVideo() {
 
+        if (getActivity() == null) {
+            return;
+        }
+        if (FileManager.checkStoragePermission(getContext()) == false) {
+            Toast.makeText(getActivity(), "파일 삭제 실패 ( 권한 필요 )", Toast.LENGTH_SHORT).show();
+            return;
+        }
         FileManager.deleteVideo(getActivity(), mTempVideoPath, result -> {
             if (result) {
                 mTempVideoPath = null;

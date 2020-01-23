@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                         presentMain();
 
                     }else {
-
+                        LogUtil.d("ppp", " requestMe false");
                         showAlert(msg);
                     }
 
@@ -75,7 +75,8 @@ public class LoginActivity extends AppCompatActivity {
             }else {
 
                 if (exception != null) {
-                    showAlert(exception.toString());
+                    LogUtil.d("ppp", " KakaoSessionCallback false");
+//                    showAlert(exception.toString());
                     exception.printStackTrace();
                 }
             }

@@ -59,4 +59,8 @@ public interface CommonInterface {
         void onSelected(int positon);
     }
 
+    interface OnPermissionCallback {
+        void onCallback(int result);
+    }
+
 }

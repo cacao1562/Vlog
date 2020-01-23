@@ -1,14 +1,24 @@
 package kr.co.valuesys.vlog.mobile.activity;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
+
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.List;
@@ -16,6 +26,7 @@ import java.util.List;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.PermissionUtils;
+import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.dialogFragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.CalendarFragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.Camera2Fragment;
@@ -32,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
 //    private VideoListFragment videoListFragment = VideoListFragment.newInstance();
     private PermissionUtils m_permissionUtils;
+
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +69,9 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
     private void presentBlankActivity(int id) {
 
         if (m_permissionUtils.checkPermission() == false) {
-            Toast.makeText(this,"접근 권한을 허용해 주세요", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this,"접근 권한을 허용해 주세요", Toast.LENGTH_LONG).show();
             m_permissionUtils.requestPermission();
+
             return;
 
         }
@@ -91,32 +105,40 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-//        switch (requestCode) {
-//
-//            case Permission_Request_Code:
-//
-//                for (int i=0; i<grantResults.length; i++) {
-//
-//                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-//
-//                        isPermission = false;
-//                        Toast.makeText(this,"permission not granted = " + permissions[i], Toast.LENGTH_LONG).show();
-//                        LogUtil.d(TAG, "permission not granted = " + permissions[i] );
-//                    }
-//                }
-//
-//                if (isPermission) {
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
-//                }
-//                break;
-//        }
+        m_permissionUtils.permissionResult(requestCode, permissions, grantResults, result -> {
 
-        if (m_permissionUtils.permissionResult(requestCode, permissions, grantResults) == false) {
-            m_permissionUtils.requestPermission();
-        }else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
+            switch (result) {
+                case 0:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
+                    break;
+                case 1:
+                    m_permissionUtils.requestPermission();
+                    break;
+                case 2:
+                    showPermissionAlert();
+                    break;
+            }
+
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1234) {
+
+            requestPermission();
+
+            if (resultCode == RESULT_OK) {
+                LogUtil.d("ppp", "onActivityResult  OK ");
+//                getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
+            }else {
+                LogUtil.d("ppp", "onActivityResult = " + resultCode);
+//                showPermissionAlert();
+            }
         }
-
     }
 
     private void requestPermission() {
@@ -125,9 +147,36 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
             m_permissionUtils.requestPermission();
 
         }else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
+//            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commitAllowingStateLoss();
         }
 
+    }
+
+    private void showPermissionAlert() {
+        alertDialog = SimpleAlert.createAlert(this, "권한을 허용해 주세요", false, dialog -> {
+
+            dialog.dismiss();
+
+            try {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        .setData(Uri.parse("package:" + getPackageName()));
+//                intent.addCategory(Intent.CATEGORY_DEFAULT);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                startActivityForResult(intent, 1234);
+//                finish();
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+                startActivityForResult(intent, 1234);
+//                finish();
+            }
+
+        });
+        alertDialog.show();
     }
 
     @Override

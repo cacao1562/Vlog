@@ -1283,6 +1283,13 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
     private void deleteVideo() {
 
+        if (getActivity() == null) {
+            return;
+        }
+        if (FileManager.checkStoragePermission(getContext()) == false) {
+            Toast.makeText(getActivity(), "파일 삭제 실패 ( 권한 필요 )", Toast.LENGTH_SHORT).show();
+            return;
+        }
         FileManager.deleteVideo(getActivity(), mNextVideoAbsolutePath, result -> {
             if (result) {
                 mNextVideoAbsolutePath = null;

@@ -261,6 +261,10 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
             }
             LogUtil.d("xxx", "remove uri = " + fragment.info.get(position).getUri().toString());
             LogUtil.d("xxx", "remove position = " + position );
+
+            if (FileManager.checkStoragePermission(fragment.getContext()) == false) {
+                return null;
+            }
             FileManager.deleteVideo(fragment.getActivity(), fragment.info.get(position).getUri(), result -> {
 
                 if (result) {

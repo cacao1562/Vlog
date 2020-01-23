@@ -1,11 +1,13 @@
 package kr.co.valuesys.vlog.mobile.common;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -14,6 +16,8 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,6 +33,29 @@ public class FileManager {
     private static final File dir = Environment.getExternalStorageDirectory().getAbsoluteFile();
 //    String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + File.separator + "CameraViewFreeDrawing";
 
+
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE };
+
+
+    /** 파일 읽기 쓰기 권한 체크 */
+    public static boolean checkStoragePermission(Context context) {
+
+        if (context == null) {
+            return false;
+        }
+
+        boolean grant = true;
+        int result;
+        for (String pm : PERMISSIONS) {
+            result = ContextCompat.checkSelfPermission(context, pm);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                grant = false;
+            }
+        }
+        return grant;
+    }
     /**
      * 파일 저장
      */
@@ -36,7 +63,7 @@ public class FileManager {
 
         boolean result = false;
 
-        if (TextUtils.isEmpty(tempPath)) {
+        if (mActivity == null || TextUtils.isEmpty(tempPath) || TextUtils.isEmpty(newFileName)) {
             callback.onFileCallback(false);
             return;
         }
@@ -88,7 +115,7 @@ public class FileManager {
      */
     public static void deleteVideo(Activity mActivity, String filePath, CommonInterface.OnFileCallback callback) {
 
-        if (TextUtils.isEmpty(filePath)) {
+        if (mActivity == null || TextUtils.isEmpty(filePath)) {
             callback.onFileCallback(false);
             return;
         }
@@ -195,13 +222,15 @@ public class FileManager {
                 for (File file : childs) {
 
                     if (file.delete()) {
-
+                        LogUtil.d("fff", " file delete ok ");
                         if (mActivity != null) {
+                            LogUtil.d("fff", " isfinish = " + mActivity.isFinishing());
+                            LogUtil.d("fff", " isDestroyed = " + mActivity.isDestroyed());
                             mActivity.getApplicationContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
                         }
 
                     }else {
-
+                         LogUtil.d("fff", " file delete fail ");
 //                        Toast.makeText(mActivity, "temp 파일들 삭제 실패", Toast.LENGTH_SHORT).show();
 
                     }

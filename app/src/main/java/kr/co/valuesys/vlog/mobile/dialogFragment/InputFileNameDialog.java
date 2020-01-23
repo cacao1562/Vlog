@@ -105,6 +105,14 @@ public class InputFileNameDialog extends DialogFragment {
 
             }else {
 
+                if (getActivity() == null) {
+                    return;
+                }
+                if (FileManager.checkStoragePermission(getContext()) == false) {
+                    Toast.makeText(getActivity(), "저장 실패 ( 권한 필요 )", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 FileManager.saveFile(getActivity(), tempPath, binding.fileNameEdittext.getText().toString(), result -> {
 
                     if (result) {

@@ -1,13 +1,13 @@
 package kr.co.valuesys.vlog.mobile.application;
 
-import androidx.appcompat.app.AlertDialog;
-
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
@@ -48,11 +48,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.activity.SplashActivity;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.Constants;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
-import kr.co.valuesys.vlog.mobile.R;
 
 //import io.realm.Realm;
 //import io.realm.RealmConfiguration;
@@ -65,9 +65,18 @@ public class MobileApplication extends Application {
         return mobileApplication;
     }
 
+    /**
+     * 로그인 이름
+     */
     private String mLoginName;
+    /**
+     * SNS 로그인 방식 ( 카카오 or 페이스북 )
+     */
     private String mLoginPlatform;
 
+    /**
+     * 캘린더에서 선택한 날짜
+     */
     private CalendarDay mSelectDay;
 
     public void setmLoginName(String mLoginName) {
@@ -402,7 +411,7 @@ public class MobileApplication extends Application {
     /**
      * 파일에 로그인 로그 쓰기
      *
-     * @param str
+     * @param str 로그인 이름
      */
     public void writeLog(String str) {
 
@@ -442,6 +451,7 @@ public class MobileApplication extends Application {
         }
 
         try {
+            /** 저장할때 한글 깨져서 MS949 사용*/
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + "/log.txt" , true), "MS949"));
             bw.append(str);
             bw.newLine();

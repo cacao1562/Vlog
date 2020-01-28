@@ -5,10 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
-
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -23,18 +19,12 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-
-import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -45,6 +35,12 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,10 +54,10 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.common.Constants;
 import kr.co.valuesys.vlog.mobile.common.FileManager;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
-import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCameraBinding;
 
@@ -108,8 +104,6 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
     private int mScreen_width;
     private int mScreen_height;
 
-//    private CommonInterface.OnCameraPauseListener mCallbackPause;
-
     private CountDownTimer mCountDownTimer;
     public CameraFragment() {
 
@@ -121,11 +115,7 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof CommonInterface.OnCameraPauseListener) {
-//            mCallbackPause = (CommonInterface.OnCameraPauseListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-//        }
+
     }
 
     @Override
@@ -257,14 +247,14 @@ public class CameraFragment extends DialogFragment implements View.OnClickListen
 
         binding.progressBar.setMax(Max_duration);
 
-        long maxTime = 15000;
+//        long maxTime = Max_duration;
                                                         // 0.01초 간격으로 프로그레스 값 업떼이트 ( 1000 = 1초 )
-        mCountDownTimer = new CountDownTimer(maxTime, 10) {
+        mCountDownTimer = new CountDownTimer(Max_duration, 10) {
 
             @Override
             public void onTick(long millisUntilFinished) {
 
-                int value = (int) ( maxTime - millisUntilFinished);
+                int value = (int) ( Max_duration - millisUntilFinished);
                 binding.progressBar.setProgress( value );
             }
 

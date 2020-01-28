@@ -2,33 +2,31 @@ package kr.co.valuesys.vlog.mobile.dialogFragment;
 
 import android.app.Dialog;
 import android.content.Intent;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.facebook.login.LoginManager;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.LogoutResponseCallback;
 
-import kr.co.valuesys.vlog.mobile.adapter.InfoAdapter;
-import kr.co.valuesys.vlog.mobile.activity.LoginActivity;
-import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.BuildConfig;
+import kr.co.valuesys.vlog.mobile.R;
+import kr.co.valuesys.vlog.mobile.activity.LoginActivity;
+import kr.co.valuesys.vlog.mobile.adapter.InfoAdapter;
+import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
-import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentAppInfoBinding;
 
 import static kr.co.valuesys.vlog.mobile.common.Constants.FaceBook;
@@ -40,8 +38,8 @@ public class AppInfoFragment extends DialogFragment implements CommonInterface.O
     private String[] Info_Titles = { "로그인 정보", "로그아웃" };
 
     public static AppInfoFragment newInstance() {
-        AppInfoFragment fragment = new AppInfoFragment();
 
+        AppInfoFragment fragment = new AppInfoFragment();
         return fragment;
     }
 
@@ -60,41 +58,6 @@ public class AppInfoFragment extends DialogFragment implements CommonInterface.O
         };
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        LogUtil.d("ddd", "onStart appinfo");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        LogUtil.d("ddd", "onStop appinfo");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        LogUtil.d("ddd", "onResume appinfo");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        LogUtil.d("ddd", "onDestroyView appinfo");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        LogUtil.d("ddd", "onDestroy appinfo");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        LogUtil.d("ddd", "onDetach appinfo");
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -122,37 +85,15 @@ public class AppInfoFragment extends DialogFragment implements CommonInterface.O
 
         binding.versionTextview.setText(BuildConfig.VERSION_NAME);
 
-//        String platform = MobileApplication.getContext().getmLoginPlatform();
-
-//        binding.loginPlatform.setText(" Login Platform : " + MobileApplication.getLoginSession());
-//        binding.loginName.setText(MobileApplication.getContext().getLoginkName());
-
-//        if (TextUtils.equals(MobileApplication.getLoginSession(), Kakao)) {
-//
-//            binding.logoutButton.setBackgroundColor(getResources().getColor(R.color.kakao_color));
-//            binding.logoutButton.setTextColor(getResources().getColor(R.color.black));
-//
-//        }else if (TextUtils.equals(MobileApplication.getLoginSession(), FaceBook)) {
-//
-//            binding.logoutButton.setBackgroundColor(getResources().getColor(R.color.facebook_color));
-//            binding.logoutButton.setTextColor(getResources().getColor(R.color.white));
-//
-//        }else {
-//
-//            binding.logoutButton.setVisibility(View.GONE);
-//        }
-
         binding.backButton.setOnClickListener(v -> {
 
-//            getActivity().finish();
             dismiss();
 
         });
 
-
-
     }
 
+    /** 로그아웃시 글로벌에 저장된 로그인 이름과 플랫폼 이름 초기화 */
     private void resetLogin() {
 
         MobileApplication.getContext().setmLoginName("");
@@ -161,10 +102,25 @@ public class AppInfoFragment extends DialogFragment implements CommonInterface.O
 
     private void presentLogin() {
 
-        dismiss();
-        Intent intent = new Intent(getActivity(), LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        if (getActivity() != null) {
+
+            getActivity().runOnUiThread(() -> {
+
+//                            Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
+                AlertDialog alert = SimpleAlert.createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
+
+                    dialog.dismiss();
+
+                    dismiss();
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+
+                });
+                alert.show();
+
+            });
+        }
     }
 
 
@@ -175,7 +131,7 @@ public class AppInfoFragment extends DialogFragment implements CommonInterface.O
         LogUtil.d("sss", "onSelected position = " + positon);
 
         if (TextUtils.equals(MobileApplication.getContext().getmLoginPlatform(), Kakao)) {
-            LogUtil.d("sss", "onSelected kakao = " );
+
             UserManagement.getInstance().requestLogout(new LogoutResponseCallback() {
                 @Override
                 public void onCompleteLogout() {
@@ -183,47 +139,20 @@ public class AppInfoFragment extends DialogFragment implements CommonInterface.O
                     LogUtil.d("ooo", "logout");
 
                     resetLogin();
-
-                    if (getActivity() != null) {
-
-                        getActivity().runOnUiThread(() -> {
-
-                            Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                            AlertDialog alert = SimpleAlert.createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
-
-                                dialog.dismiss();
-                                presentLogin();
-//                                getActivity().finish();
-                            });
-                            alert.show();
-
-                        });
-
-                    }
+                    presentLogin();
 
                 }
             });
 
         } else if (TextUtils.equals(MobileApplication.getContext().getmLoginPlatform(), FaceBook)) {
+
             LogUtil.d("sss", "onSelected facebook = " );
+
             LoginManager.getInstance().logOut();
-
             resetLogin();
-
-            getActivity().runOnUiThread(() -> {
-
-                Toast.makeText(getActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
-                AlertDialog alert = SimpleAlert.createAlert(getActivity(), "로그아웃 되었습니다.", false, dialog -> {
-
-                    dialog.dismiss();
-                    presentLogin();
-//                        getActivity().finish();
-                });
-                alert.show();
-
-            });
+            presentLogin();
 
         }
-
     }
+
 }

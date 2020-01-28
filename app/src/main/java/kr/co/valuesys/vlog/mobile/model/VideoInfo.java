@@ -1,6 +1,5 @@
 package kr.co.valuesys.vlog.mobile.model;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -8,10 +7,8 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import java.util.Date;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
@@ -23,15 +20,24 @@ public class VideoInfo {
 
     private String title;
     private Bitmap img;
-    private Uri uri;
-    private Date date;
+    /**
+     * 비디오 썸네일 만들때 사용할 file path
+     */
     private String data;
+    /**
+     * 비디오 재생할때 사용할 uri
+     */
+    private Uri uri;
+    /**
+     * 비디오 촬영 날짜 표시할때
+     */
+    private Date date;
 
     public VideoInfo(String title, Bitmap img, String data, Uri uri, Date date) {
         this.title = title;
         this.img = img;
-        this.uri = uri;
         this.data = data;
+        this.uri = uri;
         this.date = date;
     }
 
@@ -74,6 +80,7 @@ public class VideoInfo {
 //        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getAbsoluteFile().getPath() + "/DCIM/TestVideo/");
 //        Uri uri = Uri.parse(Environment.getExternalStorageDirectory().getPath() + "/DCIM/TestVideo/");
 
+        /** DESC 붙여주면 내림차순으로 알아서 정렬됨 ( 앞에 띄어쓰기 한 칸 해야 오류 안생김 ) */
         Cursor cursor = context.getContentResolver().query(uri, proj, null, null, MediaStore.Video.VideoColumns.DATE_TAKEN + " DESC");
 
 
@@ -81,6 +88,9 @@ public class VideoInfo {
 //        assert cursor != null;
         /** cursor가 null 이거나 미디어가 없을때 */
         if (cursor == null) {
+            if (callback != null) {
+                callback.onEmptyVideo(false);
+            }
             return null;
         }
 

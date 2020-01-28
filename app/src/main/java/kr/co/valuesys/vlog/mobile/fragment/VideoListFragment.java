@@ -1,37 +1,36 @@
 package kr.co.valuesys.vlog.mobile.fragment;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
+import java.lang.ref.WeakReference;
 import java.util.Calendar;
+import java.util.List;
 
+import kr.co.valuesys.vlog.mobile.R;
+import kr.co.valuesys.vlog.mobile.adapter.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.FileManager;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
-import kr.co.valuesys.vlog.mobile.model.VideoInfo;
-import kr.co.valuesys.vlog.mobile.R;
-import kr.co.valuesys.vlog.mobile.adapter.VideoListAdapter;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentVideoListBinding;
-import java.lang.ref.WeakReference;
-import java.util.List;
+import kr.co.valuesys.vlog.mobile.model.VideoInfo;
 
 public class VideoListFragment extends Fragment implements CommonInterface.OnCallbackEmptyVideo,
-                                                           CommonInterface.OnCallbackEmptyVideoToList,
-                                                           CommonInterface.OnLoadingCallback,
                                                            CommonInterface.OnRemoveCallback {
 
     private FragmentVideoListBinding binding;
@@ -59,7 +58,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
         binding.videoListRecyclerview.setHasFixedSize(true);
         binding.videoListRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.videoListRecyclerview.addItemDecoration(new RecyclerDecoration(20));
-        adapter = new VideoListAdapter(getActivity(), this, this, this);
+        adapter = new VideoListAdapter(getActivity(), this);
         binding.videoListRecyclerview.setAdapter(adapter);
 
 //        adapter.setUp(VideoInfo.getVideo(getActivity(), true, this));
@@ -95,25 +94,10 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
     }
 
 
-/** VideoListAdapter 에서 비디오 삭제했을때 callback
-    비디오 개수가 0개면 true */
-    @Override
-    public void onCallbackToList(boolean show) {
-
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                showEmptyView(show);
-            });
-        }
-    }
-
-
-
     /**
      * 비디오 삭제 버튼눌렀을때 로딩
      */
-    @Override
-    public void onLoading(boolean show) {
+    private void onLoading(boolean show) {
 
         if (loading == null) {
             loading = MobileApplication.showProgress(null, null, getActivity()).create();
@@ -133,6 +117,7 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
      */
     @Override
     public void onRemove(int index) {
+        onLoading(true);
         new RemoveVideo(index, this).execute();
     }
 
@@ -275,9 +260,9 @@ public class VideoListFragment extends Fragment implements CommonInterface.OnCal
                     LogUtil.d("zzz", "remove size = " + fragment.info.size());
                     fragment.onLoading(false);
                     if (fragment.info.size() == 0) {
-                        fragment.onCallbackToList(true);
+                        fragment.onEmptyVideo(true);
                     }else {
-                        fragment.onCallbackToList(false);
+                        fragment.onEmptyVideo(false);
                     }
 
                     fragment.adapter.setUp(fragment.info);

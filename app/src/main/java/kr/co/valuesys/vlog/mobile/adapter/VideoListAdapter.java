@@ -5,50 +5,44 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.provider.MediaStore;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
+import kr.co.valuesys.vlog.mobile.databinding.VideoItemBinding;
 import kr.co.valuesys.vlog.mobile.dialogFragment.VideoPlayDialog;
 import kr.co.valuesys.vlog.mobile.model.VideoInfo;
-import kr.co.valuesys.vlog.mobile.databinding.VideoItemBinding;
-
-import java.lang.ref.WeakReference;
-import java.util.List;
 
 public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.VideoListHolder> {
 
     private Activity activity;
     private Context context;
     private List<VideoInfo> mVideoInfo = new ArrayList<>();
-    private CommonInterface.OnCallbackEmptyVideoToList mCallbackToList;
-    private CommonInterface.OnLoadingCallback mCallbackLoading;
     private CommonInterface.OnRemoveCallback mCallbackRemove;
     private String userNamee;
 
     public VideoListAdapter(Activity activity,
-                            CommonInterface.OnCallbackEmptyVideoToList callbackToList,
-                            CommonInterface.OnLoadingCallback onLoadingCallback,
                             CommonInterface.OnRemoveCallback onRemoveCallback) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
-        this.mCallbackToList = callbackToList;
-        this.mCallbackLoading = onLoadingCallback;
         this.mCallbackRemove = onRemoveCallback;
         this.userNamee = MobileApplication.getContext().getLoginkName();
     }
@@ -157,9 +151,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
                 AlertDialog alert = SimpleAlert.createAlert(activity, "삭제 하시겠습니까?", true, dialog -> {
 
                     dialog.dismiss();
-                    if (mCallbackLoading != null) {
-                        mCallbackLoading.onLoading(true);
-                    }
+
                     if (mCallbackRemove != null) {
                         mCallbackRemove.onRemove(getAdapterPosition());
                     }
@@ -174,52 +166,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
         }
     }
 
-
-//    private class RemoveLoading extends AsyncTask<Void, Void, Void> {
-//
-//        private int position;
-//
-//        public RemoveLoading(int index) {
-//            position = index;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Void... voids) {
-//
-//            FileManager.deleteVideo(activity, mVideoInfo.get(position).getUri().toString(), result -> {
-//
-//                if (result) {
-//
-//                    setUp(VideoInfo.getVideo(activity, true, show -> {
-//
-//                        mCallbackLoading.onLoading(false);
-//                        mCallbackToList.onCallbackToList(show);
-//
-//                    }));
-//
-//                }else {
-//
-//                    mCallbackLoading.onLoading(false);
-//                    Toast.makeText(activity, "파일 삭제 실패", Toast.LENGTH_SHORT).show();
-//
-//                }
-//
-//            });
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//            super.onPostExecute(aVoid);
-//        }
-//    }
-
-
+    /** cell이 보여질때 썸네일 만드는 async task 실행해서 이미지뷰에 삽입 */
     private static class makeThumnail extends AsyncTask<Void, Void, Bitmap> {
 
         private int itemPosition;
@@ -260,9 +207,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<VideoListAdapter.Vide
             // 썸네일 크기 변경할 때.
             try {
                 // 썸네일 추출후 리사이즈해서 다시 비트맵 생성
-                Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(thumbData, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+                File file = new File(thumbData);
+//                Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(thumbData, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+                thumbnail = ThumbnailUtils.createVideoThumbnail(file, new Size(240, 480), null);
 //                        thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 1024, 512);
-                thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 960, 480);
+//                thumbnail = ThumbnailUtils.extractThumbnail(bitmap2, 480, 240);
 
             } catch (Exception e) {
                 e.printStackTrace();

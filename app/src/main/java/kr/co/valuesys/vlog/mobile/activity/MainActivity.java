@@ -1,39 +1,31 @@
 package kr.co.valuesys.vlog.mobile.activity;
 
-import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
-
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.util.List;
 
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.PermissionUtils;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
+import kr.co.valuesys.vlog.mobile.databinding.ActivityMainBinding;
 import kr.co.valuesys.vlog.mobile.dialogFragment.AppInfoFragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.CalendarFragment;
-import kr.co.valuesys.vlog.mobile.dialogFragment.Camera2Fragment;
 import kr.co.valuesys.vlog.mobile.dialogFragment.CameraFragment;
 import kr.co.valuesys.vlog.mobile.fragment.VideoListFragment;
-import kr.co.valuesys.vlog.mobile.R;
-import kr.co.valuesys.vlog.mobile.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity implements CommonInterface.OnCallbackToMain {
 
@@ -41,10 +33,11 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
     private ActivityMainBinding binding;
 
-//    private VideoListFragment videoListFragment = VideoListFragment.newInstance();
     private PermissionUtils m_permissionUtils;
 
     private AlertDialog alertDialog;
+
+    private final int Setting_Request_Code = 1010;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +49,9 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
         requestPermission();
 
-        binding.mainInfoImgbutton.setOnClickListener(v -> { presentBlankActivity(0); });
-        binding.mainRecordImgbutton.setOnClickListener(v -> { presentBlankActivity(1); });
-        binding.mainCalendarImgbutton.setOnClickListener(v -> { presentBlankActivity(2); });
+        binding.mainInfoImgbutton.setOnClickListener(v -> { presentDialog(0); });
+        binding.mainRecordImgbutton.setOnClickListener(v -> { presentDialog(1); });
+        binding.mainCalendarImgbutton.setOnClickListener(v -> { presentDialog(2); });
 
 //        MobileApplication.getContext().requestAccessTokenInfo();
 //        MobileApplication.getContext().requestMe();
@@ -66,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
     }
 
-    private void presentBlankActivity(int id) {
+    private void presentDialog(int id) {
 
         if (m_permissionUtils.checkPermission() == false) {
 //            Toast.makeText(this,"접근 권한을 허용해 주세요", Toast.LENGTH_LONG).show();
@@ -75,7 +68,11 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
             return;
 
         }
-
+        /** 메인 하단 3개 버튼
+         * 0 : 앱 정보
+         * 1 : 카메라 촬영
+         * 2 : 캘린더
+         */
         switch (id) {
 
             case 0:
@@ -108,12 +105,15 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
         m_permissionUtils.permissionResult(requestCode, permissions, grantResults, result -> {
 
             switch (result) {
+                /** 퍼미션 권한 모두 허용 했을때 */
                 case 0:
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
                     break;
+                /** 퍼미션 권한 거부 했을때 다시 요청*/
                 case 1:
                     m_permissionUtils.requestPermission();
                     break;
+                /** 퍼미션 권한 다시 않보기 체크하고 거부 했을때 설정 화면으로 */
                 case 2:
                     showPermissionAlert();
                     break;
@@ -127,20 +127,23 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1234) {
+        if (requestCode == Setting_Request_Code) {
 
             requestPermission();
 
-            if (resultCode == RESULT_OK) {
-                LogUtil.d("ppp", "onActivityResult  OK ");
-//                getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
-            }else {
-                LogUtil.d("ppp", "onActivityResult = " + resultCode);
-//                showPermissionAlert();
-            }
+//            if (resultCode == RESULT_OK) {
+//                LogUtil.d("ppp", "onActivityResult  OK ");
+////                getSupportFragmentManager().beginTransaction().replace(R.id.main_container, VideoListFragment.newInstance()).commit();
+//            }else {
+//                LogUtil.d("ppp", "onActivityResult = " + resultCode);
+////                showPermissionAlert();
+//            }
         }
     }
 
+    /** 퍼미션 체크해서 한 개라도 거부되어있으면 다시 요청
+     *  다 허용 되어있으면 리스트 화면 보여줌
+     */
     private void requestPermission() {
 
         if (m_permissionUtils.checkPermission() == false) {
@@ -153,7 +156,9 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 
     }
 
+    /** 앱 설정 화면으로 이동 */
     private void showPermissionAlert() {
+
         alertDialog = SimpleAlert.createAlert(this, "권한을 허용해 주세요", false, dialog -> {
 
             dialog.dismiss();
@@ -165,13 +170,13 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 //                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 //                intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-                startActivityForResult(intent, 1234);
+                startActivityForResult(intent, Setting_Request_Code);
 //                finish();
             } catch (ActivityNotFoundException e) {
                 e.printStackTrace();
 
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
-                startActivityForResult(intent, 1234);
+                startActivityForResult(intent, Setting_Request_Code);
 //                finish();
             }
 
@@ -192,11 +197,6 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
 //        }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LogUtil.d(TAG, "onPause");
-    }
 
     @Override
     protected void onResume() {
@@ -220,18 +220,34 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (alertDialog != null) {
+            if (alertDialog.isShowing()) {
+                alertDialog.dismiss();
+                alertDialog = null;
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void oncallbackMain(int id) {
 
         VideoListFragment vf = (VideoListFragment) getSupportFragmentManager().findFragmentById(R.id.main_container);
 
-// 캘린더에서 날짜 눌렀을때 콜백
+/** 캘린더에서 날짜 눌렀을때 콜백 */
         if (id == 2) {
 
             if (vf != null) {
                 vf.scrolltoVideo();
             }
 
-// 동영상 제목 입력하는 뷰에서 저장 버튼누르고 확인 눌렀을때 콜백
+/** 동영상 제목 입력하는 뷰에서 저장 버튼누르고 확인 눌렀을때 콜백 */
         }else if (id == 1) {
 
             List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
@@ -249,15 +265,10 @@ public class MainActivity extends AppCompatActivity implements CommonInterface.O
                         if (vf != null) {
                             vf.refreshVideo();
                         }
-
                     }
                 }
-
             }
-
         }
-
-
     }
 
 }

@@ -12,7 +12,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@android:style/Widget.Material.Light.Button.Borderless.Small"
-            android:layout_marginLeft="10dp"
             android:src="@drawable/btn_arrow"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -23,7 +22,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="저장정보"
-            android:textSize="22dp"
+            android:textSize="17dp"
+            android:textColor="@color/black"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -33,7 +33,7 @@
         <View
             android:id="@+id/line"
             android:layout_width="match_parent"
-            android:layout_height="0.7dp"
+            android:layout_height="0.6dp"
             android:layout_marginTop="58dp"
             android:background="@color/black"
             app:layout_constraintTop_toTopOf="parent" />
@@ -110,8 +110,9 @@
         <Button
             android:id="@+id/save_button"
             android:layout_width="0dp"
-            android:layout_height="44dp"
+            android:layout_height="48dp"
             android:text="저 장"
+            android:textSize="15dp"
             android:letterSpacing="-0.03"
             android:lineSpacingExtra="-2sp"
             android:textColor="@color/black"

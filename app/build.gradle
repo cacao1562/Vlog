@@ -52,11 +52,12 @@ dependencies {
 //    implementation 'com.facebook.android:facebook-android-sdk:5.5.1'
     implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
-
     // CameraView
     implementation 'com.otaliastudios:cameraview:2.6.1'
 
     // lottie
     implementation "com.airbnb.android:lottie:3.3.1"
+
+    // leakcanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
 }

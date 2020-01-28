@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="90dp"
             android:text="계속하려면 로그인이 필요합니다."
+            android:textColor="@color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"

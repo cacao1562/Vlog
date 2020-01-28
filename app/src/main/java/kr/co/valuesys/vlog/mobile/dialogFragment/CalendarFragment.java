@@ -1,24 +1,22 @@
 package kr.co.valuesys.vlog.mobile.dialogFragment;
 
-import android.app.Activity;
 import android.content.Context;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.ContextCompat;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
@@ -33,12 +31,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
-import kr.co.valuesys.vlog.mobile.model.VideoInfo;
-import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.FragmentCalendarBinding;
+import kr.co.valuesys.vlog.mobile.model.VideoInfo;
 
 public class CalendarFragment extends DialogFragment {
 
@@ -78,7 +76,8 @@ public class CalendarFragment extends DialogFragment {
         setDrawVideoDate = new SetDrawVideoDate(this);
         setDrawVideoDate.execute();
 
-        binding.calendarView.addDecorators(new SundayDecorator(),
+        binding.calendarView.addDecorators(
+                new SundayDecorator(),
                 new SaturdayDecorator(),
                 new ToDayDecorator() );
 
@@ -138,8 +137,12 @@ public class CalendarFragment extends DialogFragment {
         mListener = null;
     }
 
-    // 비디오 생성 date 리스트에 넣어서 달력에 표시하기 위해
+    /** 비디오 생성 date 리스트에 넣어서 달력에 표시하기 위해 */
     private List<CalendarDay> getVideosDate() {
+
+        if (getActivity() == null) {
+            return null;
+        }
 
         List<CalendarDay> dateList =  new ArrayList<>();
         List<VideoInfo> videoInfos = VideoInfo.getVideo(getActivity(), false, null);
@@ -155,7 +158,7 @@ public class CalendarFragment extends DialogFragment {
 
                 CalendarDay day = CalendarDay.from(cal);
 
-// 같은 날짜는 추가 안함
+                /** 같은 날짜는 추가 안함 (중복 제거) */
                 if (!day.equals(prev)) {
                     dateList.add(day);
                 }
@@ -171,7 +174,7 @@ public class CalendarFragment extends DialogFragment {
     }
 
 
-// 일요일 빨간색 글씨로 표시
+/** 일요일 빨간색 글씨로 표시 */
     public class SundayDecorator implements DayViewDecorator {
 
         private final Calendar calendar = Calendar.getInstance();
@@ -192,7 +195,7 @@ public class CalendarFragment extends DialogFragment {
         }
     }
 
-// 토요일 파린색 글씨로 표시
+/** 토요일 파린색 글씨로 표시 */
     public class SaturdayDecorator implements DayViewDecorator {
 
         private final Calendar calendar = Calendar.getInstance();
@@ -213,7 +216,7 @@ public class CalendarFragment extends DialogFragment {
         }
     }
 
-// 오늘 날짜 초록색으로 표시
+/** 오늘 날짜 초록색으로 표시 */
     public class ToDayDecorator implements DayViewDecorator {
 
         private CalendarDay date;
@@ -224,7 +227,7 @@ public class CalendarFragment extends DialogFragment {
 
         @Override
         public boolean shouldDecorate(CalendarDay day) {
-            return date != null && day.equals(date);
+            return day.equals(date);
         }
 
         @Override
@@ -242,19 +245,18 @@ public class CalendarFragment extends DialogFragment {
     }
 
 
-// param에 날짜 리스트를 넣으면 해당 날짜에 동그라미 표시
+/** param에 날짜 리스트를 넣으면 해당 날짜에 동그라미 표시 */
     public static class EventDecorator implements DayViewDecorator {
 
-        private final int color;
 //        private final HashSet<CalendarDay> dates;
         private final Collection<CalendarDay> dates;
         private Drawable drawable;
 
-        public EventDecorator(Activity context, int color, Collection<CalendarDay> dates) {
-            this.color = color;
+        public EventDecorator(Drawable shape, Collection<CalendarDay> dates) {
             this.dates = new HashSet<>(dates);
 //            this.dates.add(CalendarDay.today() );
-            this.drawable = ContextCompat.getDrawable(context, R.drawable.day_border);
+//            this.drawable = ContextCompat.getDrawable(context, R.drawable.day_border);
+            this.drawable = shape;
         }
 
         @Override
@@ -293,6 +295,7 @@ public class CalendarFragment extends DialogFragment {
 //        }
 //    }
 
+    /** 비디오 목록 가져와서 촬영한 날짜에 동그라미 표시 */
     private static class SetDrawVideoDate extends AsyncTask<Void, Void, Void> {
 
         private int minYear;
@@ -311,6 +314,7 @@ public class CalendarFragment extends DialogFragment {
         protected Void doInBackground(Void... voids) {
 
             if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing() || isCancelled()) {
+                cancel(true);
                 return null;
             }
 
@@ -341,6 +345,7 @@ public class CalendarFragment extends DialogFragment {
             super.onPostExecute(aVoid);
 
             if (fragment == null || fragment.getActivity() == null || fragment.getActivity().isFinishing()) {
+                cancel(true);
                 return;
             }
 
@@ -351,8 +356,8 @@ public class CalendarFragment extends DialogFragment {
 //                    .setCalendarDisplayMode(CalendarMode.MONTHS)
                     .commit();
 
-            fragment.binding.calendarView.addDecorators(
-                    new EventDecorator(fragment.getActivity(), R.color.black, fragment.mVideosDate) );
+//            fragment.binding.calendarView.addDecorators(new EventDecorator(fragment.getActivity(), fragment.mVideosDate) );
+            fragment.binding.calendarView.addDecorators(new EventDecorator(fragment.getResources().getDrawable(R.drawable.day_border, null), fragment.mVideosDate) );
 
         }
     }

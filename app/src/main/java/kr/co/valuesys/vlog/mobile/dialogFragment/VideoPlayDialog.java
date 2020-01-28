@@ -1,16 +1,11 @@
 package kr.co.valuesys.vlog.mobile.dialogFragment;
 
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -19,10 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
+
 import java.io.IOException;
 
-import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.R;
+import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.databinding.DialogVideoplayBinding;
 
 public class VideoPlayDialog extends DialogFragment implements TextureView.SurfaceTextureListener {
@@ -35,6 +35,8 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     private MediaPlayer mMediaPlayer;
     private Runnable runnable;
     private Handler handler;
+
+    private boolean isMoveSeek;
 
     public VideoPlayDialog() { }
 
@@ -66,7 +68,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 삳태바, 네이게이션바 투명
+        /** 삳태바, 네이게이션바 투명 */
         getDialog().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         getDialog().getWindow().setStatusBarColor(Color.TRANSPARENT);
         getDialog().getWindow().setNavigationBarColor(Color.TRANSPARENT);
@@ -81,14 +83,12 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
             }else {
 
                 startPlay();
-                binding.videoPlayPlayButton.setVisibility(View.GONE);
             }
         });
 
         binding.videoPlayPlayButton.setOnClickListener(v -> {
 
             startPlay();
-            binding.videoPlayPlayButton.setVisibility(View.GONE);
 
         });
 
@@ -136,13 +136,7 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     }
 
 
-    private boolean isMoveSeek;
 
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
 
     @Override
     public void onPause() {
@@ -186,6 +180,9 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     }
 
 
+    /**
+     * textureview가 준비 되었고 mediaplay가 준비 되었을때 start
+     */
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
 
@@ -248,11 +245,16 @@ public class VideoPlayDialog extends DialogFragment implements TextureView.Surfa
     }
 
     private void startPlay() {
+
+        if (mMediaPlayer == null) {
+            return;
+        }
         binding.videoPlayPlayButton.setVisibility(View.GONE);
         mMediaPlayer.start();
         changeSeekbar();
     }
 
+    /** seekbar 프로그레스 이동 */
     private void changeSeekbar() {
 
         if (mMediaPlayer != null) {

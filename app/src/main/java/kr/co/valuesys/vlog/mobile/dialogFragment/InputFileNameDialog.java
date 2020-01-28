@@ -1,13 +1,7 @@
 package kr.co.valuesys.vlog.mobile.dialogFragment;
 
 import android.content.Context;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +9,17 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
+
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.common.CommonInterface;
 import kr.co.valuesys.vlog.mobile.common.Constants;
 import kr.co.valuesys.vlog.mobile.common.FileManager;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
-import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.databinding.DialogInputfilenameBinding;
 
 public class InputFileNameDialog extends DialogFragment {
@@ -42,7 +42,8 @@ public class InputFileNameDialog extends DialogFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-// 카메라 다이얼로그 프래그먼트에서 input 다이얼로그 프래그먼트를 띄웠지만 메인 액티비테에 인터페이스 구현해야함
+
+        /** 카메라 다이얼로그 프래그먼트에서 input 다이얼로그 프래그먼트를 띄웠지만 메인 액티비테에 인터페이스 구현해야함 */
         if (context instanceof CommonInterface.OnCallbackToMain) {
             mListener = (CommonInterface.OnCallbackToMain) context;
         } else {
@@ -84,7 +85,7 @@ public class InputFileNameDialog extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-// 키보드 올라올때 키보드 위에 저장버튼 위치하도록
+        /** 키보드 올라올때 키보드 위에 저장버튼 위치하도록 */
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         binding.backButton.setOnClickListener(v -> {

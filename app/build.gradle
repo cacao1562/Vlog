@@ -13,19 +13,23 @@ android {
     }
     buildTypes {
         release {
+            buildConfigField 'boolean', 'IS_Show_LOG', 'false'
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            debuggable true
+//            debuggable true
+        }
+        debug {
+            buildConfigField 'boolean', 'IS_Show_LOG', 'true'
+            minifyEnabled false
         }
     }
 
     dataBinding {
         enabled = true
     }
-
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 }
 
@@ -59,5 +63,5 @@ dependencies {
     implementation "com.airbnb.android:lottie:3.3.1"
 
     // leakcanary
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
 }

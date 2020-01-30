@@ -4,7 +4,10 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Base64;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +38,18 @@ public class SplashActivity extends AppCompatActivity {
         if (FileManager.checkStoragePermission(this)) {
             FileManager.deleteTempFiles(this);
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Uri uri = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
+            LogUtil.d("sp", " Q uri = " + uri );
+        } else {
+            Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            LogUtil.d("sp", "  uri = " + uri );
+        }
+        LogUtil.d("sp", " getFilesDir = " + getFilesDir() );
+        LogUtil.d("sp", " getCacheDir = " + getCacheDir() );
+        LogUtil.d("sp", " getExternalFilesDir = " + getExternalFilesDir(null) );
+        LogUtil.d("sp", " getExternalCacheDir = " + getExternalCacheDir() );
 
         binding.spLogo.postDelayed(() -> {
 

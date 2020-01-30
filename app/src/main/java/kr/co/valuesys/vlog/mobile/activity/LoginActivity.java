@@ -1,11 +1,11 @@
 package kr.co.valuesys.vlog.mobile.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
-import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -17,9 +17,9 @@ import com.kakao.auth.Session;
 
 import java.util.Arrays;
 
+import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.application.MobileApplication;
 import kr.co.valuesys.vlog.mobile.common.KakaoSessionCallback;
-import kr.co.valuesys.vlog.mobile.R;
 import kr.co.valuesys.vlog.mobile.common.LogUtil;
 import kr.co.valuesys.vlog.mobile.common.SimpleAlert;
 import kr.co.valuesys.vlog.mobile.databinding.ActivityLoginBinding;
@@ -30,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private AlertDialog alertDialog;
+    private AlertDialog loading;
 
 /** kakao 콜배 이곳으로 들어옴 */
     private ISessionCallback kakao_callback = new KakaoSessionCallback( (result, exception) -> {
@@ -43,6 +44,8 @@ public class LoginActivity extends AppCompatActivity {
                 presentMain();
 
             }else {
+
+                dismissLoading();
                 LogUtil.d("ppp", " requestMe false");
                 showAlert(msg);
             }
@@ -50,6 +53,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }else {
+
+        dismissLoading();
 
         if (exception != null) {
             LogUtil.d("ppp", " KakaoSessionCallback false");
@@ -75,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                     presentMain();
 
                 }else {
+                    dismissLoading();
                     showAlert(msg);
                 }
             });
@@ -86,6 +92,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onError(FacebookException error) {
+            dismissLoading();
             showAlert(error.getMessage());
         }
 
@@ -96,7 +103,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_login);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
-
+        loading = MobileApplication.showProgress(null, null, this).create();
+        loading.show();
 //        m_permissionUtils = new PermissionUtils(this, this);
 //        LogUtil.d(TAG, " kaako " + Session.getCurrentSession().checkAndImplicitOpen());
 //        LogUtil.d(TAG, " kaako oepn " + Session.getCurrentSession().isOpenable());
@@ -129,6 +137,7 @@ public class LoginActivity extends AppCompatActivity {
              * KakaoSessionCallback 으로 콜백 됨
              * */
             Session.getCurrentSession().checkAndImplicitOpen();
+            dismissLoading();
         }
 
 
@@ -175,6 +184,8 @@ public class LoginActivity extends AppCompatActivity {
     /** 로그인 로그 파일에 쓰고 메인으로 이동 */
     private void presentMain() {
 
+        dismissLoading();
+
         MobileApplication.getContext().writeLog(MobileApplication.getContext().getLoginkName());
 
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
@@ -200,6 +211,12 @@ public class LoginActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    private void dismissLoading() {
+        if (loading != null) {
+            loading.dismiss();
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -207,6 +224,13 @@ public class LoginActivity extends AppCompatActivity {
             if (alertDialog.isShowing()) {
                 alertDialog.dismiss();
                 alertDialog = null;
+            }
+        }
+
+        if (loading != null) {
+            if (loading.isShowing()) {
+                loading.dismiss();
+                loading = null;
             }
         }
     }

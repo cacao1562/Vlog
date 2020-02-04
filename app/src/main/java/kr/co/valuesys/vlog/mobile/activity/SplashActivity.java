@@ -7,12 +7,14 @@ import android.content.pm.Signature;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -49,7 +51,35 @@ public class SplashActivity extends AppCompatActivity {
         LogUtil.d("sp", " getFilesDir = " + getFilesDir() );
         LogUtil.d("sp", " getCacheDir = " + getCacheDir() );
         LogUtil.d("sp", " getExternalFilesDir = " + getExternalFilesDir(null) );
+
+        /**
+         * getExternalCacheDir()
+         * /storage/emulated/0/Android/data/kr.co.valuesys.vlog.mobile/cache
+         * /내장메모리/Android/data/kr.co.valuesys.vlog.mobile/files/cache
+         */
         LogUtil.d("sp", " getExternalCacheDir = " + getExternalCacheDir() );
+
+        /**
+         * getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+         * /storage/emulated/0/Android/data/kr.co.valuesys.vlog.mobile/files/Documents
+         * /내장메모리/Android/data/kr.co.valuesys.vlog.mobile/files/Documents
+         * Documents 폴더는 없다가 호출하면 생김
+         */
+        LogUtil.d("sp", " DIRECTORY_DOCUMENTS = " + getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) );
+
+        /**
+         * getExternalMediaDirs()
+         * 결과 2개 나옴
+         * 1. /storage/emulated/0/Android/media/kr.co.valuesys.vlog.mobile
+         * 2. /storage/0000-0000/Android/media/kr.co.valuesys.vlog.mobile
+         *    /내장메모리/Android/media/kr.co.valuesys.vlog.mobile
+         */
+        for (File file : getExternalMediaDirs()) {
+            LogUtil.d("sp", " MediaDirs = " + file );
+        }
+        Uri collection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        LogUtil.d("sp", " VOLUME_EXTERNAL_PRIMARY = " + collection );
+        LogUtil.d("sp", " EXTERNAL_CONTENT_URI = " + MediaStore.Video.Media.EXTERNAL_CONTENT_URI );
 
         binding.spLogo.postDelayed(() -> {
 

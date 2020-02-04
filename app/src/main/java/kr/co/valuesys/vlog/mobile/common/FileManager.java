@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -66,6 +67,8 @@ public class FileManager {
             callback.onFileCallback(false);
             return;
         }
+
+//        saveFile2(mActivity, tempPath, newFileName, callback);
 
         File tempFile = new File(tempPath);
         String path = dir.getPath() + REAL_PATH;
@@ -197,8 +200,21 @@ public class FileManager {
     public static String getVideoFilePath() {
 
         String path = dir.getPath() + TEMP_PATH;
+//        try {
+//            path = MobileApplication.getContext().getExternalFilesDir(null).getAbsolutePath() + "/vlogTemp";
+////            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+////                path = mobileApplication.getExternalFilesDir(null).getAbsolutePath() + folderName;
+////            } else {
+////                path = Environment.getExternalStorageDirectory().getAbsolutePath() + folderName;
+////            }
+//
+//        } catch (NullPointerException e) {
+//            e.printStackTrace();
+//        }
         File dst = new File(path);
         if (!dst.exists()) dst.mkdirs();
+
+
 
         return path + System.currentTimeMillis() + ".mp4";
 //        return MediaStore.Video.Media.EXTERNAL_CONTENT_URI.getEncodedPath() + System.currentTimeMillis() + ".mp4";
@@ -318,43 +334,66 @@ public class FileManager {
     }
 
 
-    public static void saveFile2(Activity activity) {
+    public static void saveFile2(Activity activity, String tempPath , String newFileName , CommonInterface.OnFileCallback callback) {
+
         ContentValues values = new ContentValues();
-        values.put(MediaStore.Video.Media.DISPLAY_NAME, "video_1024.mp4");
+        values.put(MediaStore.Video.Media.DISPLAY_NAME, newFileName + ".mp4");
         values.put(MediaStore.Video.Media.MIME_TYPE, "video/*");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // 파일을 write중이라면 다른곳에서 데이터요구를 무시하겠다는 의미입니다.
             values.put(MediaStore.Video.Media.IS_PENDING, 1);
         }
 
         ContentResolver contentResolver = activity.getContentResolver();
-        Uri item = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+        Uri collection = MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+//        Uri item = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+        Uri item = contentResolver.insert(collection, values);
 
         try {
             ParcelFileDescriptor pdf = contentResolver.openFileDescriptor(item, "w", null);
 
             if (pdf == null) {
                 Log.d("asdf", "null");
+                callback.onFileCallback(false);
             } else {
                 String str = "heloo";
                 byte[] strToByte = str.getBytes();
-                FileOutputStream fos = new FileOutputStream(pdf.getFileDescriptor());
-                fos.write(strToByte);
-                fos.close();
+
+//                File storageDir = new File(mContext.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Folder");
+//                File imageFile = new File(storageDir, "Myvideo");
+                File imageFile = new File(tempPath);
+                FileInputStream in = new FileInputStream(imageFile);
+                FileOutputStream out = new FileOutputStream(pdf.getFileDescriptor());
+
+                byte[] buf = new byte[8192];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+
+                out.close();
+                in.close();
+                pdf.close();
+//                fos.write(strToByte);
+//                fos.close();
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     values.clear();
+                    // 파일을 모두 write하고 다른곳에서 사용할 수 있도록 0으로 업데이트를 해줍니다.
                     values.put(MediaStore.Video.Media.IS_PENDING, 0);
                     contentResolver.update(item, values, null, null);
                 }
+                callback.onFileCallback(true);
 
             }
         } catch (FileNotFoundException e) {
+            callback.onFileCallback(false);
             e.printStackTrace();
         } catch (IOException e) {
+            callback.onFileCallback(false);
             e.printStackTrace();
         }
     }
-
 
 }
